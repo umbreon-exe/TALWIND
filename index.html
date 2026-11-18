@@ -390,6 +390,7 @@ function drawShrine(){
  if(main.stage===4){pixel(220,155,40,30,'#496b46');pixel(225,142,30,18,'#668d51');pixel(230,148,6,6,'#ffdf85');pixel(244,148,6,6,'#ffdf85')}
  const guardian=monsters.find(m=>m.zone==='shrine'&&m.hp>0);if(guardian)drawMonster(guardian,performance.now());
  drawHero(player.x-camera.x,player.y-camera.y,performance.now());
+ if(player.y>190&&player.x>170&&player.x<265){ctx.fillStyle='#fff0c9';ctx.font='bold 9px Verdana';ctx.textAlign='center';ctx.fillText('E · Zurück in den Wald',VW/2,VH-8);ctx.textAlign='left'}
 }
 function nearbyPrompt(){
  if(room){return player.y>VH-58&&Math.abs(player.x-VW/2)<62?'Hinausgehen':roomNPC?'Mit Bewohner reden':''}
