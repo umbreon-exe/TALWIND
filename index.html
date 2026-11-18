@@ -11,7 +11,7 @@ const P={edge:'#604332',grass:'#75bd68',grass2:'#a8d879',deep:'#38634c',water:'#
 const keys={},touch={x:0,y:0},cam={x:0,y:0};let live=false,last=0,dialog=false,petals=0,hp=5,unlocked=false;
 const hero=['....oooo....','...oddddo...','..odyyyydo..','..odssssd...','...osssso....','..osssssso...','..obbbbbb...','..obbbbbb...','...obbbbo....','....oddo.....','...od..do....','...o....o....'];
 const slime=['...gggg...','..gllllg..','.gllllllg.','gllggggllg','gllllllllg','.gllllllg.','..gggggg..','...oooo...'];
-const HPal={o:P.edge,d:'#345b4d',g:'#76b96b,l:'#b5db7b,s:'#efbd83',b:'#426f9a',y:'#f1c85d'};
+const HPal={o:P.edge,d:'#345b4d',g:'#76b96b',l:'#b5db7b,s:'#efbd83',b:'#426f9a',y:'#f1c85d'};
 function R(x,y,w,h,col){g.fillStyle=col;g.fillRect(Math.round(x),Math.round(y),w,h)}
 function sprite(rows,x,y,p){rows.forEach((r,j)=>[...r].forEach((ch,i)=>{if(p[ch])R(x+i,y+j,1,1,p[ch])}))}
 function ground(tx,ty){let x=tx*T,y=ty*T,rx=39+Math.sin(ty*.23)*2;if(Math.abs(tx-rx)<2.5){R(x,y,16,16,P.water);R(x+2,y+3,5,1,P.foam);R(x+9,y+10,4,1,'#76c4cb');if((tx+ty)%3===0)R(x+7,y+6,2,1,'#d0eee0');return}
