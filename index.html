@@ -122,11 +122,11 @@ const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');ctx.im
 const mapImage=new Image();mapImage.src='assets/windruh.webp';
 const W=960,H=540,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const heroes=[
- {name:'LYRA',title:'Windläuferin',skill:'Windstoß',speed:172,coat:'#3b958c',light:'#8dd6bd',dark:'#245e5c',cape:'#4db3a3',hair:'#d9a45b',item:'#d8eaff',desc:'Ein schneller Windstoß nach vorn. Ideal zum Ausweichen und für flinke Angriffe.'},
- {name:'BRAM',title:'Felswächter',skill:'Steinhaut',speed:124,coat:'#8f8766',light:'#d2bd8a',dark:'#514b3d',cape:'#6c6047',hair:'#654a36',item:'#b2b7ac',desc:'Wird kurz unverwundbar und stößt Gegner in der Nähe zurück.'},
- {name:'KAEL',title:'Waldhüter',skill:'Sternenschuss',speed:145,coat:'#5d8f51',light:'#a8c76c',dark:'#31563b',cape:'#3f7547',hair:'#76543b',item:'#e2d09a',desc:'Schießt einen magischen Pfeil weit nach vorn. Gut gegen entfernte Gegner.'},
- {name:'NIMA',title:'Echomagierin',skill:'Echowelle',speed:136,coat:'#8e70b7',light:'#d0b8f0',dark:'#4b3e75',cape:'#7254a2',hair:'#49354d',item:'#a7e7f0',desc:'Eine magische Welle trifft Gegner im Umkreis und heilt einen Herzpunkt.'},
- {name:'ROOK',title:'Schattenklinge',skill:'Schattenrolle',speed:160,coat:'#536b83',light:'#9fbad0',dark:'#34485d',cape:'#394d68',hair:'#423a48',item:'#e8edf0',desc:'Eine weite Schattenrolle macht Rook kurz unverwundbar.'}
+ {name:'LYRA',title:'Windläuferin',skill:'Windstoß',speed:172,coat:'#3b958c',light:'#8dd6bd',dark:'#245e5c',cape:'#4db3a3',hair:'#d9a45b',item:'#d8eaff',style:'Langer Zopf, jadegrüner Reisemantel und goldene Windspangen',desc:'Ein schneller Windstoß nach vorn. Ideal zum Ausweichen und für flinke Angriffe.'},
+ {name:'BRAM',title:'Felswächter',skill:'Steinhaut',speed:124,coat:'#8f8766',light:'#d2bd8a',dark:'#514b3d',cape:'#6c6047',hair:'#654a36',item:'#b2b7ac',style:'Breite Silhouette, steinerne Armschienen und robuste Lederweste',desc:'Wird kurz unverwundbar und stößt Gegner in der Nähe zurück.'},
+ {name:'KAEL',title:'Waldhüter',skill:'Sternenschuss',speed:145,coat:'#5d8f51',light:'#a8c76c',dark:'#31563b',cape:'#3f7547',hair:'#76543b',item:'#e2d09a',style:'Waldgrüne Jägerausrüstung, kräftige Statur und Schulterriemen',desc:'Schießt einen magischen Pfeil weit nach vorn. Gut gegen entfernte Gegner.'},
+ {name:'NIMA',title:'Echomagierin',skill:'Echowelle',speed:136,coat:'#8e70b7',light:'#d0b8f0',dark:'#4b3e75',cape:'#7254a2',hair:'#49354d',item:'#a7e7f0',style:'Lange dunkle Locken, violetter Mantel und leuchtende Runen',desc:'Eine magische Welle trifft Gegner im Umkreis und heilt einen Herzpunkt.'},
+ {name:'ROOK',title:'Schattenklinge',skill:'Schattenrolle',speed:160,coat:'#536b83',light:'#9fbad0',dark:'#34485d',cape:'#394d68',hair:'#423a48',item:'#e8edf0',style:'Aschgraue Kurzhaarfrisur, offene Reiseweste und Schattenarmschienen',desc:'Eine weite Schattenrolle macht Rook kurz unverwundbar.'}
 ];
 let selected=0,started=false,last=0,dialogOpen=false,panelOpen=false,paused=false;
 const keys={},stick={x:0,y:0},player={x:476,y:338,faceX:0,faceY:-1,walk:0,hp:5,attack:0,skill:0,roll:0,inv:0,coins:125,potions:3,xp:0};
@@ -148,18 +148,30 @@ const shots=[],particles=[];
 function px(g,x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)}
 function drawHeroSprite(g,h,x,y,scale=2,step=0){
  g.save();g.translate(x,y+(step?Math.sin(step)*1:0));g.scale(scale,scale);
- // ground shadow, cape, boots and legs
+ // Pixel-Silhouette: jede Figur bekommt eine eigene, klare Kleidungssprache
+ const feminine=h.name==='LYRA'||h.name==='NIMA';
  px(g,2,19,12,2,'#294b3c');
  px(g,4,9,8,8,h.cape);px(g,3,11,2,5,h.dark);px(g,13,11,1,5,h.dark);
  px(g,4,16,3,4,'#49382e');px(g,10,16,3,4,'#49382e');
  px(g,4,19,4,2,'#d4b17c');px(g,10,19,4,2,'#d4b17c');
- px(g,4,9,8,8,h.coat);px(g,3,10,2,5,h.dark);px(g,12,10,2,5,h.dark);
- px(g,5,10,6,1,h.light);px(g,5,14,6,1,h.dark);px(g,7,11,2,3,h.light);
- px(g,2,11,2,3,'#efbd86');px(g,13,11,2,3,'#efbd86');
- // neck and head
- px(g,7,7,3,3,'#d89a72');px(g,5,2,7,7,'#efbd8a');px(g,4,3,1,4,h.hair);px(g,12,3,1,4,h.hair);
- px(g,5,1,7,2,h.hair);px(g,4,3,3,2,h.hair);px(g,10,3,3,1,h.hair);
- px(g,6,4,1,1,'#45352f');px(g,10,4,1,1,'#45352f');px(g,8,6,1,1,'#b9755b');
+ if(feminine){
+   // Elegante, erwachsen wirkende Abenteurerinnen: langer Haarschnitt, Mantelkragen und Ziergürtel
+   px(g,3,9,2,7,h.hair);px(g,13,8,2,8,h.hair);
+   px(g,4,9,8,8,h.coat);px(g,3,10,2,4,h.dark);px(g,12,10,2,4,h.dark);
+   px(g,5,9,6,2,h.light);px(g,6,12,4,3,h.coat);px(g,6,15,5,1,'#e9c77d');
+   px(g,2,11,2,3,'#efbd86');px(g,13,11,2,3,'#efbd86');
+   px(g,4,1,8,2,h.hair);px(g,3,3,2,4,h.hair);px(g,11,3,2,4,h.hair);
+   px(g,5,0,6,1,h.light);px(g,6,4,1,1,'#45352f');px(g,10,4,1,1,'#45352f');
+   px(g,4,7,2,2,h.item);px(g,12,7,2,2,h.item);
+ }else{
+   // Kräftige erwachsene Abenteurer: breite Schultern, freie Arme und robuste Leder-/Stoffausrüstung
+   px(g,3,9,10,3,h.coat);px(g,2,10,3,5,'#d89a72');px(g,13,10,2,5,'#d89a72');
+   px(g,5,10,6,7,h.coat);px(g,4,10,2,4,h.light);px(g,11,10,2,4,h.dark);
+   px(g,7,10,2,6,'#d89a72');px(g,6,11,1,5,'#d89a72');px(g,9,11,1,5,'#d89a72');
+   px(g,5,15,7,2,'#9b7045');px(g,7,15,3,1,'#f1d18b');
+   px(g,5,1,7,2,h.hair);px(g,4,3,2,3,h.hair);px(g,11,3,2,3,h.hair);
+   px(g,6,4,1,1,'#45352f');px(g,10,4,1,1,'#45352f');
+ }
  // signature gear per hero
  if(h.name==='LYRA'){px(g,3,7,2,5,h.item);px(g,13,7,2,5,h.item);px(g,4,0,8,1,'#e8cf8b');px(g,5,-1,6,2,'#e8cf8b');px(g,2,12,2,4,'#aee9e5')}
  if(h.name==='BRAM'){px(g,13,8,3,8,'#8b908b');px(g,14,9,2,6,'#c5c7b6');px(g,14,11,2,2,'#7a8a82');px(g,5,0,7,2,'#857d68');px(g,6,-1,5,2,'#c4b48a')}
