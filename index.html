@@ -720,7 +720,7 @@ function drawPerson(n,x,y,now){
  if(n.kind==='baker'){pixel(sx+4,sy+1,18,4,'#efe5d1');pixel(sx+9,sy-2,10,4,'#fff4e5')}
 }
 function roomCollides(x,y){
- if(x<18||x>VW-42||y<24||y>VH-40)return true;
+ if(x<18||x>VW-42||y<24||y>VH-16)return true;
  if(roomNPC&&roomNPC.kind==='inn'&&x>45&&x<430&&y<105)return true;
  if(roomNPC&&roomNPC.kind==='shop'&&((x<165&&y<175)||(x>315&&y<175)))return true;
  if(roomNPC&&roomNPC.kind==='library'&&((x<125&&y<190)||(x>355&&y<190)))return true;
