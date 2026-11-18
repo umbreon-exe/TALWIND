@@ -309,16 +309,17 @@ function interact(){
  if(person){talk(person);updateQuest();return}
  const seeds=zone==='windruh'?seedSpots:flowerSpots;
  if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-player.x,v.y-player.y)<23);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');updateQuest();saveGame();return}}
- if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-player.x,v.y-player.y)<23);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');updateQuest();saveGame();return}}
+ if(zone==='wald'&&(main.stage===3||main.stage===4)){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-player.x,v.y-player.y)<23);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');updateQuest();saveGame();return}}
  const ex=world.exits.find(e=>Math.hypot(e.x+e.w/2-player.x,e.y+e.h/2-player.y)<40);
  if(ex){if(!ex.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg bleibt geschlossen, bis du die drei Echosamen zum Brunnen gebracht hast.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(ex.to,ex.tx,ex.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
  if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-player.x,fountain.y+14-player.y)<54&&main.stage===2){main.stage=3;changeZone('wald',6*T,31*T);showDialogue('DER BRUNNEN','Das Wasser klingt wie eine kleine Glocke. Im Flüsterwald antwortet ein zweites Echo! Folge dem Licht.');return}
- if(zone==='shrine'&&main.stage===4){main.stage=5;player.xp+=150;player.coins+=60;player.potions++;showDialogue('DAS ERSTE ECHO','Ein warmer Ton erfüllt die Halle. Ein Lichtfunke schwebt in deinen Rucksack. Sechs weitere Echos warten in Avarra.');saveGame();return}
+ 
  showDialogue('AVARRA','Ein leichter Wind trägt Blütenblätter über den Weg. In der Nähe gibt es bestimmt etwas zu entdecken.');
 }
 function enterRoom(b){currentRoom=b.id;roomNPC=rooms[b.id];room={w:30,h:17};player.x=VW/2;player.y=VH-70;showDialogue(b.name,'Du betrittst '+b.name+'. Schau dich um, sprich mit den Bewohnern und nutze die Tür unten, um wieder hinauszugehen.')}
 function talk(n){
+ if(n.id==='echo'){showDialogue('ECHO-WÄCHTER','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen. Besiege den Wächter mit deinem Angriff.');return}
  if(n.id==='mira'){
   if(main.stage===0){main.stage=1;showDialogue('MIRA','Die sieben Echos wurden aus den Schreinen gerissen. Drei Echosamen liegen im Dorf versteckt. Bring sie zum Brunnen – er zeigt uns den Weg in den Flüsterwald.');showToast('Neue Hauptquest: Die drei Echosamen')}
   else if(main.stage===1)showDialogue('MIRA','Die Echosamen leuchten ganz schwach. Schau in den Gärten, beim Brunnen und am Rand des Dorfes.');
@@ -372,12 +373,14 @@ function drawWorld(now){
  world.npcs.forEach(n=>drawables.push({y:n.y+23,fn:()=>drawPerson(n,n.x,n.y,now)}));
  if(zone==='windruh'){seedSpots.forEach(s=>{if(!s.found)drawables.push({y:s.y+12,fn:()=>drawSeed(s.x,s.y,now,'#f4d45f')})})}
  if(zone==='wald'){flowerSpots.forEach(s=>{if(!s.found)drawables.push({y:s.y+12,fn:()=>drawSeed(s.x,s.y,now,'#78d6ed')})})}
+ monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>drawables.push({y:m.y+25,fn:()=>drawMonster(m,now)}));
  drawables.push({y:player.y+22,fn:()=>drawHero(player.x-camera.x,player.y-camera.y,now)});
  drawables.sort((a,b)=>a.y-b.y);drawables.forEach(d=>d.fn());
  // Door/exit prompts are HTML text-free pixel labels; UI itself stays crisp.
  currentPrompt=nearbyPrompt();
  if(currentPrompt){ctx.fillStyle='#fff2cf';ctx.font='bold 9px Verdana';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt, VW/2,VH-8);ctx.textAlign='left'}
 }
+function drawMonster(m,now){const x=m.x-camera.x,y=m.y-camera.y,bob=Math.sin(now/140)*1.5;if(m.zone==='shrine'){pixel(x+2,y+18+bob,30,7,'#354b38');pixel(x+3,y+5+bob,29,18,'#5c7a4b');pixel(x+7,y+1+bob,21,13,'#819b5d');pixel(x+10,y+7+bob,5,6,'#f5da92');pixel(x+23,y+7+bob,5,6,'#f5da92');pixel(x+12,y+9+bob,2,3,'#3b342b');pixel(x+25,y+9+bob,2,3,'#3b342b');pixel(x+4,y+20+bob,5,6,'#8b9b74');pixel(x+27,y+20+bob,6,6,'#8b9b74');pixel(x+6,y-5,22,3,'#44362c');pixel(x+7,y-4,20*m.hp/8,1,'#c65343')}else{pixel(x+3,y+18+bob,22,4,'#365b3b');pixel(x+2,y+8+bob,24,13,'#448d4c');pixel(x+6,y+3+bob,17,12,'#79c36a');pixel(x+7,y+8+bob,5,5,'#fff1c6');pixel(x+18,y+8+bob,5,5,'#fff1c6');pixel(x+9,y+10+bob,2,2,'#33352e');pixel(x+20,y+10+bob,2,2,'#33352e')}}
 function drawSeed(x,y,now,color){let sx=x-camera.x,sy=y-camera.y;let pulse=Math.sin(now/160+x)*1;pixel(sx+6,sy+2,4,11+Math.max(0,pulse),color);pixel(sx+2,sy+6,4,4,'#fff4bd');pixel(sx+10,sy+4,4,4,'#fff4bd');pixel(sx+6,sy+13,4,2,'#4c8b4e')}
 function drawShrine(){
  pixel(0,0,VW,VH,'#626b62');for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#8c897b':'#797b70');pixel(x+2,y+2,12,12,'#999587')}
@@ -450,7 +453,7 @@ function gameLoop(now){
 function startGame(){document.getElementById('titleScreen').classList.add('hidden');started=true;last=performance.now();updateQuest();showDialogue('MIRA','Willkommen in Windruh! Sprich mit mir am Brunnen. Ich erzähle dir, was mit den sieben Echos geschehen ist.');requestAnimationFrame(gameLoop);saveGame()}
 function buildHeroCards(){
  const grid=document.getElementById('heroGrid');grid.innerHTML='';
- heroes.forEach((h,i)=>{let card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');card.innerHTML='<canvas width="55" height="70"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';let g=card.querySelector('canvas').getContext('2d');const old=selected;selected=i;drawHero(18,24,0);selected=old;card.onclick=()=>{selected=i;buildHeroCards();updateQuest()};grid.appendChild(card)})
+ heroes.forEach((h,i)=>{let card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');card.innerHTML='<canvas width="55" height="70"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';let g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;const p=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};p(15,54,26,5,'#3b5c3b');p(17,37,22,18,h.cape);p(17,38,22,17,h.coat);p(18,51,8,11,'#61452f');p(31,51,8,11,'#61452f');p(18,19,21,21,'#efbf90');p(17,14,24,13,h.hair);p(18,24,4,3,'#40332b');p(32,24,4,3,'#40332b');p(17,38,22,3,h.detail);if(h.female){p(14,20,4,24,h.hair);p(38,20,4,24,h.hair);p(20,10,17,4,h.detail)}else{p(17,12,23,4,h.hair);p(14,38,4,10,'#d89b78');p(39,38,4,10,'#d89b78')}if(i===1){p(39,35,8,23,'#b9c1b0')}if(i===2){p(10,25,5,29,'#805a37')}if(i===3){p(24,6,10,8,'#ddd0ff')}if(i===4){p(38,38,7,13,'#cadde1')}card.onclick=()=>{selected=i;buildHeroCards();updateQuest()};grid.appendChild(card)})
 }
 function keyDown(e){
  const k=e.key.toLowerCase();keys[k]=true;
@@ -473,7 +476,7 @@ const stickEl=document.getElementById('stick'),nub=document.getElementById('nub'
 function moveStick(e){const r=stickEl.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy),m=Math.min(30,d);stick.x=d>5?dx/d*m/30:0;stick.y=d>5?dy/d*m/30:0;nub.style.transform='translate('+stick.x*30+'px,'+stick.y*30+'px)'}
 function resetStick(){stick.x=stick.y=0;nub.style.transform=''}
 stickEl.addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);moveStick(e)});stickEl.addEventListener('pointermove',e=>{if(e.buttons)moveStick(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
-function makeMonsters(){monsters.push({zone:'wald',x:22*T,y:41*T,hp:3},{zone:'wald',x:48*T,y:48*T,hp:4},{zone:'shrine',x:48*T,y:40*T,hp:8})}
+function makeMonsters(){monsters.push({zone:'wald',x:22*T,y:41*T,hp:3},{zone:'wald',x:48*T,y:48*T,hp:4},{zone:'shrine',x:48*T,y:31*T,hp:8})}
 function startBoss(){if(zone==='shrine'&&main.stage===4){attack()}}
 function drawTitleArt(){}
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
