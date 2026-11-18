@@ -161,11 +161,11 @@ function drawHeroSprite(g,h,x,y,scale=2,step=0){
  px(g,5,1,7,2,h.hair);px(g,4,3,3,2,h.hair);px(g,10,3,3,1,h.hair);
  px(g,6,4,1,1,'#45352f');px(g,10,4,1,1,'#45352f');px(g,8,6,1,1,'#b9755b');
  // signature gear per hero
- if(selected===0){px(g,3,7,2,5,h.item);px(g,13,7,2,5,h.item);px(g,4,0,8,1,'#e8cf8b');px(g,5,-1,6,2,'#e8cf8b');px(g,2,12,2,4,'#aee9e5')}
- if(selected===1){px(g,13,8,3,8,'#8b908b');px(g,14,9,2,6,'#c5c7b6');px(g,14,11,2,2,'#7a8a82');px(g,5,0,7,2,'#857d68');px(g,6,-1,5,2,'#c4b48a')}
- if(selected===2){px(g,2,5,3,10,'#654b34');px(g,1,6,1,8,h.item);px(g,3,4,1,2,h.item);px(g,13,8,2,2,'#b99462');px(g,5,0,7,2,'#416f44');px(g,4,2,9,1,'#8dbb68')}
- if(selected===3){px(g,1,5,2,2,h.item);px(g,14,5,2,2,h.item);px(g,2,7,1,4,'#c9b5ee');px(g,13,7,1,4,'#c9b5ee');px(g,4,0,9,2,'#513c66');px(g,7,-2,3,3,'#e1d2fc')}
- if(selected===4){px(g,2,9,2,6,h.item);px(g,13,9,2,6,h.item);px(g,5,0,8,2,'#4a5366');px(g,4,2,10,1,'#9bb0c1');px(g,6,5,6,1,h.dark)}
+ if(h.name==='LYRA'){px(g,3,7,2,5,h.item);px(g,13,7,2,5,h.item);px(g,4,0,8,1,'#e8cf8b');px(g,5,-1,6,2,'#e8cf8b');px(g,2,12,2,4,'#aee9e5')}
+ if(h.name==='BRAM'){px(g,13,8,3,8,'#8b908b');px(g,14,9,2,6,'#c5c7b6');px(g,14,11,2,2,'#7a8a82');px(g,5,0,7,2,'#857d68');px(g,6,-1,5,2,'#c4b48a')}
+ if(h.name==='KAEL'){px(g,2,5,3,10,'#654b34');px(g,1,6,1,8,h.item);px(g,3,4,1,2,h.item);px(g,13,8,2,2,'#b99462');px(g,5,0,7,2,'#416f44');px(g,4,2,9,1,'#8dbb68')}
+ if(h.name==='NIMA'){px(g,1,5,2,2,h.item);px(g,14,5,2,2,h.item);px(g,2,7,1,4,'#c9b5ee');px(g,13,7,1,4,'#c9b5ee');px(g,4,0,9,2,'#513c66');px(g,7,-2,3,3,'#e1d2fc')}
+ if(h.name==='ROOK'){px(g,2,9,2,6,h.item);px(g,13,9,2,6,h.item);px(g,5,0,8,2,'#4a5366');px(g,4,2,10,1,'#9bb0c1');px(g,6,5,6,1,h.dark)}
  g.restore();
 }
 function drawPerson(n,x,y,color,hair,phase=0){
@@ -214,7 +214,7 @@ function updateHUD(){
  document.querySelector('#coins').textContent=player.coins;
  const q=questStage===0?'Finde Mira am Dorfbrunnen':questStage===1?'Sammle die drei Echosamen':questStage===2?'Aktiviere den Brunnen mit den Echosamen':questStage===3?'Besiege den Stille-Wächter im Osten': 'Das erste Echo ist erwacht – sprich mit Mira';
  document.querySelector('#questText').textContent=q;
- document.querySelector('#skillButton').style.opacity=player.skill>0?.55:1;
+ document.querySelector('#skillButton').style.opacity=player.skill>0 ? 0.55 : 1;
  document.querySelector('#skillButton').querySelector('.actionLabel').textContent=player.skill>0?player.skill.toFixed(1)+'s':'FÄHIGKEIT';
  if(boss.active){document.querySelector('#bossName').textContent='STILLE-WÄCHTER';document.querySelector('#bossBar').style.display='block';document.querySelector('#bossFill').style.width=(100*boss.hp/boss.max)+'%'}else{document.querySelector('#bossBar').style.display='none';document.querySelector('#bossName').textContent=''}
 }
