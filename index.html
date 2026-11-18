@@ -204,7 +204,7 @@ function saveGame(){
  try{localStorage.setItem('talwind-save-v2',JSON.stringify(data));toast('Spielstand gespeichert.')}catch(e){toast('Speichern ist in diesem Browser nicht verfügbar.')}
 }
 function loadGame(){
- try{const d=JSON.parse(localStorage.getItem('talwind-save-v2')||'null');if(!d)return false;selected=clamp(d.selected||0,0,4);player.x=clamp(d.x||476,30,930);player.y=clamp(d.y||338,35,510);player.hp=clamp(d.hp||5,1,5);player.coins=d.coins||125;player.potions=d.potions??3;player.xp=d.xp||0;questStage=d.questStage||0;seedItems.forEach((s,i)=>s.got=!!(d.seeds&&d.seeds[i]));seeds=seedItems.filter(s=>s.got).length;chestFound=!!d.chestFound;document.querySelector('#continueGame').style.display='inline-block';return true}catch(e){return false}
+ try{const d=JSON.parse(localStorage.getItem('talwind-save-v2')||'null');if(!d)return false;selected=clamp(d.selected||0,0,4);player.x=clamp(d.x||476,30,930);player.y=clamp(d.y||338,35,510);player.hp=clamp(d.hp||5,1,5);player.coins=d.coins||125;player.potions=d.potions??3;player.xp=d.xp||0;questStage=d.questStage||0;seedItems.forEach((s,i)=>s.got=!!(d.seeds&&d.seeds[i]));seeds=seedItems.filter(s=>s.got).length;chestFound=!!d.chestFound;boss.active=questStage===3;boss.hp=boss.active?boss.max:0;document.querySelector('#continueGame').style.display='inline-block';return true}catch(e){return false}
 }
 function updateHUD(){
  document.querySelector('#heroName').textContent=heroes[selected].name;
@@ -234,7 +234,7 @@ function interact(){
  const seed=seedItems.find(s=>!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<42);
  if(seed){seed.got=true;spawnParticles(seed.x,seed.y,'#f5d86b',13);toast('Echosamen gefunden!');const count=seedItems.filter(s=>s.got).length;if(count===3){questStage=2;openDialog('ECHO DES BRUNNENS','Drei Samen sind vereint. Der Brunnen beginnt leise zu singen. Kehre zum Brunnen in der Dorfmitte zurück.')}else openDialog('ECHOSAMEN','Ein kleines Echo tanzt in deiner Hand. Noch '+(3-count)+' fehlen.');updateHUD();saveGame();return;}
  if(!chestFound&&Math.hypot(190-player.x,360-player.y)<52){chestFound=true;player.coins+=75;player.potions++;spawnParticles(190,360,'#f3ca62',18);openDialog('ALTE TRUHE','Du findest 75 Windtaler und einen Heiltrank. Der Deckel trägt das Zeichen eines vergessenen Schreins.');saveGame();updateHUD();return;}
- if(questStage===2&&Math.hypot(480-player.x,278-player.y)<92){questStage=3;boss.active=true;boss.hp=boss.max;openDialog('DER BRUNNEN','Das Wasser steigt auf. Im Osten erwacht ein Wächter aus Moos und Stein!');toast('Bosskampf: Stille-Wächter');updateHUD();return;}
+ if(questStage===2&&Math.hypot(480-player.x,278-player.y)<92){questStage=3;boss.active=true;boss.hp=boss.max;saveGame();openDialog('DER BRUNNEN','Das Wasser steigt auf. Im Osten erwacht ein Wächter aus Moos und Stein!');toast('Bosskampf: Stille-Wächter');updateHUD();return;}
  if(boss.active&&Math.hypot(boss.x-player.x,boss.y-player.y)<90){openDialog('STILLE-WÄCHTER','Ein tiefer Ton erzittert im Boden. Weiche seinen Schlägen aus und greife an, wenn er sich öffnet.');return;}
  openDialog('AVARRA','Der Wind flüstert: „Sieben Echos, sieben Wege. Höre genau hin.“');
 }
