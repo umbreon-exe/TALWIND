@@ -45,6 +45,23 @@ body{display:grid;place-items:center;touch-action:none}
 .hidden{display:none!important}
 @media(pointer:coarse){#stick{display:block}}
 @media(max-width:650px){#hud{inset:5px 5px auto}.plate{padding:5px 7px;font-size:10px}#hearts{font-size:15px}#questLine{top:61px;max-width:66%}#menuButtons{left:5px;top:102px;gap:4px}.menuBtn{min-width:100px;font-size:9px;padding:6px}.act{width:51px;height:49px;border-radius:12px}.act b{font-size:18px}.act small{font-size:8px}#rightActions{right:5px;bottom:6px;gap:5px}#stick{left:6px;bottom:6px;width:91px;height:91px}#nub{left:25px;top:25px;width:35px;height:35px}#dialog{width:88%;bottom:7px}.heroGrid{gap:3px}.heroCard{padding:5px 1px}.heroCard canvas{width:43px;height:57px}.heroCard small{font-size:8px}}
+
+/* TALWIND pixel HUD refresh */
+#hud{gap:10px}
+.plate{font-family:ui-monospace,Consolas,monospace;border-radius:0;border:3px solid #513727;box-shadow:inset 0 0 0 2px #f8dda0, inset 0 -4px 0 #c78b4a, 3px 4px 0 #30271f;background:repeating-linear-gradient(0deg,#fff1c9 0 4px,#f6dfad 4px 8px);letter-spacing:.25px}
+#questLine{font-family:ui-monospace,Consolas,monospace;border-radius:0;max-width:min(58%,560px);font-size:11px}
+#menuButtons{top:116px;gap:7px}
+.menuBtn{font-family:ui-monospace,Consolas,monospace;border-radius:0;border:3px solid #523728;background:repeating-linear-gradient(0deg,#f3d79d 0 4px,#e9c17b 4px 8px);box-shadow:inset 0 0 0 1px #fff0c8,3px 4px 0 #35291f;font-size:11px;letter-spacing:.2px;padding:8px 10px;min-width:132px}
+.act{border-radius:0;border:3px solid #4b3225;box-shadow:inset 0 0 0 2px #fff0c3,0 4px 0 #34251d;font-family:ui-monospace,Consolas,monospace}
+.act b{font-size:23px;text-shadow:1px 1px #fff1c9}
+.card,.panelCard{border-radius:0}
+.heroCard{border-radius:0}
+#dialog{border-radius:0;font-family:ui-monospace,Consolas,monospace}
+.uiButton{border-radius:0;font-family:ui-monospace,Consolas,monospace;box-shadow:inset 0 0 0 1px #f6dca2,0 3px 0 #452c22}
+#toast{border-radius:0;font-family:ui-monospace,Consolas,monospace}
+#controlHint{position:absolute;left:145px;bottom:14px;z-index:2;color:#fff4d0;background:#274c38d9;border:2px solid #e4c27d;padding:6px 8px;font:10px ui-monospace,monospace;text-shadow:1px 1px #263626;pointer-events:none}
+#gamepadState{position:absolute;right:92px;bottom:18px;color:#fff0c9;font:9px ui-monospace,monospace;text-shadow:1px 1px #27392d;pointer-events:none}
+@media(max-width:650px){#controlHint{left:102px;bottom:8px;max-width:116px;font-size:8px;padding:4px}#gamepadState{right:68px;bottom:9px;font-size:8px}#menuButtons{top:101px}.menuBtn{min-width:99px;font-size:9px;padding:6px}}
 </style></head>
 <body><main id="game">
 <canvas id="world" width="480" height="270" aria-label="TALWIND-Spielwelt"></canvas>
@@ -52,7 +69,7 @@ body{display:grid;place-items:center;touch-action:none}
 <div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
 <div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button></div>
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
-<div id="stick"><div id="nub"></div></div>
+<div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
 <div class="overlay" id="titleScreen"><div class="card"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p></div></div>
 <div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
@@ -60,7 +77,7 @@ body{display:grid;place-items:center;touch-action:none}
 <script>
 (()=>{'use strict';
 const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-const VW=480,VH=270,T=16,MAP_W=96,MAP_H=64;
+const VW=480,VH=270,T=16,MAP_W=64,MAP_H=42;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const heroes=[
 {name:'LYRA',role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
@@ -72,8 +89,8 @@ const heroes=[
 const palette={grass:'#68ad5c',grass2:'#5fa454',darkGrass:'#3e814b',path:'#d8c79d',pathEdge:'#b6a77f',stone:'#9b9a85',water:'#288bc6',waterLight:'#65c8e9',wood:'#93613a',wall:'#e4cea0',roof:'#b94f41'};
 let selected=0,started=false,last=0,zone='windruh',room=null,dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0;
 const keys={},stick={x:0,y:0},camera={x:0,y:0};
-const player={x:48*T,y:31*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,atk:0,skill:0};
-const saveKey='talwind-world-save-v3';
+const player={x:32*T-12,y:21*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,atk:0,skill:0};
+const saveKey='talwind-world-save-v4';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
 const side={blueHerb:0,letter:0,cat:0};
 const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0};
@@ -487,6 +504,395 @@ stickEl.addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId
 function makeMonsters(){monsters.push({zone:'wald',x:22*T,y:41*T,hp:3},{zone:'wald',x:48*T,y:48*T,hp:4},{zone:'shrine',x:350,y:118,hp:8})}
 function startBoss(){if(zone==='shrine'&&main.stage===4){attack()}}
 function drawTitleArt(){}
+
+// ===== TALWIND WORLD & PRESENTATION UPGRADE v4 =====
+// Tile-based compact town, multi-layer depth sorting, solid collision and legible character sprites.
+function makeWorld(id){
+ const width=64,height=42;
+ const w={id,name:id==='windruh'?'Windruh':id==='wald'?'Flüsterwald':'Echo-Schrein',width,height,tiles:new Uint8Array(width*height),decor:[],buildings:[],npcs:[],exits:[],items:[],solid:[]};
+ const set=(x,y,t)=>{if(x>=0&&y>=0&&x<width&&y<height)w.tiles[y*width+x]=t};
+ const rect=(x,y,ww,hh,t)=>{for(let yy=y;yy<y+hh;yy++)for(let xx=x;xx<x+ww;xx++)set(xx,yy,t)};
+ for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,id==='windruh'?0:id==='wald'?5:6);
+ if(id==='windruh'){
+  // Curved river, sandy banks and a wooden bridge into a compact, busy town.
+  for(let y=0;y<height;y++){const edge=4+Math.round(Math.sin(y*.22)*1);for(let x=0;x<edge;x++)set(x,y,2);set(edge,y,4);set(edge+1,y,4)}
+  rect(0,19,10,5,1);rect(5,17,59,7,1);rect(7,26,55,4,1);
+  rect(25,14,16,14,3);rect(29,12,7,19,3);
+  // Streets lead directly to the door of each home or shop.
+  for(const x of [13,22,34,45,55])rect(x-1,9,3,10,1);
+  for(const x of [11,22,33,44,55])rect(x-1,27,3,10,1);
+  rect(11,10,3,9,1);rect(21,11,3,8,1);rect(33,10,3,9,1);rect(44,10,3,9,1);rect(54,12,3,7,1);
+  rect(10,27,3,10,1);rect(21,27,3,10,1);rect(32,27,3,10,1);rect(43,27,3,10,1);rect(54,27,3,10,1);
+  // Gardens and orchard beds.
+  rect(48,13,12,5,7);rect(49,14,10,3,0);rect(7,13,8,4,7);rect(8,14,6,2,0);
+  rect(44,35,9,4,7);rect(45,36,7,2,0);
+  // A larger tiled fountain plaza.
+  rect(27,16,12,10,3);rect(29,18,8,6,3);
+  w.decor.push({type:'fountain',x:31*T-8,y:18*T,solid:true});
+  // Each facade is a separate building with its own enterable interior.
+  const houses=[
+   ['mira',10,5,6,5,'teal','Miras Haus'],['inn',19,5,7,6,'red','Zum singenden Krug'],
+   ['shop',31,5,6,5,'ochre','Pavos Krämerladen'],['library',42,5,6,5,'blue','Alte Bibliothek'],
+   ['home2',52,7,6,5,'green','Haus am Apfelgarten'],
+   ['tailor',8,30,6,5,'violet','Linas Nähstube'],['smith',18,30,7,5,'slate','Orins Werkstatt'],
+   ['bakery',30,30,6,5,'orange','Tavis Bäckerei'],['garden',41,30,6,5,'green','Gartenhaus'],
+   ['clinic',52,30,6,5,'cream','Kräuterstube']
+  ];
+  for(const [bid,x,y,ww,hh,style,name] of houses)w.buildings.push({id:bid,x:x*T,y:y*T,w:ww*T,h:hh*T,style,name,doorX:(x+ww/2)*T,doorY:(y+hh)*T+4});
+  // Orchard, parks, fences, flower beds and small street props.
+  for(let y=3;y<39;y+=5){w.decor.push({type:'tree',x:7*T,y:y*T,solid:true});w.decor.push({type:'tree',x:60*T,y:y*T,solid:true})}
+  for(let x=9;x<59;x+=6){w.decor.push({type:'tree',x:x*T,y:2*T,solid:true});if(x%2===1)w.decor.push({type:'tree',x:x*T,y:38*T,solid:true})}
+  for(let x=49;x<59;x+=2)for(let y=13;y<18;y+=2)w.decor.push({type:'appleTree',x:x*T,y:y*T,solid:true});
+  for(let x=8;x<15;x+=2)for(let y=13;y<17;y+=2)w.decor.push({type:'flowerBed',x:x*T,y:y*T});
+  for(let x=44;x<53;x+=2)for(let y=35;y<39;y+=2)w.decor.push({type:'crop',x:x*T,y:y*T});
+  for(let x=8;x<15;x+=2){w.decor.push({type:'fence',x:x*T,y:12*T});w.decor.push({type:'fence',x:x*T,y:18*T})}
+  for(let x=47;x<60;x+=2){w.decor.push({type:'fence',x:x*T,y:12*T});w.decor.push({type:'fence',x:x*T,y:19*T})}
+  w.decor.push(
+   {type:'bridge',x:2*T,y:19*T},{type:'bench',x:25*T,y:25*T},{type:'bench',x:40*T,y:16*T},
+   {type:'lamp',x:26*T,y:17*T},{type:'lamp',x:39*T,y:25*T},{type:'lamp',x:16*T,y:23*T},{type:'lamp',x:48*T,y:24*T},
+   {type:'sign',x:17*T,y:23*T},{type:'barrel',x:28*T,y:29*T},{type:'barrel',x:37*T,y:29*T},
+   {type:'stall',x:26*T,y:13*T},{type:'stall',x:38*T,y:13*T},{type:'well',x:57*T,y:25*T},
+   {type:'campfire',x:16*T,y:27*T},{type:'bush',x:16*T,y:15*T},{type:'bush',x:60*T,y:28*T}
+  );
+  for(let i=0;i<65;i++){let x=8+(i*13)%52,y=4+(i*17)%34;if((x<16||x>48||y<17||y>27)&&!(x>50&&y>28))w.decor.push({type:i%5===0?'mushroom':i%3===0?'flower':'tuft',x:x*T,y:y*T})}
+  w.npcs=[
+   npc('mira','Mira',31,24,'rose','auburn','mother','Die sieben Echos sind verstummt. Drei Echosamen können den Brunnen wieder erwecken. Hilfst du uns?'),
+   npc('tomke','Tomke',8,22,'blue','brown','fisher','Am Fluss treiben manchmal blaue Blüten. Eine davon soll Heilkräfte besitzen.'),
+   npc('eda','Eda',47,27,'gold','silver','gardener','Mein Garten wird blass. Bring mir drei blaue Waldblüten, dann schenke ich dir ein Kräuterpaket.'),
+   npc('finn','Finn',38,25,'violet','dark','child','Ich habe etwas Glänzendes beim alten Brunnen gesehen.'),
+   npc('runa','Runa',26,15,'red','brown','innkeeper','Im Krug ist immer ein Platz frei. Bring später Tomke einen Brief von mir.'),
+   npc('pavo','Pavo',40,15,'green','black','merchant','Tränke, Beeren und warme Pasteten! Alles für deine Reise.'),
+   npc('lina','Lina',15,27,'violet','blonde','tailor','Ich nähe farbenfrohe Reiseumhänge.'),
+   npc('orin','Orin',26,27,'slate','ginger','craftsman','Alte Werkzeuge erzählen Geschichten.'),
+   npc('sela','Sela',45,27,'blue','black','librarian','In der Bibliothek liegt eine Karte zum Flüsterwald.'),
+   npc('tavi','Tavi',56,27,'orange','brown','baker','Frisches Brot macht jeden Weg leichter.'),
+   npc('wulf','Wulf',18,23,'green','brown','guard','Der Fluss ist ruhig. Die alte Brücke hält noch.'),
+   npc('pippa','Pippa',42,24,'rose','black','villager','Hast du schon die kleinen Blumen am Brunnen entdeckt?')
+  ];
+  w.exits.push({x:62*T,y:18*T,w:24,h:78,to:'wald',tx:3*T,ty:20*T,label:'Pfad zum Flüsterwald',open:()=>main.stage>=2});
+ }else if(id==='wald'){
+  // Compact forest with clear paths, a pond, a clearing, flowers, camp and an old shrine gate.
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,5);
+  rect(0,18,64,6,1);rect(27,5,6,34,1);rect(30,16,18,14,3);
+  rect(39,6,9,9,2);rect(38,6,2,10,4);rect(48,6,2,10,4);
+  rect(51,8,10,3,1);
+  for(let i=0;i<78;i++){const x=5+(i*11)%54,y=4+(i*17)%34;if(!((x>24&&x<35)||(y>17&&y<25&&x<54)||(x>36&&x<50&&y>5&&y<16)))w.decor.push({type:i%6===0?'pine':'tree',x:x*T,y:y*T,solid:true})}
+  for(let i=0;i<34;i++){const x=6+(i*19)%52,y=5+(i*13)%32;w.decor.push({type:i%3===0?'mushroom':'flower',x:x*T,y:y*T})}
+  w.decor.push({type:'bridge',x:11*T,y:18*T},{type:'campfire',x:21*T,y:27*T},{type:'sign',x:5*T,y:19*T},{type:'shrine',x:53*T,y:6*T,solid:true},{type:'crystal',x:45*T,y:27*T});
+  w.npcs=[npc('elder','Elder Noren',29,17,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),npc('mossy','Moos',36,27,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.')];
+  w.exits.push({x:0,y:18*T,w:18,h:85,to:'windruh',tx:60*T,ty:20*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:52*T,y:6*T,w:44,h:34,to:'shrine',tx:15*T,ty:9*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
+ }else{
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++)set(x,y,6);
+  rect(8,5,48,32,3);rect(12,8,40,26,1);rect(18,13,28,17,3);
+  w.decor.push({type:'altar',x:29*T,y:19*T},{type:'crystal',x:15*T,y:12*T},{type:'crystal',x:47*T,y:12*T},{type:'torch',x:13*T,y:9*T},{type:'torch',x:50*T,y:9*T},{type:'torch',x:13*T,y:31*T},{type:'torch',x:50*T,y:31*T});
+  w.npcs=[npc('echo','Echo-Wächter',32,13,'gold','blue','guardian','Das Echo wartet nicht auf Stärke, sondern auf einen ruhigen Geist.')];
+  w.exits.push({x:12*T,y:33*T,w:64,h:20,to:'wald',tx:53*T,ty:12*T,label:'Zurück in den Flüsterwald',open:()=>true});
+ }
+ return w;
+}
+function paletteColor(v){
+ const p={rose:'#c65c70',auburn:'#794534',blue:'#5486a5',brown:'#76503a',gold:'#d5a84f',silver:'#b9c2c5',violet:'#8264a5',dark:'#393345',red:'#b54e42',green:'#4e8a50',black:'#342c2c',blonde:'#d8b25f',slate:'#687b8a',ginger:'#bd7548',orange:'#c87943',cream:'#e8d9b7',white:'#e8e3d0'};
+ return p[v]||v||'#5c8050';
+}
+function pixelHuman(g,x,y,coat,hair,detail,kind,frame,faceX,faceY,isHero){
+ const P=(a,b,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(a),Math.round(b),w,h)};
+ const step=frame%2, bob=frame===0?0:(step?1:0);
+ // body shadow, legs and boots
+ P(x+4,y+30,18,4,'#31563b');
+ P(x+7,y+23+(step?1:0),5,8,'#594332');P(x+15,y+23+(step?0:1),5,8,'#594332');
+ P(x+6,y+29+(step?1:0),6,3,'#d8b985');P(x+15,y+29+(step?0:1),6,3,'#d8b985');
+ // cloak silhouette and tunic with layered highlights
+ P(x+5,y+12+bob,17,14,detail);P(x+4,y+15+bob,19,11,coat);P(x+2,y+15+bob,4,10,coat);P(x+21,y+15+bob,4,10,coat);
+ P(x+6,y+13+bob,15,3,detail);P(x+8,y+17+bob,11,7,coat);P(x+10,y+20+bob,7,2,detail);
+ P(x+12,y+15+bob,3,10,'#e1bd72');
+ // arms and hands
+ P(x+2,y+17+bob,4,8,'#dca17c');P(x+21,y+17+bob,4,8,'#dca17c');P(x+2,y+23+bob,4,3,'#dca17c');P(x+21,y+23+bob,4,3,'#dca17c');
+ // neck and shaped head
+ P(x+10,y+8+bob,8,6,'#d99d79');P(x+7,y+2+bob,14,12,'#efc295');P(x+5,y+4+bob,3,7,'#d89470');P(x+20,y+4+bob,3,7,'#d89470');
+ // hairstyle with side fringe; facing up shows hair over most of the face
+ P(x+6,y+1+bob,16,5,hair);P(x+5,y+4+bob,3,8,hair);P(x+20,y+4+bob,3,7,hair);P(x+7,y+9+bob,3,5,hair);
+ if(faceY>=0){P(x+9,y+7+bob,3,2,'#392d29');P(x+17,y+7+bob,3,2,'#392d29');P(x+12,y+11+bob,5,1,'#aa6258')}
+ else{P(x+8,y+4+bob,12,6,hair);P(x+10,y+8+bob,8,3,'#d9a47d')}
+ if(faceX!==0){P(x+(faceX>0?18:7),y+7+bob,3,2,'#392d29');P(x+(faceX>0?8:18),y+7+bob,2,2,'#efc295')}
+ // unmistakable class silhouettes / equipment
+ if(kind==='wind'){P(x+1,y+11,3,14,'#c3e5e8');P(x+22,y+11,3,14,'#c3e5e8');P(x+9,y-1,10,3,'#e7d08e')}
+ if(kind==='tank'){P(x+21,y+13,8,17,'#89998f');P(x+23,y+16,4,10,'#c2cab6');P(x+5,y-2,16,4,'#c5b88f')}
+ if(kind==='archer'){P(x+1,y+9,4,20,'#765332');P(x+2,y+7,3,3,'#d6c08e');P(x+5,y-1,17,4,'#4d7b48')}
+ if(kind==='mage'){P(x+5,y-5,16,8,'#4f3a68');P(x+11,y-9,6,5,'#e4d9ff');P(x+1,y+13,3,7,'#c9b9ec');P(x+22,y+13,3,7,'#c9b9ec')}
+ if(kind==='rogue'){P(x+20,y+14,7,12,'#d7e0e0');P(x+21,y+12,8,3,'#9cb7c5');P(x+6,y+1,16,3,'#53657b')}
+ if(isHero&&kind==='wind'){P(x+8,y+15,12,2,'#fff0bf')}
+}
+function drawHero(x,y,now){
+ const h=heroes[selected],frame=Math.floor(player.walk)%2,kind=['wind','tank','archer','mage','rogue'][selected];
+ pixelHuman(ctx,x,y,h.coat,h.hair,h.detail,kind,player.walk>.2?frame:0,player.faceX,player.faceY,true);
+}
+function drawPerson(n,x,y,now){
+ const colors={rose:'#c65c70',blue:'#5486a5',gold:'#d5a84f',violet:'#8264a5',green:'#4e8a50',red:'#b54e42',slate:'#687b8a',orange:'#c87943',cream:'#e8d9b7'};
+ const hair={auburn:'#794534',brown:'#76503a',silver:'#b9c2c5',dark:'#393345',black:'#342c2c',blonde:'#d8b25f',ginger:'#bd7548',white:'#e8e3d0',green:'#47794a',blue:'#5d80aa'};
+ const sx=x-camera.x,sy=y-camera.y,frame=Math.floor(now/600+n.phase)%2;
+ pixelHuman(ctx,sx,sy,colors[n.color]||paletteColor(n.color),hair[n.hair]||paletteColor(n.hair),'#e6c17c','villager',frame,0,1,false);
+ if(n.kind==='innkeeper'){pixel(sx+4,sy+1,18,4,'#ad443c');pixel(sx+9,sy-2,9,4,'#fff0d0')}
+ if(n.kind==='merchant'){pixel(sx+3,sy+1,20,4,'#4d8350');pixel(sx+10,sy-2,8,4,'#d5ad69')}
+ if(n.kind==='librarian'){pixel(sx+3,sy+1,20,4,'#587ba0');pixel(sx+8,sy-2,11,4,'#e5d4ad')}
+ if(n.kind==='elder'){pixel(sx+4,sy+1,19,4,'#e7e2cf');pixel(sx+8,sy+9,3,13,'#d9d8d0')}
+ if(n.kind==='child'){pixel(sx+5,sy+1,18,4,'#d8b36d');pixel(sx+11,sy-2,8,4,'#e9cd81')}
+ if(n.kind==='fisher'){pixel(sx+3,sy+1,20,4,'#638b9d');pixel(sx+16,sy+1,4,7,'#d3b276')}
+ if(n.kind==='baker'){pixel(sx+4,sy+1,18,4,'#efe5d1');pixel(sx+9,sy-2,10,4,'#fff4e5')}
+}
+function drawTile(tx,ty,id,now){
+ const x=tx*T-camera.x,y=ty*T-camera.y;
+ if(id===0||id===5){
+  const forest=id===5;pixel(x,y,16,16,forest?'#57914d':'#70b960');
+  pixel(x+2+(tx*7+ty*3)%10,y+3+(tx*5+ty)%9,2,2,forest?'#78b45c':'#9bd477');
+  pixel(x+10,y+11,2,1,forest?'#397446':'#4a914c');
+  if((tx*13+ty*7)%11===0){pixel(x+4,y+10,2,3,'#b2dc76');pixel(x+8,y+8,1,3,'#b2dc76')}
+  if((tx+ty)%17===0){pixel(x+2,y+2,1,1,'#f6e9bb');pixel(x+12,y+5,2,1,'#dce78d')}
+ }else if(id===1){
+  pixel(x,y,16,16,'#d9c99f');pixel(x,y,16,1,'#f4e6c1');pixel(x,y+15,16,1,'#b5a37b');
+  pixel(x+3,y+4,2,1,'#bcae8c');pixel(x+10,y+10,2,1,'#bcae8c');pixel(x+6,y+1,1,7,'#c8b890');pixel(x+13,y+8,1,7,'#c8b890');
+ }else if(id===2){
+  pixel(x,y,16,16,'#278ac1');const phase=Math.floor(now/280+x+y)%7;
+  pixel(x+2+phase,y+4,5,1,'#91dced');pixel(x+8-phase/2,y+11,5,1,'#5cc0e4');pixel(x+4,y+7,3,1,'#d2f3e7');
+ }else if(id===3){
+  pixel(x,y,16,16,'#aaa68d');pixel(x,y,16,1,'#e4dac0');pixel(x,y+15,16,1,'#898575');
+  pixel(x+2,y+4,5,1,'#c9c2a7');pixel(x+9,y+9,5,1,'#c9c2a7');pixel(x+7,y+2,1,4,'#918d7c');
+ }else if(id===4){pixel(x,y,16,16,'#c6ad77');pixel(x+2,y+4,5,2,'#9ab95e');pixel(x+9,y+11,5,2,'#91aa57')}
+ else if(id===6){pixel(x,y,16,16,'#777b70');pixel(x+2,y+2,12,12,'#979486');pixel(x+3,y+3,4,1,'#b8b19a')}
+ else if(id===7){pixel(x,y,16,16,'#806447');pixel(x+1,y+2,14,12,'#aa8651');pixel(x+2,y+4,12,2,'#c39c5e')}
+}
+function drawBuilding(b){
+ const x=Math.round(b.x-camera.x),y=Math.round(b.y-camera.y),w=b.w,h=b.h;
+ const roofs={teal:['#287e80','#17535d','#65aaa0'],red:['#bd4d42','#7a3233','#e27e58'],ochre:['#c18a43','#83552d','#e4bf71'],violet:['#8062a0','#4c3c68','#b5a0d2'],blue:['#4f7f9f','#314e70','#96bfd0'],slate:['#71818a','#46545c','#b5c1bd'],green:['#668a53','#365b3b','#a5bd73'],orange:['#c87943','#8e4b32','#e7aa66'],cream:['#c9b68b','#796a4e','#e8d9b7']};
+ const c=roofs[b.style]||roofs.red;
+ // Cast shadow and masonry foundation
+ pixel(x+3,y+h-3,w-1,10,'#456f43');pixel(x+7,y+h-8,w-14,10,'#6b5138');
+ // Left/right wall planes establish a 3/4 top-down view.
+ pixel(x+7,y+34,w-14,h-35,'#d7bd8c');pixel(x+7,y+34,7,h-35,'#a67d54');pixel(x+w-14,y+34,7,h-35,'#98704d');
+ pixel(x+14,y+40,w-28,h-43,'#ead8b2');
+ // Visible front facade with beams, sill and lower shadow
+ pixel(x+12,y+49,w-24,h-55,'#e7d2a4');pixel(x+12,y+49,3,h-52,'#745038');pixel(x+w-15,y+49,3,h-52,'#745038');
+ pixel(x+12,y+h-12,w-24,4,'#8c603e');pixel(x+12,y+50,w-24,2,'#bd9867');
+ // Two windows with panes, cross-bars and shutters
+ for(let side=0;side<2;side++){
+  const wx=x+20+side*(w-55),wy=y+54;
+  pixel(wx-3,wy-2,23,19,'#6e4931');pixel(wx,wy,17,15,'#5795a2');pixel(wx+2,wy+2,6,5,'#c6eff0');pixel(wx+10,wy+2,5,5,'#a6d6dc');
+  pixel(wx+8,wy,2,15,'#744c31');pixel(wx,wy+7,17,2,'#744c31');pixel(wx-5,wy+1,4,15,c[1]);pixel(wx+18,wy+1,4,15,c[1]);
+  pixel(wx-4,wy+16,26,3,'#f1d9a2');
+ }
+ // Door with stone step, planks, handle and lintel
+ const dx=x+w/2-9,dy=y+h-34;
+ pixel(dx-4,dy-3,26,37,'#67452e');pixel(dx,dy,18,32,'#875735');pixel(dx+2,dy+2,6,28,'#a46e42');pixel(dx+10,dy+2,6,28,'#74472d');
+ pixel(dx+13,dy+15,2,3,'#f1d179');pixel(dx-5,dy-5,28,4,'#63402c');pixel(dx-8,dy+32,34,5,'#b7aa8d');
+ // Deep roof: stepped silhouette, side fascia, individual roof rows and ridge.
+ pixel(x-5,y+30,w+10,8,c[1]);pixel(x-3,y+24,w+6,9,c[0]);pixel(x+2,y+18,w-4,9,c[0]);pixel(x+7,y+12,w-14,9,c[0]);
+ pixel(x+13,y+7,w-26,8,c[0]);pixel(x+20,y+2,w-40,7,c[0]);
+ for(let row=0;row<5;row++){const yy=y+10+row*5, inset=Math.max(4,10-row*1);for(let rx=x-inset;rx<x+w+inset;rx+=12){pixel(rx,yy,9,2,row%2?c[1]:c[2]);pixel(rx+3,yy+2,5,1,c[1])}}
+ pixel(x+w/2-2,y-1,5,8,'#f1d99a');pixel(x+w/2,y+4,2,5,c[1]);
+ // Chimney and decorative roof gable
+ pixel(x+w-27,y+3,12,20,'#8e5d40');pixel(x+w-25,y+1,9,7,'#b97850');pixel(x+w-27,y+1,13,3,'#68442f');
+ pixel(x+w/2-12,y+20,24,10,c[1]);pixel(x+w/2-8,y+22,16,7,c[0]);pixel(x+w/2-3,y+23,7,5,c[2]);
+ // Eaves, roof highlights and a small hanging sign make buildings readable at a glance.
+ pixel(x-3,y+29,w+6,3,c[2]);pixel(x-4,y+36,w+8,3,c[1]);
+ pixel(x+5,y+26,4,2,'#f0cb7c');pixel(x+w-11,y+26,4,2,'#f0cb7c');
+ pixel(x+w-17,y+h-42,5,13,'#745038');pixel(x+w-16,y+h-40,3,9,'#f0d17b');
+}
+function drawHero(x,y,now){
+ const h=heroes[selected],frame=player.walk>0?Math.floor(player.walk*1.8)%2:0,kind=['wind','tank','archer','mage','rogue'][selected];
+ pixelHuman(ctx,x,y,h.coat,h.hair,h.detail,kind,frame,player.faceX,player.faceY,true);
+ if(player.inv>0&&Math.floor(now/75)%2===0){ctx.globalAlpha=.55;pixel(x+3,y+2,19,32,'#fff4c9');ctx.globalAlpha=1}
+}
+function drawPerson(n,x,y,now){
+ const colors={rose:'#c65c70',blue:'#5486a5',gold:'#d5a84f',violet:'#8264a5',green:'#4e8a50',red:'#b54e42',slate:'#687b8a',orange:'#c87943',cream:'#e8d9b7'};
+ const hair={auburn:'#794534',brown:'#76503a',silver:'#b9c2c5',dark:'#393345',black:'#342c2c',blonde:'#d8b25f',ginger:'#bd7548',white:'#e8e3d0',green:'#47794a',blue:'#5d80aa'};
+ const sx=x-camera.x,sy=y-camera.y,frame=Math.floor(now/650+n.phase)%2;
+ pixelHuman(ctx,sx,sy,colors[n.color]||paletteColor(n.color),hair[n.hair]||paletteColor(n.hair),'#e6c17c','villager',frame,0,1,false);
+ if(n.kind==='innkeeper'){pixel(sx+3,sy+1,20,4,'#ad443c');pixel(sx+9,sy-2,10,4,'#fff0d0')}
+ if(n.kind==='merchant'){pixel(sx+3,sy+1,20,4,'#4d8350');pixel(sx+10,sy-2,8,4,'#d5ad69')}
+ if(n.kind==='librarian'){pixel(sx+3,sy+1,20,4,'#587ba0');pixel(sx+8,sy-2,11,4,'#e5d4ad')}
+ if(n.kind==='elder'){pixel(sx+4,sy+1,19,4,'#e7e2cf');pixel(sx+8,sy+9,3,13,'#d9d8d0')}
+ if(n.kind==='child'||n.kind==='forestChild'){pixel(sx+5,sy+1,18,4,'#d8b36d');pixel(sx+11,sy-2,8,4,'#e9cd81')}
+ if(n.kind==='fisher'){pixel(sx+3,sy+1,20,4,'#638b9d');pixel(sx+16,sy+1,4,7,'#d3b276')}
+ if(n.kind==='baker'){pixel(sx+4,sy+1,18,4,'#efe5d1');pixel(sx+9,sy-2,10,4,'#fff4e5')}
+}
+function roomCollides(x,y){
+ if(x<18||x>VW-42||y<24||y>VH-40)return true;
+ if(roomNPC&&roomNPC.kind==='inn'&&x>45&&x<430&&y<105)return true;
+ if(roomNPC&&roomNPC.kind==='shop'&&((x<165&&y<175)||(x>315&&y<175)))return true;
+ if(roomNPC&&roomNPC.kind==='library'&&((x<125&&y<190)||(x>355&&y<190)))return true;
+ if(roomNPC&&roomNPC.kind==='smith'&&x>160&&x<330&&y>145&&y<205)return true;
+ if(roomNPC&&roomNPC.kind==='tailor'&&((x<165&&y<190)||(x>310&&y<180)))return true;
+ return false;
+}
+function pointBlocked(px,py){
+ if(zone==='shrine')return false;
+ if(room)return roomCollides(px,py);
+ const tx=Math.floor(px/T),ty=Math.floor(py/T);
+ if(tx<1||ty<1||tx>=world.width-1||ty>=world.height-1)return true;
+ const id=world.tiles[ty*world.width+tx];if(id===2)return true;
+ for(const b of world.buildings){
+  const inBody=px>b.x+4&&px<b.x+b.w-4&&py>b.y+31&&py<b.y+b.h-3;
+  if(inBody){const door= Math.abs(px-b.doorX)<17&&py>b.doorY-28&&py<b.doorY+9;if(!door)return true}
+ }
+ for(const o of world.decor){
+  if(!o.solid)continue;
+  if(o.type==='tree'||o.type==='pine'||o.type==='appleTree'){if(px>o.x+4&&px<o.x+23&&py>o.y+22&&py<o.y+34)return true}
+  else if(o.type==='fountain'&&px>o.x+2&&px<o.x+31&&py>o.y+15&&py<o.y+29)return true;
+  else if(o.type==='shrine'&&px>o.x&&px<o.x+48&&py>o.y+20&&py<o.y+36)return true;
+ }
+ return false;
+}
+function canOccupy(x,y){
+ const pts=[[x+6,y+27],[x+18,y+27],[x+6,y+34],[x+18,y+34],[x+12,y+31]];
+ return !pts.some(([px,py])=>pointBlocked(px,py));
+}
+function move(dt){
+ let ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+stick.x;
+ let iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+stick.y;
+ const pads=navigator.getGamepads?navigator.getGamepads():[];
+ const gp=pads&&pads.find(v=>v&&v.connected);
+ if(gp){
+  const ax=gp.axes[0]||0,ay=gp.axes[1]||0;
+  if(Math.hypot(ax,ay)>.15){ix=ax;iy=ay}
+  const pressed=(b)=>!!(gp.buttons[b]&&gp.buttons[b].pressed);
+  if(pressed(0)&&!move._a){interact();move._a=true}if(!pressed(0))move._a=false;
+  if(pressed(1)&&!move._b){attack();move._b=true}if(!pressed(1))move._b=false;
+  if(pressed(2)&&!move._x){ability();move._x=true}if(!pressed(2))move._x=false;
+  if(pressed(3)&&!move._y){dodge();move._y=true}if(!pressed(3))move._y=false;
+  const state=document.getElementById('gamepadState');if(state)state.textContent='Controller verbunden';
+ }
+ let m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m}
+ if(m<.05){player.walk=0;return}
+ if(Math.abs(ix)>Math.abs(iy)){player.faceX=Math.sign(ix);player.faceY=0}else{player.faceX=0;player.faceY=Math.sign(iy)}
+ player.walk+=dt*9;
+ const speed=heroes[selected].speed*(player.inv>0?1.12:1);
+ const dx=ix*speed*dt,dy=iy*speed*dt;
+ if(canOccupy(player.x+dx,player.y))player.x+=dx;
+ if(canOccupy(player.x,player.y+dy))player.y+=dy;
+ if(zone==='shrine'){player.x=clamp(player.x,18,VW-44);player.y=clamp(player.y,20,VH-48)}
+ else if(!room){
+  camera.x=clamp(player.x+12-VW/2,0,world.width*T-VW);
+  camera.y=clamp(player.y+32-VH/2,0,world.height*T-VH);
+ }
+}
+function drawRoom(){
+ const kind=roomNPC?roomNPC.kind:'home';
+ pixel(0,0,VW,VH,'#9a704b');
+ for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#c79d6d':'#b98d5f');pixel(x,y+15,16,1,'#916744')}
+ pixel(10,8,460,6,'#69482e');pixel(10,8,5,250,'#69482e');pixel(465,8,5,250,'#69482e');
+ pixel(27,32,426,190,'#ead7ad');pixel(29,32,422,4,'#9a7049');
+ // Window light and wall frames
+ pixel(53,43,54,45,'#78513a');pixel(57,47,46,36,'#78acb0');pixel(61,51,18,28,'#c3e7df');pixel(82,51,17,28,'#9dd2d7');pixel(78,47,3,36,'#795238');
+ pixel(370,43,54,45,'#78513a');pixel(374,47,46,36,'#78acb0');pixel(378,51,18,28,'#c3e7df');pixel(399,51,17,28,'#9dd2d7');
+ if(kind==='inn'||kind==='bakery'){
+  pixel(65,104,350,43,'#6d482f');pixel(71,100,338,12,'#c38b4e');pixel(74,116,332,25,'#95613b');
+  for(let x=84;x<400;x+=48){pixel(x,108,30,5,'#f3d79a');pixel(x+6,116,18,14,'#d4ad72')}
+  pixel(90,170,75,38,'#8a5b3b');pixel(98,164,60,10,'#c59456');pixel(315,170,75,38,'#8a5b3b');pixel(323,164,60,10,'#c59456');
+ }else if(kind==='shop'){
+  for(const x of [54,360]){pixel(x,88,68,110,'#815235');pixel(x+5,95,58,12,'#d3a05e');pixel(x+5,120,58,12,'#a37145');pixel(x+5,145,58,12,'#d3a05e');pixel(x+5,170,58,12,'#a37145')}
+  pixel(180,54,120,44,'#b34b40');pixel(187,61,106,30,'#e2c07d');
+ }else if(kind==='library'){
+  for(let x=66;x<400;x+=76){pixel(x,91,55,118,'#795034');for(let y=103;y<198;y+=24){pixel(x+5,y,45,7,'#c18d54');for(let j=0;j<5;j++)pixel(x+7+j*8,y-13,5,13,['#b34f43','#4f7d9b','#668d50','#9b6eae','#b68b48'][j])}}
+ }else if(kind==='smith'){
+  pixel(54,96,130,115,'#75523c');pixel(62,104,114,98,'#a8774d');pixel(305,90,108,100,'#76553e');pixel(170,170,144,42,'#805b40');pixel(183,161,119,12,'#a5aca9');pixel(204,139,74,20,'#6b5140');pixel(220,133,42,13,'#f1a44d');
+ }else if(kind==='tailor'){
+  pixel(55,87,118,119,'#8e6848');pixel(65,94,98,12,'#dbb67b');pixel(302,89,118,114,'#82543e');pixel(312,96,98,12,'#d1a36b');pixel(185,62,110,32,'#85629d');pixel(191,67,98,20,'#d5b9e9');
+ }else if(kind==='garden'){
+  pixel(52,98,378,115,'#c4aa7c');for(let i=0;i<8;i++){pixel(62+i*43,130+(i%2)*25,28,21,'#6b9a4a');pixel(68+i*43,121+(i%2)*25,7,12,'#e99ec4');pixel(77+i*43,121+(i%2)*25,6,12,'#fff0c1')}
+ }else{
+  pixel(62,96,108,110,'#80583a');pixel(70,103,92,13,'#d5a96b');pixel(309,93,100,112,'#80583a');pixel(316,101,86,13,'#d5a96b');
+ }
+ // Exit rug points toward the door; player remains independently movable.
+ pixel(176,218,128,34,'#8a4c39');pixel(182,222,116,26,'#dab57a');pixel(190,228,100,5,'#b77d48');
+ pixel(154,14,172,20,'#62442f');pixel(160,18,160,12,'#e8c98b');
+ const resident=world.npcs.find(n=>roomNPC&&n.id===roomNPC.npc);
+ if(resident)drawPerson(resident,220,103,performance.now());
+ drawHero(player.x,player.y,performance.now());
+ ctx.fillStyle='#fff0cd';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,28);ctx.textAlign='left';
+ ctx.fillStyle='#fff0cc';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText('E · Hinausgehen',VW/2,VH-8);ctx.textAlign='left';
+}
+function drawWorld(now){
+ ctx.clearRect(0,0,VW,VH);
+ if(room){drawRoom();return}
+ if(zone==='shrine'){drawShrine();return}
+ const sx=Math.floor(camera.x/T)-1,sy=Math.floor(camera.y/T)-1,ex=Math.ceil((camera.x+VW)/T)+1,ey=Math.ceil((camera.y+VH)/T)+1;
+ for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++){if(tx>=0&&ty>=0&&tx<world.width&&ty<world.height)drawTile(tx,ty,world.tiles[ty*world.width+tx],now)}
+ const list=[];
+ world.decor.forEach(o=>list.push({y:o.y+29,fn:()=>drawProp(o)}));
+ world.buildings.forEach(b=>list.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)}));
+ world.npcs.forEach(n=>list.push({y:n.y+33,fn:()=>drawPerson(n,n.x,n.y,now)}));
+ const things=zone==='windruh'?seedSpots:flowerSpots;
+ if(zone==='windruh'&&main.stage===1||zone==='wald'&&(main.stage===3||main.stage===4))things.forEach((v)=>{if(!v.found)list.push({y:v.y+15,fn:()=>drawSeed(v.x,v.y,now,zone==='windruh'?'#f2d45c':'#7cdbed')})});
+ monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>list.push({y:m.y+29,fn:()=>drawMonster(m,now)}));
+ list.push({y:player.y+34,fn:()=>drawHero(player.x-camera.x,player.y-camera.y,now)});
+ list.sort((a,b)=>a.y-b.y);list.forEach(o=>o.fn());
+ currentPrompt=nearbyPrompt();if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-8);ctx.textAlign='left'}
+}
+function enterRoom(b){
+ currentRoom=b.id;roomNPC=rooms[b.id]||{title:b.name,kind:'home',npc:''};
+ insideDoorSpawn={x:b.doorX-12,y:b.doorY-30};
+ room={w:30,h:17,cameraX:camera.x,cameraY:camera.y};
+ camera.x=0;camera.y=0;player.x=228;player.y=175;
+ showToast('Betreten: '+b.name);updateQuest();
+}
+function insideDoor(){
+ if(!room)return;
+ room=null;currentRoom=null;roomNPC=null;
+ player.x=insideDoorSpawn.x;player.y=insideDoorSpawn.y;
+ camera.x=clamp(player.x+12-VW/2,0,world.width*T-VW);camera.y=clamp(player.y+32-VH/2,0,world.height*T-VH);
+ showToast('Zurück auf dem Dorfplatz');updateQuest();
+}
+function interact(){
+ if(dialogOpen){closeDialogue();return}
+ if(panelOpen)return;
+ const px=player.x+12,py=player.y+31;
+ if(room){
+  if(player.y>205&&Math.abs(px-VW/2)<70){insideDoor();return}
+  const resident=roomNPC?world.npcs.find(n=>n.id===roomNPC.npc):null;
+  if(resident&&Math.hypot(resident.x-px,resident.y-py)<65){roomNPCAction();return}
+  if(currentRoom==='shop'){openShop();return}
+  showDialogue(roomNPC?roomNPC.title:'Haus','Du schaust dich um. Auf dem Tisch liegen kleine Dinge aus dem Alltag.');return;
+ }
+ const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<42);
+ if(b){enterRoom(b);return}
+ const person=world.npcs.find(n=>Math.hypot(n.x-px,n.y-py)<38);
+ if(person){talk(person);updateQuest();return}
+ if(zone==='windruh'&&main.stage===1){const item=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item){item.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');updateQuest();saveGame();return}}
+ if(zone==='wald'&&(main.stage===3||main.stage===4)){const item=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item){item.found=true;main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');updateQuest();saveGame();return}}
+ const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
+ if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
+ const fountain=world.decor.find(o=>o.type==='fountain');
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',5*T,20*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='shrine'&&main.stage===4){showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
+ showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
+}
+function startGame(){
+ document.getElementById('titleScreen').classList.add('hidden');started=true;last=performance.now();updateQuest();showToast('Willkommen in Windruh – du kannst dich sofort bewegen.');requestAnimationFrame(gameLoop);saveGame();
+}
+function buildHeroCards(){
+ const grid=document.getElementById('heroGrid');grid.innerHTML='';
+ heroes.forEach((h,i)=>{
+  const card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');
+  card.innerHTML='<canvas width="55" height="70"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';
+  const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
+  const P=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};
+  P(18,56,20,5,'#3b5b39');P(19,37,18,18,h.cape);P(18,39,20,13,h.coat);P(19,51,7,10,'#644630');P(31,51,7,10,'#644630');
+  P(18,18,20,19,'#efc295');P(17,13,22,14,h.hair);P(20,26,3,2,'#332b28');P(32,26,3,2,'#332b28');P(21,39,16,3,h.detail);
+  if(h.female){P(15,20,4,24,h.hair);P(37,20,4,24,h.hair);P(20,8,18,4,h.detail)}else{P(16,38,4,10,'#d99c79');P(38,38,4,10,'#d99c79')}
+  if(i===1){P(40,34,9,23,'#9ca99e')}if(i===2){P(10,24,5,29,'#765332')}if(i===3){P(22,5,15,8,'#4f3a68')}if(i===4){P(39,36,8,14,'#cadde1')}
+  card.onclick=()=>{selected=i;buildHeroCards();updateQuest()};grid.appendChild(card);
+ });
+}
+addEventListener('blur',()=>{for(const k in keys)keys[k]=false;stick.x=0;stick.y=0});
+addEventListener('gamepadconnected',()=>{const el=document.getElementById('gamepadState');if(el)el.textContent='Controller verbunden'});
+addEventListener('gamepaddisconnected',()=>{const el=document.getElementById('gamepadState');if(el)el.textContent='Tastatur bereit'});
+// Rebuild a compact, dense town and migrate the starting positions to its central square.
+seedSpots[0].x=16*T+8;seedSpots[0].y=16*T+8;seedSpots[1].x=46*T+8;seedSpots[1].y=25*T+8;seedSpots[2].x=57*T+8;seedSpots[2].y=22*T+8;
+flowerSpots[0].x=14*T+8;flowerSpots[0].y=10*T+8;flowerSpots[1].x=32*T+8;flowerSpots[1].y=32*T+8;flowerSpots[2].x=47*T+8;flowerSpots[2].y=27*T+8;
+player.x=32*T-12;player.y=21*T;world=makeWorld(zone);camera.x=clamp(player.x+12-VW/2,0,world.width*T-VW);camera.y=clamp(player.y+32-VH/2,0,world.height*T-VH);
+if(rooms.home2===undefined)rooms.home2={title:'Haus am Apfelgarten',kind:'home',npc:'finn'};
+if(rooms.clinic===undefined)rooms.clinic={title:'Kräuterstube',kind:'garden',npc:'eda'};
+
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
