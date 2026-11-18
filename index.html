@@ -1,416 +1,79 @@
 <!doctype html>
-<html lang="de">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#f5d48a"><title>TALWIND – Die sieben Echos</title>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183d35"><title>TALWIND – Die sieben Echos</title>
 <style>
-:root{font-family:Arial,Helvetica,sans-serif;color:#49372e;background:#283f37}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{display:grid;place-items:center;background:radial-gradient(ellipse at center,#3c6650,#20362f);touch-action:none}
-#frame{position:relative;width:min(100vw,177.7778vh);height:min(100vh,56.25vw);overflow:hidden;background:#72b85d;box-shadow:0 0 0 5px #614532,0 0 0 9px #e9bd70}
-#game{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
-#hud{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:flex-start;padding:12px;pointer-events:none}
-.panel{background:#fff2ce;border:3px solid #694834;box-shadow:inset 0 0 0 2px #dfad5f,3px 4px #3d3029;color:#49372e;padding:8px 12px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;line-height:1.35;letter-spacing:.1px}
-#hearts{font-size:21px;letter-spacing:2px;color:#c64b43;line-height:1.15}
-#quest{max-width:42%;min-width:180px;text-align:left;font-size:15px}
-#quest small{display:block;font-size:13px;font-weight:500;margin-top:3px}
-#bottom{display:none;position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(84%,600px);min-height:70px;padding:10px 14px;text-align:left}
-#bottom strong{display:block;color:#a3473d;font-size:14px;letter-spacing:1px;margin-bottom:4px}
-#bottom p{margin:0;font-size:16px;font-weight:500;line-height:1.4}
-#start{position:absolute;inset:0;display:grid;place-items:center;background:#20392fc9;text-align:center;padding:15px}
-#startCard{width:min(92%,470px);padding:23px 25px 24px;background:#fff0c8;border:5px solid #694834;box-shadow:inset 0 0 0 3px #e2ae5b,7px 8px #172c25;color:#49372e}
-#logo{font-size:clamp(36px,7vw,62px);font-weight:1000;letter-spacing:5px;color:#b84e43;text-shadow:2px 2px #f7d77d,4px 5px #604332;margin:0}
-#startCard h2{font-size:17px;letter-spacing:2px;margin:2px 0 12px;color:#76513a}
-#startCard p{font-size:15px;line-height:1.55;margin:8px 0 16px}
-button{font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:800;color:#fff2ce;background:#b84e43;border:3px solid #694834;padding:11px 18px;box-shadow:3px 4px #443128;cursor:pointer}
-button:active{transform:translate(2px,2px);box-shadow:1px 2px #443128}
-#touch{display:none;position:absolute;inset:auto 12px 12px;justify-content:space-between;align-items:end;pointer-events:none}
-#dpad{width:124px;height:112px;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);gap:4px;pointer-events:auto}
-#dpad button,#actions button{padding:0;background:#fff0c7;color:#614632;border:3px solid #694834;box-shadow:2px 3px #443128;opacity:.94}
-#dpad button:nth-child(1){grid-area:1/2}#dpad button:nth-child(2){grid-area:2/1}#dpad button:nth-child(3){grid-area:2/3}#dpad button:nth-child(4){grid-area:3/2}
-#actions{display:flex;gap:9px;pointer-events:auto}#actions button{width:54px;height:54px;border-radius:50%;font-size:13px}
-@media(pointer:coarse){#touch{display:flex}}
-@media(max-width:560px){#hud{padding:6px}.panel{font-size:14px;padding:6px 8px}#quest{min-width:150px;font-size:13px}#quest small{font-size:11px}#hearts{font-size:18px}#bottom{bottom:98px;width:94%}#bottom p{font-size:14px}#dpad{width:108px;height:98px}#actions button{width:46px;height:46px;font-size:11px}}
-</style></head>
-<body><div id="frame">
-<canvas id="game" width="480" height="270" aria-label="TALWIND-Spielwelt"></canvas>
-<div id="hud">
-  <div class="panel"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><div>✦ <span id="seedCount">0</span>/3 Echosamen</div></div>
-  <div class="panel" id="quest">DORF WINDRUH<small>Sprich mit Mira am Brunnen</small></div>
-</div>
-<div id="bottom" class="panel"><strong id="speaker">MIRA</strong><p id="words"></p></div>
-<div id="start"><div id="startCard"><p id="logo">TALWIND</p><h2>DIE SIEBEN ECHOS</h2><p>Ein farbenfrohes Abenteuer durch das Dorf Windruh.<br>Finde die Echosamen und entdecke die alte Ruine.</p><p><b>WASD / Pfeiltasten:</b> Bewegen<br><b>E / Leertaste:</b> Reden &amp; Aufheben<br><b>J:</b> Schwertangriff</p><button id="begin">ABENTEUER STARTEN</button></div></div>
-<div id="touch"><div id="dpad"><button data-dir="up">▲</button><button data-dir="left">◀</button><button data-dir="right">▶</button><button data-dir="down">▼</button></div><div id="actions"><button data-act="talk">A<br>AKTION</button><button data-act="hit">B<br>SCHWERT</button></div></div>
+:root{--ink:#392b2a;--cream:#fff0c9;--gold:#e8b85d;--red:#b94e43;--green:#356e4e}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#142e2b;color:var(--ink);font-family:Verdana,Arial,sans-serif}body{display:grid;place-items:center}#shell{position:relative;width:min(100vw,177.78vh);height:min(100vh,56.25vw);background:#263f36;overflow:hidden;box-shadow:0 0 0 5px #533b2e,0 0 0 9px #d7a85a}canvas{width:100%;height:100%;display:block;image-rendering:pixelated}#hud{position:absolute;inset:0;pointer-events:none;padding:12px;display:flex;justify-content:space-between;align-items:flex-start}.plate{background:linear-gradient(#fff4d8,#f2d9a0);border:3px solid #684632;box-shadow:inset 0 0 0 2px #d5a45c,3px 4px #382d27;border-radius:5px;padding:7px 11px;font-weight:800;font-size:clamp(10px,1.1vw,15px);line-height:1.45}.plate small{display:block;font-size:10px;color:#876548;font-weight:700}.hearts{color:#c74743;font-size:19px;letter-spacing:2px}.rightHud{text-align:right;max-width:40%}#quest{margin-top:6px}#rightActions{position:absolute;right:15px;bottom:16px;display:flex;flex-direction:column;gap:10px;align-items:center}#rightActions button{pointer-events:auto;width:clamp(48px,6vw,66px);height:clamp(48px,6vw,66px);border-radius:50%;border:4px solid #65452f;background:radial-gradient(circle at 35% 25%,#fff0bb,#d99a48 72%);box-shadow:0 5px #52372b, inset 0 0 0 2px #f9d78d;color:#593a2b;font-weight:1000;font-size:clamp(10px,1vw,13px);text-shadow:0 1px #fff1c9}#rightActions button:active{transform:translateY(3px);box-shadow:0 2px #52372b}#stick{position:absolute;left:15px;bottom:15px;width:112px;height:112px;border-radius:50%;background:#fff0c9aa;border:3px solid #76533a88;display:none;touch-action:none}#nub{position:absolute;left:33px;top:33px;width:40px;height:40px;border-radius:50%;background:linear-gradient(#fff1c9,#d9a45a);border:3px solid #65452f;box-shadow:0 3px #65452f}#dialog{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:min(66%,650px);display:none;pointer-events:auto;text-align:left}.dialogInner{background:linear-gradient(#fff4d9,#f4dfae);border:4px solid #684632;box-shadow:inset 0 0 0 2px #d9ad67,4px 5px #352c27;border-radius:5px;padding:12px 16px}.dialogInner strong{color:#a7473d;letter-spacing:1px}.dialogInner p{margin:6px 0 0;font-size:clamp(12px,1.2vw,16px);line-height:1.5}#dialog button{float:right;border:2px solid #65452f;background:#b94e43;color:#fff1cc;border-radius:4px;padding:6px 12px;font-weight:900}#overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(#173d35d9,#16352fef);padding:12px}.menu{width:min(92%,760px);max-height:96%;overflow:auto;background:linear-gradient(145deg,#fff1cb,#e9c17a);border:6px solid #65452f;box-shadow:inset 0 0 0 3px #d99d50,0 10px 0 #172e28;border-radius:8px;padding:clamp(14px,3vw,28px);text-align:center}.logo{font-family:Georgia,serif;font-size:clamp(42px,8vw,76px);font-weight:1000;letter-spacing:5px;color:#b84c3f;text-shadow:2px 2px #ffedb6,5px 6px #67412f;margin:0}.sub{font-family:Georgia,serif;color:#5d4936;font-weight:bold;letter-spacing:3px}.menu p{line-height:1.5}.heroes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.heroCard{border:3px solid #9a7148;background:#f8e5b7;border-radius:6px;padding:8px 4px;cursor:pointer;min-width:0;color:#49372c}.heroCard.selected{border-color:#a84339;background:#fff3ce;box-shadow:0 0 0 2px #e3b75d}.heroArt{height:48px;display:grid;place-items:center;font-size:34px;filter:drop-shadow(2px 3px #92704b)}.heroCard b{display:block;font-size:clamp(10px,1.2vw,14px)}.heroCard small{display:block;font-size:clamp(8px,.9vw,11px);line-height:1.3;margin-top:4px}.mainBtn{background:linear-gradient(#d35e4d,#a63c36);border:3px solid #633b30;box-shadow:0 4px #57372d;color:#fff0c9;padding:12px 25px;border-radius:5px;font-size:15px;font-weight:1000;letter-spacing:1px;cursor:pointer}.mainBtn:active{transform:translateY(3px);box-shadow:0 1px #57372d}.hint{font-size:11px;color:#765d43}@media(pointer:coarse){#stick{display:block}}@media(max-width:600px){.heroes{gap:4px}.heroCard{padding:5px 2px}.heroArt{height:34px;font-size:26px}.heroCard small{display:none}#hud{padding:6px}.plate{padding:4px 7px}#rightActions{right:7px;bottom:10px;gap:7px}#stick{left:8px;bottom:8px;width:94px;height:94px}#nub{left:27px;top:27px;width:34px;height:34px}#dialog{width:78%;bottom:8px}}
+</style></head><body><div id="shell"><canvas id="world" width="960" height="540"></canvas>
+<div id="hud"><div class="plate"><div class="hearts" id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroName">LYRA</span><small id="heroSkill">Windläuferin · Windstoß</small></div><div class="rightHud"><div class="plate">✦ <span id="seeds">0</span> / 3 Echosamen<small id="area">WINDRUH · DAS GRÜNE TAL</small></div><div class="plate" id="quest">Finde Mira am Dorfbrunnen</div></div></div>
+<div id="stick"><div id="nub"></div></div><div id="rightActions"><button id="skillBtn">FÄHIG-<br>KEIT</button><button id="attackBtn">KLANG-<br>KLIN­GE</button><button id="useBtn">AKTION</button></div>
+<div id="dialog"><div class="dialogInner"><button id="next">WEITER ▸</button><strong id="speaker">MIRA</strong><p id="speech"></p></div></div>
+<div id="overlay"><div class="menu"><h1 class="logo">TALWIND</h1><div class="sub">DIE SIEBEN ECHOS</div><p>Ein Abenteuer durch Avarra · Allein spielbar, für gemeinsames Spiel vorbereitet</p><h3>Wähle deinen Helden</h3><div class="heroes" id="heroes">
+<div class="heroCard selected" data-hero="0"><div class="heroArt">🧝🏻‍♀️</div><b>Lyra</b><small>Windläuferin<br>Schneller Sprint</small></div>
+<div class="heroCard" data-hero="1"><div class="heroArt">🛡️</div><b>Bram</b><small>Felswächter<br>Starker Schild</small></div>
+<div class="heroCard" data-hero="2"><div class="heroArt">🏹</div><b>Kael</b><small>Waldhüter<br>Fernschuss</small></div>
+<div class="heroCard" data-hero="3"><div class="heroArt">🔮</div><b>Nima</b><small>Echomagierin<br>Magischer Impuls</small></div>
+<div class="heroCard" data-hero="4"><div class="heroArt">🗡️</div><b>Rook</b><small>Schattenklinge<br>Ausweichrolle</small></div></div>
+<button class="mainBtn" id="start">ABENTEUER BEGINNEN</button><p class="hint">WASD / Pfeiltasten bewegen · J Angriff · K Fähigkeit · E Aktion · Controller unterstützt</p><p class="hint">Die Geschichte lässt sich allein erleben. Koop für bis zu vier Personen ist als spätere Erweiterung vorgesehen.</p></div></div>
 </div>
 <script>
 (()=>{'use strict';
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d',{alpha:false});ctx.imageSmoothingEnabled=false;
-const W=480,H=270,T=16,MW=76,MH=56;
-const C={
-  grass:'#78bd63',grassL:'#a6d775',grassD:'#4a8a50',grassX:'#326b49',
-  dirt:'#c58e59',dirtL:'#e0b177',dirtD:'#946343',stone:'#8e927f',stoneL:'#c1b99a',stoneD:'#626b61',
-  water:'#398cae',waterL:'#78c9ce',waterD:'#236b8a',foam:'#c5e8d7',
-  outline:'#563d32',wood:'#875538',woodL:'#bd8250',woodD:'#603d30',
-  roof:'#bd4c40',roofL:'#e17b55',roofD:'#803d38',roofX:'#f3a36a',
-  plaster:'#efd09a',plasterL:'#fff0c8',plasterD:'#c08a5b',
-  leaf:'#34764a',leafL:'#67ad59',leafX:'#8cc96b',leafD:'#28583d',
-  gold:'#f3c95f',white:'#fff0c8',skin:'#efbd83',teal:'#3d8d88',tealL:'#76c2a0',blue:'#497eaa'
-};
-const patterns={
-grassA:[
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg'],
-grassB:[
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg'],
-pathA:[
-'dddddddddddddddd','dssssssssssssssd','dsllsssllsssllsd','dssssssssssssssd',
-'dsssssddsssssssd','dssssssddssssssd','dssssssssssssssd','dddddddddddddddd',
-'dddddddddddddddd','dssssssssssssssd','dlllsssllsssllsd','dssssssssssssssd',
-'dssssssssssssssd','dssssssdddsssssd','dssssssssssssssd','dddddddddddddddd'],
-waterA:[
-'wwwwwwwwwwwwwwww','wlllllwwwwllllww','wwllwwwwwlllllww','wwwwwwwwllwwwwww',
-'wwllwwwwwwwwllww','wwlllwwwwllllwww','wwwwwwwwwwllwwww','wwwwllwwwwwwwwww',
-'wwwwwwwwwwwwwwww','wllllwwwwwwllllw','wwllwwwwwllllwww','wwwwwwwwwwllwwww',
-'wwllwwwwwwwwllww','wwlllwwwwllllwww','wwwwwwwwwwwwwwww','wwwwwwwwwwwwwwww'],
-shore:[
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg',
-'gggggggggggggggg','gggggggggggggggg','gggggggggggggggg','gggggggggggggggg'],
-roofA:[
-'rrrrrrrrrrrrrrrr','rxxxxxxxxxxxxxxr','rllrrllrrllrrllr','rllrrllrrllrrllr',
-'rrrrrrrrrrrrrrrr','rxxxxxxxxxxxxxxr','rllrrllrrllrrllr','rllrrllrrllrrllr',
-'rrrrrrrrrrrrrrrr','rxxxxxxxxxxxxxxr','rllrrllrrllrrllr','rllrrllrrllrrllr',
-'rrrrrrrrrrrrrrrr','rxxxxxxxxxxxxxxr','rllrrllrrllrrllr','rrrrrrrrrrrrrrrr'],
-roofB:[
-'rrrrrrrrrrrrrrrr','rrrrrrrrrrrrrrrr','rxxrrxxrrxxrrxxr','rxxrrxxrrxxrrxxr',
-'rrrrrrrrrrrrrrrr','rrrrrrrrrrrrrrrr','rxxrrxxrrxxrrxxr','rxxrrxxrrxxrrxxr',
-'rrrrrrrrrrrrrrrr','rrrrrrrrrrrrrrrr','rxxrrxxrrxxrrxxr','rxxrrxxrrxxrrxxr',
-'rrrrrrrrrrrrrrrr','rrrrrrrrrrrrrrrr','rxxrrxxrrxxrrxxr','rrrrrrrrrrrrrrrr'],
-wallA:[
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppplppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppppppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppppppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','dddddddddddddddd'],
-wallB:[
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppppppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppppppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','pppppppppppppppp',
-'pppppppppppppppp','pppppppppppppppp','pppppppppppppppp','dddddddddddddddd'],
-leafA:[
-'......dddd......','....ddllllldd...','..ddllllllllldd.','.dlllllllldlllld.',
-'dlllllllllllllld','dlllllldllllllld','dlllllllldllllld','dlllllllllllllld',
-'dlllllllldllllld','dlllllllllllllld','.dllllllllllll d'.replace(' ',''),'..ddllllllllldd.','....ddllllldd...','......dddd......','.......dd.......','................'],
-leafB:[
-'................','.....dddd.......','..ddllllldd.....','.dlllllllllld....','dllllllllllllld..','dlllllllldllllld.','dlllllllllllllld.','dlllllldlllllllld','dlllllllllllllld.','.dllllllllllllld.','..ddllllllllldd..','....ddllllddd....','......dddd.......','.......dd........','................','................'],
-flowerA:[
-'................','.......yy.......','......yyyy......','.......yy.......',
-'....pp.yy.pp.....','....pp.yw.pp.....','.....yyyyyy......','......ywy........',
-'.......gg........','.......gg........','......gggg.......','......g..g.......',
-'................','................','................','................'],
-bushA:[
-'................','......dddd......','....ddllllldd....','..ddllllllllldd..',
-'.dlllllldlllllld.','dlllllllldlllllld','dlllllllllllllld','dlllllllllllllld',
-'dlllllldlllllllld','dlllllllllllllld','.dllllllllllllld.','..dddddddddddd..',
-'....dd....dd.....','................','................','................'],
-hero:[
-'......dddd......','.....dyyyy d.....'.replaceAll(' ',''),'....dyyyyyy d....'.replaceAll(' ',''),'....dyyssyy d....'.replaceAll(' ',''),'.....dssss d.....'.replaceAll(' ',''),'......dssd........','.....dttttd.......','....dttttttd......','....dttttttd......','.....dttttd.......',
-'......dttd........','.....ddttdd.......','.....d....d.......','....dd....dd......','....d......d......','................',
-'................','................','................','................',
-'................','................','................','................'],
-slime:[
-'................','.....dddd.......','...ddggggdd.....','..dggllllggd....',
-'.dggllllllllgd...','dggllggggllggd..','dggllllllllllgd.','dggllllllllllgd.',
-'.dggllllllllgd...','..ddggggggdd.....','....dddddd.......','................',
-'................','................','................','................'],
-npc:[
-'......dddd......','.....dssss d.....'.replaceAll(' ',''),'....dssssss d....'.replaceAll(' ',''),'....dsswwssd.....','.....dssss d.....'.replaceAll(' ',''),'......dddd........',
-'.....dccccd.......','....dccccccd......','....dccccccd......','.....dccccd.......',
-'......d..d.........','.....dd..dd........','................','................','................','................'],
-trunk:['..dddd..','..dwwd..','..dwwd..','..dwwd..','..dwwd..','..dwwd..','..dwwd..','..dddd..']
-};
-const paletteFor={
-grassA:{g:C.grass},grassB:{g:C.grass,l:C.grassL,d:C.grassD},
-pathA:{d:C.dirtD,s:C.stone,l:C.stoneL},waterA:{w:C.water,l:C.waterL},shore:{g:C.grass},
-roofA:{r:C.roof,x:C.roofD,l:C.roofL},roofB:{r:C.roof,x:C.roofD,l:C.roofX},
-wallA:{p:C.plaster,l:C.plasterL,d:C.woodD},wallB:{p:C.plaster,d:C.woodD},
-leafA:{d:C.leafD,l:C.leaf},leafB:{d:C.leafD,l:C.leafL},
-flowerA:{y:C.gold,p:'#e98683',w:C.white,g:C.leaf},bushA:{d:C.leafD,l:C.leafL},
-hero:{d:C.outline,y:C.gold,s:C.skin,t:C.teal},slime:{d:C.outline,g:'#4a9955',l:'#a8d879'},
-npc:{d:C.outline,s:C.skin,w:C.white,c:C.blue}
-};
-const spriteCache=new Map();
-function blit(pattern,pal,x,y){for(let j=0;j<pattern.length;j++){const row=pattern[j];for(let i=0;i<row.length;i++){const col=pal[row[i]];if(col){ctx.fillStyle=col;ctx.fillRect(Math.round(x+i),Math.round(y+j),1,1)}}}}
-const map=Array.from({length:MH},()=>Array(MW).fill('grass'));
-function put(tx,ty,type){if(tx>=0&&ty>=0&&tx<MW&&ty<MH)map[ty][tx]=type}
-function makeWorld(){
-  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)put(x,y,((x*17+y*23)%29===0)?'grassB':'grass');
-  for(let y=0;y<MH;y++){const rx=43+Math.round(Math.sin(y*.19)*1.7);for(let d=-1;d<=1;d++)put(rx+d,y,'water');put(rx-2,y,'shore');put(rx+2,y,'shore')}
-  for(let x=5;x<44;x++)for(let dy=-1;dy<=1;dy++)put(x,24+dy,'path');
-  for(let y=8;y<42;y++)for(let dx=-1;dx<=1;dx++)put(22+dx,y,'path');
-  for(let x=17;x<29;x++)for(let y=18;y<30;y++)if((x+y)%2===0)put(x,y,'path');
-  // meadow, gardens and forest clearings
-  for(let x=4;x<40;x++)for(let y=5;y<43;y++)if((x*13+y*7)%47===0)put(x,y,'flower');
-  for(let x=7;x<15;x++)for(let y=10;y<17;y++)if((x+y)%3===0)put(x,y,'flower');
+const c=document.querySelector('#world'),ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;const S=2,tw=32,th=32,MW=84,MH=60;const cam={x:0,y:0};let started=false,last=0,selected=0,dialog=false,seedCount=0,hp=5,attackT=0,skillT=0,inv=0,toastT=0;const key={};const stick={x:0,y:0};
+const heroes=[{name:'LYRA',title:'Windläuferin',skill:'Windstoß',color:'#e8b6a1',speed:158,desc:'Ein schneller Windstoß schiebt dich nach vorn.'},{name:'BRAM',title:'Felswächter',skill:'Steinhaut',color:'#9d9b82',speed:112,desc:'Steinhaut schützt dich kurz vor Gegnern.'},{name:'KAEL',title:'Waldhüter',skill:'Sternenschuss',color:'#78a66a',speed:132,desc:'Ein grüner Lichtpfeil trifft Gegner aus der Ferne.'},{name:'NIMA',title:'Echomagierin',skill:'Echowelle',color:'#a78bd0',speed:126,desc:'Eine magische Welle vertreibt Gegner in deiner Nähe.'},{name:'ROOK',title:'Schattenklinge',skill:'Schattenrolle',color:'#657e9a',speed:146,desc:'Eine kurze Rolle macht dich vorübergehend unverwundbar.'}];
+const player={x:42*tw,y:31*th,vx:0,vy:0,face:1,walk:0};const npcs=[{x:41*tw,y:29*th,name:'MIRA',color:'#c76c54',line:'Die sieben Echos sind verschwunden. Drei Echosamen können den alten Brunnen wieder erwecken. Hilfst du unserem Dorf?'},{x:32*tw,y:34*th,name:'TOMKE',color:'#5b92a8',line:'Am Flussufer wachsen blaue Sternblumen. Die alten Wege führen überall hin – schau dich um!'},{x:53*tw,y:27*th,name:'EDA',color:'#d49b53',line:'Hinter dem Apfelgarten liegt ein vergessener Schrein. Dort soll ein Echo wohnen.'},{x:47*tw,y:38*th,name:'FINN',color:'#8c79ad',line:'Die kleinen Schleime sehen harmlos aus. Aber pass auf, wenn sie sich ducken!'}];
+const seeds=[{x:25*tw,y:28*th},{x:58*tw,y:18*th},{x:66*tw,y:44*th,got:false}];const enemies=[{x:69*tw,y:24*th,hp:3},{x:73*tw,y:30*th,hp:3},{x:65*tw,y:40*th,hp:3},{x:76*tw,y:44*th,hp:4}];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));function rect(x,y,w,h,col){ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),w,h)}function line(x,y,w,h,col){rect(x,y,w,h,col)}
+function tile(x,y,col){rect(x*tw,y*tw,tw,tw,col)}
+function grass(x,y){tile(x,y,((x*13+y*7)%5===0)?'#58a957':'#68b85d');for(let k=0;k<4;k++){let px=x*tw+(x*17+y*11+k*9)%29,py=y*tw+(x*7+y*19+k*13)%29;rect(px,py,2,2,k%2?'#8bd16d':'#4c984d')}if((x*3+y*11)%19===0){rect(x*tw+8,y*tw+10,5,2,'#9bd878');rect(x*tw+10,y*tw+7,2,6,'#9bd878')}}
+function path(x,y){tile(x,y,'#ddcda4');rect(x*tw,y*tw,tw,2,'#f4e8c8');rect(x*tw,y*tw+30,tw,2,'#c6b68f');for(let i=0;i<3;i++){rect(x*tw+3+i*10,y*tw+7,1,21,'#c9b991');rect(x*tw+4+i*10,y*tw+8,7,1,'#eee0bd')}}
+function water(x,y){tile(x,y,'#2589c8');rect(x*tw+4,y*tw+5,11,2,'#64c6ed');rect(x*tw+20,y*tw+19,8,2,'#83d5ef');rect(x*tw+13,y*tw+26,6,2,'#1673b1');if((x+y)%3===0)rect(x*tw+5,y*tw+14,3,2,'#d1f5ef')}
+function tree(x,y,kind=0){let X=x*tw,Y=y*tw;rect(X+12,Y+21,10,13,'#805037');rect(X+8,Y+9,20,18,'#276e48');rect(X+4,Y+5,24,19,kind?'#28794c':'#318b50');rect(X+8,Y+1,18,16,'#42a65a');rect(X+12,Y+3,10,6,'#75c969');rect(X+6,Y+12,6,7,'#56b961');rect(X+22,Y+12,5,6,'#1e603f');rect(X+13,Y+21,3,3,'#a4d56a');rect(X+10,Y+27,3,2,'#553c2d');}
+function flower(x,y,col){let X=x*tw,Y=y*tw;rect(X+14,Y+15,2,9,'#327e43');rect(X+10,Y+11,4,4,col);rect(X+18,Y+11,4,4,col);rect(X+14,Y+7,4,4,'#fff4d0');rect(X+14,Y+14,4,4,'#f7c94f');}
+function bush(x,y){let X=x*tw,Y=y*tw;rect(X+5,Y+12,22,13,'#2d7b48');rect(X+8,Y+7,16,15,'#43a956');rect(X+11,Y+9,6,5,'#82d16a');rect(X+21,Y+14,5,4,'#23613c')}
+function house(x,y,roof){let X=x*tw,Y=y*tw;rect(X+3,Y+18,58,42,'#c49a65');rect(X+7,Y+22,50,34,'#ead4a7');rect(X+2,Y+16,60,7,'#5a4030');rect(X+5,Y+5,54,19,roof);rect(X+11,Y,42,12,roof);rect(X+16,Y-3,30,6,roof);for(let r=0;r<3;r++)for(let q=0;q<4;q++)rect(X+8+q*12,Y+7+r*5,9,2,r%2?'#8d3d36':'#e88a65');rect(X+12,Y+28,11,13,'#5d9db2');rect(X+13,Y+29,9,11,'#b4e8e0');rect(X+44,Y+28,10,13,'#5d9db2');rect(X+45,Y+29,8,11,'#b4e8e0');rect(X+27,Y+35,12,25,'#75482f');rect(X+35,Y+46,2,2,'#f6c65b');rect(X+27,Y+35,12,2,'#b77a4a');rect(X+18,Y+3,5,3,'#f5c978');rect(X+42,Y+8,5,3,'#f5c978')}
+function fence(x,y,len=1){for(let i=0;i<len;i++){let X=(x+i)*tw,Y=y*tw;rect(X+2,Y+8,28,4,'#9a6539');rect(X+2,Y+21,28,4,'#9a6539');rect(X+4,Y+4,5,25,'#754a2e');rect(X+23,Y+4,5,25,'#754a2e');rect(X+3,Y+4,7,3,'#d4a46a');rect(X+22,Y+4,7,3,'#d4a46a')}}
+function fountain(x,y){let X=x*tw,Y=y*tw;rect(X+2,Y+14,60,36,'#8c897b');rect(X+7,Y+10,50,34,'#c6c2a8');rect(X+11,Y+14,42,25,'#2c9bd0');rect(X+18,Y+19,27,3,'#7fe1ed');rect(X+29,Y+4,5,18,'#aaa999');rect(X+24,Y+9,15,5,'#d6d3bd');rect(X+28,Y,7,7,'#e3e1cf');rect(X+30,Y-6,3,9,'#9ce7f1');}
+function sign(x,y){let X=x*tw,Y=y*tw;rect(X+14,Y+14,4,19,'#785033');rect(X+3,Y+3,27,16,'#9b623a');rect(X+5,Y+5,23,11,'#e4bd79');rect(X+9,Y+8,15,2,'#8d4936');}
+function generateWorld(){for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)grass(x,y);
+for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(x>=7&&x<=10&&y<26||x>=4&&x<=8&&y>=35&&y<59)water(x,y)}
+// River bend and pebble banks
+for(let y=0;y<26;y++){for(let x=6;x<=11;x++)if(x===6||x===11) {rect(x*tw,y*tw,tw,tw,'#a8a078');rect(x*tw+5,y*tw+5,20,20,'#6c9b59')}} 
+// Main village plaza and branching paths
+for(let y=26;y<=37;y++)for(let x=10;x<MW;x++)path(x,y);
+for(let y=5;y<27;y++)for(let x=39;x<=42;x++)path(x,y);
+for(let y=37;y<49;y++)for(let x=39;x<=42;x++)path(x,y);
+for(let y=27;y<=36;y++)for(let x=26;x<=28;x++)path(x,y);
+for(let y=20;y<=25;y++)for(let x=10;x<=20;x++)path(x,y);
+for(let y=0;y< MH;y++)for(let x=0;x<MW;x++){if((x*5+y*3)%47===0&&!(x>10&&x<60&&y>20&&y<40))bush(x,y)}
+// Homes and gardens
+house(24,10,'#287d83');house(49,10,'#b94c42');house(15,42,'#c58a45');house(54,43,'#638c72');
+fountain(34,27);sign(29,30);sign(46,33);
+fence(57,17,6);fence(57,22,6);for(let x=58;x<63;x++)for(let y=18;y<22;y++){bush(x,y);if((x+y)%2===0)flower(x,y,'#d48bd0')}
+fence(49,40,5);fence(49,45,5);for(let x=50;x<54;x++)for(let y=41;y<45;y++)if((x+y)%2===0)flower(x,y,'#f3b2cb');
+fence(17,48,5);fence(17,53,5);for(let x=18;x<21;x++)for(let y=49;y<53;y++)flower(x,y,'#eecb63');
+for(let i=0;i<38;i++){let x=(i*17+3)%MW,y=(i*23+4)%MH;if((x<6||x>61||y<5||y>53)&&!(x>7&&x<12))tree(x,y,i%3===0)}
+for(let i=0;i<28;i++){let x=(i*19+13)%MW,y=(i*11+7)%MH;if(x>12&&x<77&&y>4&&y<55)flower(x,y,['#fff0c2','#f0a4c1','#b8a0e8'][i%3])}
+for(let x=0;x<MW;x+=3){if(x<7||x>62){tree(x,55,1);if(x+1<MW)tree(x+1,56,1)}}
+for(let i=0;i<10;i++){let x=64+i%5,y=8+Math.floor(i/5)*3;tree(x,y,0)}
+// bridge crossing the river
+for(let y=27;y<=34;y++){rect(6*tw,y*tw,6*tw,tw,'#9b683e');rect(6*tw,y*tw,6*tw,4,'#d5a46a');rect(6*tw,y*tw+27,6*tw,5,'#67442f');for(let x=6;x<12;x+=2){rect(x*tw,y*tw+5,4,20,'#b77d48')}}
 }
-makeWorld();
-const houses=[
-{x:7,y:8,roof:0},{x:16,y:6,roof:1},{x:28,y:8,roof:2},{x:5,y:31,roof:3},
-{x:15,y:32,roof:4},{x:28,y:31,roof:5},{x:34,y:15,roof:6},{x:3,y:19,roof:7},
-{x:18,y:15,roof:8},{x:29,y:20,roof:9}
-];
-const npcs=[
-{x:22*T,y:21*T,name:'MIRA',shirt:'#d38b55',line:'Die sieben Echos sind verstummt. Sammle drei Echosamen in den Gärten und bringe den Wind zurück.',kind:'mira'},
-{x:11*T,y:24*T,name:'BRUNO',shirt:'#477eaa',line:'Hinter dem Fluss liegt die alte Ruine. Die Holzbrücke führt dich hinüber.',kind:'bruno'},
-{x:31*T,y:24*T,name:'LIO',shirt:'#9a72a8',line:'Die Blumen am Brunnen blühen sogar im Winter. Seltsam, oder?',kind:'lio'},
-{x:9*T,y:16*T,name:'EDA',shirt:'#bd6550',line:'Ich verkaufe Beeren und Honig. Pass auf die Schleime am Waldrand auf!',kind:'eda'},
-{x:27*T,y:18*T,name:'TOM',shirt:'#ad6d3c',line:'Ich repariere die Dächer. Das rote Haus dort gehört dem Schmied.',kind:'tom'},
-{x:17*T,y:27*T,name:'NELA',shirt:'#ae6d9c',line:'Ich habe einen Echosamen im Garten gesehen. Er glitzert golden.',kind:'nela'},
-{x:35*T,y:26*T,name:'WACHE',shirt:'#647c78',line:'Östlich der Brücke beginnt der alte Wald. Dort sind Schleime unterwegs.',kind:'guard'}
-];
-const seeds=[{x:10*T+7,y:13*T+5,got:false},{x:30*T+7,y:12*T+5,got:false},{x:34*T+7,y:37*T+5,got:false}];
-const enemies=[{x:53*T,y:22*T,hp:2,alive:true},{x:58*T,y:30*T,hp:2,alive:true},{x:49*T,y:38*T,hp:2,alive:true},{x:62*T,y:35*T,hp:3,alive:true}];
-const trees=[];
-for(let y=4;y<49;y+=4)for(let x=2;x<41;x+=5)if((x*11+y*7)%4!==0 && !(x>5&&x<39&&y>5&&y<41&&((x>6&&x<38)&&(y>5&&y<42))&&((x*13+y*7)%9!==0)))trees.push({x:x*T,y:y*T});
-for(let y=5;y<48;y+=3)for(let x=62;x<75;x+=3)trees.push({x:x*T,y:y*T});
-const props=[
-{x:19*T,y:23*T,type:'well'},{x:25*T,y:25*T,type:'stall'},{x:13*T,y:25*T,type:'crate'},
-{x:32*T,y:27*T,type:'lamp'},{x:8*T,y:27*T,type:'fence'},{x:14*T,y:28*T,type:'fence'},
-{x:37*T,y:24*T,type:'barrel'},{x:4*T,y:27*T,type:'bush'}
-];
-const player={x:22*T+8,y:27*T,vx:0,vy:0,dir:'down',walk:0,attack:0,inv:0,hp:5};
-let found=0,ruinUnlocked=false,dialog=false,started=false,gameOver=false;
-const keys={},touch={x:0,y:0};let padAction=false,padAttack=false,last=0,cam={x:0,y:0};
-function drawTile(type,x,y,variation=0){
-  if(type==='grass'||type==='grassB')blit(patterns[type],paletteFor[type],x,y);
-  else if(type==='path')blit(patterns.pathA,paletteFor.pathA,x,y);
-  else if(type==='water')blit(patterns.waterA,paletteFor.waterA,x,y);
-  else if(type==='shore'){
-    blit(patterns.grassA,{g:C.grass},x,y);
-    for(let i=0;i<5;i++){ctx.fillStyle=i%2?C.waterL:C.water;ctx.fillRect(x+11+i,y+((i*3+variation)%13),1,2)}
-    ctx.fillStyle=C.foam;ctx.fillRect(x+10,y+3+variation%6,4,1);
-  }else if(type==='flower'){
-    blit(patterns.grassB,paletteFor.grassB,x,y);
-    blit(patterns.flowerA,paletteFor.flowerA,x,y);
-  }
-}
-function drawHouse(h){
-  const x=h.x*T,y=h.y*T,roofPal={r:['#b94b40','#c55a45','#a94a42','#c77a46','#4f8791','#b85042','#d18d43','#4e8594','#cf694d','#b85749'][h.roof],x:C.roofD,l:C.roofL};
-  // deep cast shadow and the warm plaster walls
-  ctx.fillStyle='#3a59444a';ctx.fillRect(x+3,y+39,59,10);
-  for(let row=0;row<2;row++)for(let col=0;col<3;col++)blit(patterns[row===0?'wallA':'wallB'],paletteFor[row===0?'wallA':'wallB'],x+8+col*16,y+5+row*16);
-  // roof: individual patterned shingle tiles, with a dark fascia and highlights
-  for(let row=0;row<2;row++)for(let col=0;col<4;col++)blit(patterns[(row+col)%2?'roofA':'roofB'],roofPal,x+col*16,y-17+row*16);
-  ctx.fillStyle=C.outline;ctx.fillRect(x-1,y+12,4,34);ctx.fillRect(x+61,y+12,4,34);
-  // windows have wooden frames, a bright pane and a small crossbar
-  drawWindow(x+13,y+14);drawWindow(x+43,y+14);
-  drawDoor(x+27,y+20);
-  // chimney and roof ridge glints
-  ctx.fillStyle=C.outline;ctx.fillRect(x+48,y-24,8,12);ctx.fillStyle='#b7b2a0';ctx.fillRect(x+49,y-23,6,7);ctx.fillStyle='#e9d0a0';ctx.fillRect(x+49,y-24,6,2);
-}
-function drawWindow(x,y){
-  ctx.fillStyle=C.outline;ctx.fillRect(x-1,y-1,11,13);ctx.fillStyle=C.wood;ctx.fillRect(x,y,9,11);
-  ctx.fillStyle='#4d8da0';ctx.fillRect(x+1,y+1,7,8);ctx.fillStyle='#b6e3d1';ctx.fillRect(x+2,y+2,3,3);
-  ctx.fillStyle=C.woodD;ctx.fillRect(x+4,y+1,1,8);ctx.fillRect(x+1,y+5,7,1);
-  ctx.fillStyle='#e6bd79';ctx.fillRect(x-2,y+10,13,2);
-}
-function drawDoor(x,y){
-  ctx.fillStyle=C.outline;ctx.fillRect(x-1,y-1,14,20);ctx.fillStyle=C.wood;ctx.fillRect(x,y,12,19);
-  ctx.fillStyle=C.woodL;ctx.fillRect(x+2,y+2,8,14);ctx.fillStyle=C.woodD;ctx.fillRect(x+5,y+2,1,14);
-  ctx.fillStyle=C.gold;ctx.fillRect(x+9,y+10,2,2);ctx.fillStyle='#d9a46b';ctx.fillRect(x-2,y+18,16,2);
-}
-function drawTree(o){
-  const x=o.x,y=o.y;
-  ctx.fillStyle='#3c553b80';ctx.fillRect(x+4,y+25,25,5);
-  blit(patterns.trunk,{d:C.woodD,w:C.wood},x+12,y+17);
-  blit(patterns.leafA,paletteFor.leafA,x,y);
-  blit(patterns.leafB,paletteFor.leafB,x+14,y+2);
-  ctx.fillStyle=C.leafX;ctx.fillRect(x+7,y+5,3,2);ctx.fillRect(x+19,y+8,2,2);ctx.fillRect(x+11,y+14,2,2);
-  ctx.fillStyle=C.leafD;ctx.fillRect(x+3,y+19,3,3);ctx.fillRect(x+25,y+15,3,4);
-}
-function drawActor(a,isPlayer=false){
-  const x=Math.round(a.x-8),y=Math.round(a.y-20),bob=isPlayer&&Math.hypot(player.vx,player.vy)>1?Math.round(Math.sin(player.walk)*1):0;
-  ctx.fillStyle='#344f3c88';ctx.fillRect(x+3,y+22,11,3);
-  if(isPlayer){
-    blit(patterns.hero,paletteFor.hero,x,y+bob);
-    // face, helmet rim and shoulder detail
-    ctx.fillStyle='#684431';ctx.fillRect(x+5,y+9+bob,2,2);ctx.fillRect(x+10,y+9+bob,2,2);
-    ctx.fillStyle='#d9b66c';ctx.fillRect(x+4,y+5+bob,8,1);
-    if(player.attack>0){ctx.fillStyle='#f6e69a';if(player.dir==='left')ctx.fillRect(x-9,y+9,8,3);else if(player.dir==='right')ctx.fillRect(x+17,y+9,8,3);else if(player.dir==='up')ctx.fillRect(x+6,y-5,3,8);else ctx.fillRect(x+7,y+23,3,8)}
-  }else{
-    const shirt=a.shirt||C.blue;
-    blit(patterns.npc,paletteFor.npc,x,y);
-    ctx.fillStyle=shirt;ctx.fillRect(x+4,y+13,8,7);ctx.fillRect(x+3,y+15,2,4);ctx.fillRect(x+11,y+15,2,4);
-    ctx.fillStyle='#604332';ctx.fillRect(x+5,y+8,2,2);ctx.fillRect(x+10,y+8,2,2);
-    ctx.fillStyle='#fff0c8';ctx.fillRect(x+6,y+8,1,1);ctx.fillRect(x+11,y+8,1,1);
-  }
-}
-function drawSlime(e){
-  const x=Math.round(e.x-8),y=Math.round(e.y-10);
-  ctx.fillStyle='#36533e88';ctx.fillRect(x+2,y+10,13,3);
-  blit(patterns.slime,paletteFor.slime,x,y);
-  ctx.fillStyle='#eff6bb';ctx.fillRect(x+4,y+5,2,2);ctx.fillRect(x+10,y+5,2,2);
-  ctx.fillStyle='#33553d';ctx.fillRect(x+5,y+6,1,2);ctx.fillRect(x+11,y+6,1,2);
-}
-function drawWell(x,y){
-  ctx.fillStyle=C.outline;ctx.fillRect(x,y+4,28,15);ctx.fillStyle='#a6a18b';ctx.fillRect(x+2,y+5,24,12);
-  ctx.fillStyle='#5d9eaa';ctx.fillRect(x+5,y+7,18,8);ctx.fillStyle='#b8e2d2';ctx.fillRect(x+8,y+8,6,2);
-  ctx.fillStyle=C.woodD;ctx.fillRect(x+1,y+1,26,3);ctx.fillRect(x+4,y-5,3,8);ctx.fillRect(x+21,y-5,3,8);
-  ctx.fillStyle='#bd8a59';ctx.fillRect(x+3,y-7,22,3);ctx.fillStyle=C.gold;ctx.fillRect(x+12,y-2,2,2);
-}
-function drawStall(x,y){
-  ctx.fillStyle=C.outline;ctx.fillRect(x,y+7,30,15);ctx.fillStyle=C.wood;ctx.fillRect(x+2,y+9,26,11);
-  ctx.fillStyle='#d8b278';ctx.fillRect(x-1,y+4,32,4);ctx.fillStyle='#c95449';ctx.fillRect(x+1,y-4,28,8);
-  ctx.fillStyle='#f0c36b';ctx.fillRect(x+1,y-4,7,8);ctx.fillRect(x+15,y-4,7,8);
-  ctx.fillStyle='#5c8c55';ctx.fillRect(x+5,y+6,4,3);ctx.fillStyle='#e2b950';ctx.fillRect(x+14,y+6,5,3);
-}
-function drawProp(p){
-  const x=p.x,y=p.y;
-  if(p.type==='well')drawWell(x,y);
-  if(p.type==='stall')drawStall(x,y);
-  if(p.type==='crate'){ctx.fillStyle=C.outline;ctx.fillRect(x,y,15,14);ctx.fillStyle=C.woodL;ctx.fillRect(x+1,y+1,13,12);ctx.fillStyle=C.woodD;ctx.fillRect(x+3,y+1,2,12);ctx.fillRect(x+9,y+1,2,12);ctx.fillRect(x+1,y+6,13,2)}
-  if(p.type==='barrel'){ctx.fillStyle=C.outline;ctx.fillRect(x+2,y,12,17);ctx.fillStyle=C.woodL;ctx.fillRect(x+3,y+1,10,15);ctx.fillStyle=C.woodD;ctx.fillRect(x+3,y+4,10,2);ctx.fillRect(x+3,y+11,10,2);ctx.fillStyle='#d2a36b';ctx.fillRect(x+3,y+1,2,14)}
-  if(p.type==='lamp'){ctx.fillStyle=C.woodD;ctx.fillRect(x+7,y,3,27);ctx.fillStyle=C.gold;ctx.fillRect(x+3,y-7,11,9);ctx.fillStyle='#fff1a4';ctx.fillRect(x+6,y-5,5,5);ctx.fillStyle='#e38d43';ctx.fillRect(x+5,y-4,2,3)}
-  if(p.type==='fence'){ctx.fillStyle=C.woodD;ctx.fillRect(x,y+3,16,3);ctx.fillRect(x,y+11,16,3);ctx.fillRect(x+2,y,3,16);ctx.fillRect(x+11,y,3,16);ctx.fillStyle=C.woodL;ctx.fillRect(x+3,y+4,12,1)}
-  if(p.type==='bush'){blit(patterns.bushA,paletteFor.bushA,x-3,y-3);ctx.fillStyle=C.gold;ctx.fillRect(x+4,y+4,2,2);ctx.fillRect(x+11,y+8,2,2)}
-}
-function drawBridge(){
-  const rx=43*T+Math.round(Math.sin(23*.19)*1.7)*T;
-  for(let y=21;y<=26;y++){
-    ctx.fillStyle='#674630';ctx.fillRect(rx-8,y*T,52,16);
-    ctx.fillStyle='#b77d4e';ctx.fillRect(rx-7,y*T+1,50,3);
-    for(let x=0;x<4;x++){ctx.fillStyle=x%2?'#8f5c3c':'#a96e45';ctx.fillRect(rx-6+x*13,y*T+4,12,10);ctx.fillStyle='#d49a61';ctx.fillRect(rx-5+x*13,y*T+5,1,7)}
-    ctx.fillStyle='#644530';ctx.fillRect(rx-8,y*T,2,16);ctx.fillRect(rx+42,y*T,2,16);
-  }
-  ctx.fillStyle='#d1a26b';ctx.fillRect(rx-10,21*T,3,96);ctx.fillRect(rx+43,21*T,3,96);
-}
-function drawSeed(s,t){
-  const x=s.x-5,y=s.y-8,bob=Math.sin(t/220+s.x)*1.5;
-  ctx.fillStyle='#3d664988';ctx.fillRect(x+3,y+14,10,2);
-  ctx.fillStyle='#d99b32';ctx.fillRect(x+7,y+4+bob,4,9);ctx.fillRect(x+5,y+7+bob,2,4);
-  ctx.fillStyle='#fff0a0';ctx.fillRect(x+6,y+2+bob,3,3);ctx.fillRect(x+11,y+5+bob,2,2);
-  ctx.fillStyle='#f8d65e';ctx.fillRect(x+8,y+3+bob,2,2);
-}
-function talk(text,name){
-  dialog=true;document.getElementById('speaker').textContent=name;
-  document.getElementById('words').textContent=text;document.getElementById('bottom').style.display='block';
-}
-function closeTalk(){dialog=false;document.getElementById('bottom').style.display='none'}
-function interact(){
- if(dialog){closeTalk();return}
- const near=npcs.find(n=>Math.hypot(n.x-player.x,n.y-player.y)<35);
- if(near){
-   if(near.kind==='mira'&&found>=3){ruinUnlocked=true;document.getElementById('quest').innerHTML='DIE ALTE RUINE<small>Das Tor im Osten ist offen!</small>';talk('Du hast alle drei Echosamen gefunden! Die Ruine erwacht. Geh über die Brücke nach Osten.','MIRA')}
-   else talk(near.line,near.name);
-   return;
- }
- const seed=seeds.find(s=>!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<30);
- if(seed){seed.got=true;found++;document.getElementById('seedCount').textContent=found;localStorage.setItem('talwind-seeds',String(found));
-   if(found>=3){document.getElementById('quest').innerHTML='ZURÜCK ZU MIRA<small>Die drei Echosamen sind gefunden!</small>';talk('Drei goldene Echosamen! Kehre zum Brunnen zurück und sprich mit Mira.','ECHOSAMEN')}
-   else talk('Ein Echosamen! Er leuchtet warm in deiner Hand.','ECHOSAMEN');
-   return;
- }
- if(Math.hypot(player.x-68*T,player.y-18*T)<70){
-   if(ruinUnlocked)talk('Das uralte Tor schwingt auf. Ein heller Wind trägt eine vergessene Melodie aus den Steinen.','DIE RUINE');
-   else talk('Das Tor ist versiegelt. Sammle zuerst die drei Echosamen und sprich mit Mira.','VERSCHLOSSEN');
- }
-}
-function attack(){
- if(player.attack>0)return;player.attack=.23;
- for(const e of enemies)if(e.alive&&Math.hypot(e.x-player.x,e.y-player.y)<34){e.hp--;if(e.hp<=0)e.alive=false}
-}
-function inputVector(){
- let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+touch.x;
- let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+touch.y;
- const pads=navigator.getGamepads?navigator.getGamepads():[];
- const gp=pads&&pads[0];
- if(gp&&gp.connected){
-   const ax=gp.axes[0]||0,ay=gp.axes[1]||0;
-   if(Math.hypot(ax,ay)>.15){x=ax;y=ay}
-   const a=!!(gp.buttons[0]&&gp.buttons[0].pressed),b=!!(gp.buttons[1]&&gp.buttons[1].pressed);
-   if(a&&!padAction){interact();padAction=true}if(!a)padAction=false;
-   if(b&&!padAttack){attack();padAttack=true}if(!b)padAttack=false;
- }
- const m=Math.hypot(x,y);if(m>1){x/=m;y/=m}
- return{x,y};
-}
-function blocked(x,y){
- if(x<10||y<8||x>MW*T-10||y>MH*T-8)return true;
- const tx=Math.floor(x/T),ty=Math.floor(y/T),tile=map[ty]&&map[ty][tx];
- if(tile==='water' && !(tx>=41&&tx<=45&&ty>=21&&ty<=26))return true;
- for(const h of houses)if(x>h.x*T+3&&x<h.x*T+61&&y>h.y*T+1&&y<h.y*T+39)return true;
- if(x>67*T&&x<73*T&&y>14*T&&y<23*T&&!ruinUnlocked)return true;
- for(const p of props)if(p.type==='well'&&Math.hypot(x-(p.x+14),y-(p.y+12))<20)return true;
- return false;
-}
-function update(dt,t){
- const v=inputVector(),speed=94;
- player.vx=v.x*speed;player.vy=v.y*speed;
- if(v.x||v.y){player.walk+=dt*10;player.dir=Math.abs(v.x)>Math.abs(v.y)?(v.x>0?'right':'left'):(v.y>0?'down':'up')}
- let nx=player.x+player.vx*dt,ny=player.y+player.vy*dt;
- if(!blocked(nx,player.y))player.x=nx;if(!blocked(player.x,ny))player.y=ny;
- player.attack=Math.max(0,player.attack-dt);player.inv=Math.max(0,player.inv-dt);
- for(const e of enemies)if(e.alive){
-   const dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy);
-   if(d<100&&d>3){e.x+=dx/d*22*dt;e.y+=dy/d*22*dt}
-   if(d<18&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=1.0;document.getElementById('hearts').textContent='♥ '.repeat(player.hp)+'♡ '.repeat(5-player.hp);if(player.hp===0){player.hp=5;player.x=22*T+8;player.y=27*T;talk('Du bist zurück zum Dorfbrunnen gebracht worden. Pass im Wald besser auf!','MIRA')}}
- }
- cam.x=Math.max(0,Math.min(MW*T-W,player.x-W/2));cam.y=Math.max(0,Math.min(MH*T-H,player.y-H/2));
-}
-function render(t){
- ctx.fillStyle=C.grass;ctx.fillRect(0,0,W,H);
- ctx.save();ctx.translate(-Math.floor(cam.x),-Math.floor(cam.y));
- const sx=Math.floor(cam.x/T),sy=Math.floor(cam.y/T);
- for(let y=sy;y<sy+18;y++)for(let x=sx;x<sx+32;x++)if(map[y]&&map[y][x])drawTile(map[y][x],x*T,y*T,(x+y)%7);
- drawBridge();
- // houses and tall objects are sorted by their ground contact point
- const drawables=[
-   ...houses.map(h=>({y:(h.y+2.8)*T,draw:()=>drawHouse(h)})),
-   ...trees.map(o=>({y:o.y+29,draw:()=>drawTree(o)})),
-   ...props.map(o=>({y:o.y+15,draw:()=>drawProp(o)})),
-   ...npcs.map(o=>({y:o.y+5,draw:()=>drawActor(o)})),
-   ...enemies.filter(e=>e.alive).map(o=>({y:o.y+5,draw:()=>drawSlime(o)})),
-   {y:player.y+4,draw:()=>drawActor(player,true)}
- ].sort((a,b)=>a.y-b.y);
- for(const obj of drawables)obj.draw();
- for(const s of seeds)if(!s.got)drawSeed(s,t);
- // far eastern ruin with stone gate
- const rx=68*T,ry=13*T;
- ctx.fillStyle=C.stoneD;ctx.fillRect(rx,ry,6*T,8*T);ctx.fillStyle=C.stone;ctx.fillRect(rx+5,ry+4,4*T,4*T);
- ctx.fillStyle=C.stoneL;ctx.fillRect(rx+5,ry+4,4*T,2);ctx.fillRect(rx+5,ry+4,2,4*T);
- ctx.fillStyle=ruinUnlocked?'#6eae77':'#493a32';ctx.fillRect(rx+T,ry+2*T,4*T,5*T);
- ctx.fillStyle='#b1a58b';ctx.fillRect(rx+T,ry+2*T,4*T,2);
- ctx.restore();
-}
-function loop(t){
- if(!started)return;
- const dt=Math.min(.04,(t-last)/1000||0);last=t;
- if(!dialog)update(dt,t);
- render(t);requestAnimationFrame(loop);
-}
-document.getElementById('begin').onclick=()=>{
- document.getElementById('start').style.display='none';started=true;last=performance.now();requestAnimationFrame(loop);
-};
-addEventListener('keydown',e=>{
- const k=e.key.toLowerCase();keys[k]=true;
- if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
- if((k==='e'||k===' '||k==='enter')&&!e.repeat)interact();
- if(k==='j'&&!e.repeat)attack();
-});
-addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
-document.querySelectorAll('[data-dir]').forEach(b=>{
- const set=()=>{touch.x=(keys.left? -1:0)+(keys.right?1:0);touch.y=(keys.up?-1:0)+(keys.down?1:0)};
- const press=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);keys[b.dataset.dir]=true;set()};
- const release=()=>{keys[b.dataset.dir]=false;set()};
- b.addEventListener('pointerdown',press);['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,release));
-});
-document.querySelector('[data-act="talk"]').onclick=interact;
-document.querySelector('[data-act="hit"]').onclick=attack;
-render(0);
-})();</script></body></html>
+function drawPerson(x,y,color,kind=0){let X=Math.round(x),Y=Math.round(y);rect(X+7,Y+24,18,4,'#38543d');rect(X+9,Y+9,14,15,color);rect(X+8,Y+2,16,12,'#604333');rect(X+10,Y+4,12,8,kind===0?'#d7a27a':'#8d6549');rect(X+11,Y+6,3,3,'#fff0c6');rect(X+18,Y+6,3,3,'#fff0c6');rect(X+12,Y+7,1,2,'#3d332d');rect(X+19,Y+7,1,2,'#3d332d');rect(X+9,Y+23,6,7,'#4d4b67');rect(X+18,Y+23,6,7,'#4d4b67')}
+function drawHero(){let h=heroes[selected],x=player.x,y=player.y;rect(x+6,y+26,22,5,'#294b38');rect(x+10,y+8,14,18,h.color);rect(x+8,y+2,18,13,'#6b4934');rect(x+11,y+5,12,8,'#f1c99b');rect(x+12,y+7,2,2,'#292b34');rect(x+20,y+7,2,2,'#292b34');rect(x+9,y+22,7,9,'#42516a');rect(x+19,y+22,7,9,'#42516a');if(selected===0){rect(x+5,y+4,5,15,'#78c9dc');rect(x+24,y+4,5,15,'#78c9dc')}if(selected===1){rect(x+25,y+10,7,17,'#a6a99a');rect(x+26,y+12,5,12,'#d6d4bd')}if(selected===2){rect(x+26,y+8,3,20,'#8a613c');rect(x+27,y+8,7,3,'#c6a16c')}if(selected===3){rect(x+4,y+6,4,4,'#d9a6ff');rect(x+27,y+6,4,4,'#d9a6ff')}if(selected===4){rect(x+25,y+10,8,3,'#d6e5ee');rect(x+30,y+8,3,8,'#d6e5ee')}}
+function drawEnemy(e){let x=e.x,y=e.y;rect(x+5,y+20,22,4,'#37523a');rect(x+4,y+8,24,14,'#4d9957');rect(x+8,y+3,16,12,'#79c66b');rect(x+10,y+9,3,4,'#fff3c8');rect(x+20,y+9,3,4,'#fff3c8');rect(x+11,y+10,2,3,'#273a32');rect(x+21,y+10,2,3,'#273a32')}
+function openDialog(name,text){dialog=true;document.querySelector('#speaker').textContent=name;document.querySelector('#speech').textContent=text;document.querySelector('#dialog').style.display='block'}
+function closeDialog(){dialog=false;document.querySelector('#dialog').style.display='none'}
+function action(){if(dialog){closeDialog();return}let npc=npcs.find(n=>Math.hypot(n.x-player.x,n.y-player.y)<58);if(npc){openDialog(npc.name,npc.line);return}let seed=seeds.find(s=>!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<48);if(seed){seed.got=true;seedCount++;document.querySelector('#seeds').textContent=seedCount;if(seedCount===3){document.querySelector('#quest').textContent='Kehre zu Mira am Brunnen zurück';openDialog('ECHO DES BRUNNENS','Drei Samen beginnen zu leuchten. Der alte Brunnen singt wieder – bring die Nachricht zu Mira!')}else openDialog('ECHOSAMEN','Ein kleiner Samen pulsiert in deiner Hand. Noch '+(3-seedCount)+' fehlen.');return}openDialog('AVARRA','Der Wind trägt ein leises Flüstern aus dem Osten. Vielleicht wartet dort das nächste Echo.')}
+function attack(){if(attackT>0)return;attackT=.28;for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<58)e.hp--}
+function ability(){if(skillT>0)return;skillT=3.8;let h=heroes[selected];if(selected===0){player.x+=player.face*85}else if(selected===1){inv=2.1}else if(selected===2){for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<190)e.hp--}else if(selected===3){for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<125)e.hp--}else{player.x+=player.face*125;inv=1.3}toast(h.skill+'!')}
+function toast(t){document.querySelector('#quest').textContent=t;toastT=2}
+function solid(x,y){if(x<0||y<0||x>MW*tw-25||y>MH*tw-30)return true;let tx=Math.floor(x/tw),ty=Math.floor(y/tw);if((tx>=7&&tx<=10&&ty<26)||(tx>=4&&tx<=8&&ty>=35&&ty<59))return true;let buildings=[[24,10],[49,10],[15,42],[54,43]];for(let [bx,by] of buildings)if(x>bx*tw+2&&x<(bx+2)*tw+30&&y>by*tw+15&&y<(by+2)*tw+15)return true;return false}
+function move(dt){let x=(key.d||key.ArrowRight?1:0)-(key.a||key.ArrowLeft?1:0)+stick.x,y=(key.s||key.ArrowDown?1:0)-(key.w||key.ArrowUp?1:0)+stick.y;let gp=navigator.getGamepads?.()[0];if(gp){let ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.15){x=ax;y=ay}if(gp.buttons[0]?.pressed&&!move.a){action();move.a=1}if(!gp.buttons[0]?.pressed)move.a=0;if(gp.buttons[1]?.pressed&&!move.b){attack();move.b=1}if(!gp.buttons[1]?.pressed)move.b=0;if(gp.buttons[2]?.pressed&&!move.k){ability();move.k=1}if(!gp.buttons[2]?.pressed)move.k=0}let d=Math.hypot(x,y);if(d>1){x/=d;y/=d}let h=heroes[selected],sp=h.speed*(selected===0&&key.Shift?1.45:1);let nx=player.x+x*sp*dt,ny=player.y+y*sp*dt;if(x)player.face=Math.sign(x);if(!solid(nx+8,player.y+25)&&!solid(nx+23,player.y+29))player.x=nx;if(!solid(player.x+8,ny+25)&&!solid(player.x+23,ny+29))player.y=ny;player.walk+=dt*10;for(let e of enemies)if(e.hp>0){let dx=player.x-e.x,dy=player.y-e.y,dist=Math.hypot(dx,dy);if(dist<145&&dist>1){e.x+=dx/dist*23*dt;e.y+=dy/dist*23*dt}if(dist<29&&inv<=0){hp=Math.max(0,hp-1);inv=1.2;document.querySelector('#hearts').textContent='♥ '.repeat(hp)+'♡ '.repeat(5-hp);if(hp===0){hp=5;player.x=42*tw;player.y=31*tw;toast('Du findest zurück zum Brunnen.')}}}attackT=Math.max(0,attackT-dt);skillT=Math.max(0,skillT-dt);inv=Math.max(0,inv-dt);toastT=Math.max(0,toastT-dt);if(toastT===0&&seedCount<3)document.querySelector('#quest').textContent=seedCount===0?'Finde Mira am Dorfbrunnen': 'Sammle die Echosamen ('+seedCount+'/3)';cam.x=clamp(player.x-c.width/2,0,MW*tw-c.width);cam.y=clamp(player.y-c.height/2,0,MH*tw-c.height)}
+function render(){ctx.clearRect(0,0,c.width,c.height);ctx.save();ctx.translate(-Math.floor(cam.x),-Math.floor(cam.y));generateWorld();for(let n of npcs)drawPerson(n.x,n.y,n.color);for(let e of enemies)if(e.hp>0)drawEnemy(e);for(let s of seeds)if(!s.got){rect(s.x+14,s.y+5,5,12,'#f3d65c');rect(s.x+8,s.y+7,5,5,'#fff3ae');rect(s.x+20,s.y+1,5,5,'#fff3ae')}drawHero();ctx.restore();if(attackT>0){ctx.strokeStyle='#fff0a2';ctx.lineWidth=5;ctx.beginPath();ctx.arc(c.width/2+player.face*30,c.height/2,36,-1,1);ctx.stroke()}}
+function loop(t){if(!started)return;let dt=Math.min(.04,(t-last)/1000||0);last=t;if(!dialog)move(dt);render();requestAnimationFrame(loop)}
+document.querySelectorAll('.heroCard').forEach(el=>el.onclick=()=>{selected=+el.dataset.hero;document.querySelectorAll('.heroCard').forEach(c=>c.classList.toggle('selected',c===el))});
+document.querySelector('#start').onclick=()=>{document.querySelector('#overlay').style.display='none';started=true;last=performance.now();requestAnimationFrame(loop)};
+document.querySelector('#next').onclick=closeDialog;document.querySelector('#useBtn').onclick=action;document.querySelector('#attackBtn').onclick=attack;document.querySelector('#skillBtn').onclick=ability;
+addEventListener('keydown',e=>{key[e.key]=1;if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)action()}if(e.key.toLowerCase()==='j'&&!e.repeat)attack();if(e.key.toLowerCase()==='k'&&!e.repeat)ability();});addEventListener('keyup',e=>key[e.key]=0);
+const stickEl=document.querySelector('#stick'),nub=document.querySelector('#nub');stickEl.addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);stickMove(e)});stickEl.addEventListener('pointermove',e=>{if(e.buttons)stickMove(e)});function stickMove(e){let r=stickEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),m=Math.min(30,d);stick.x=d>7?dx/d*m/30:0;stick.y=d>7?dy/d*m/30:0;nub.style.transform='translate('+stick.x*30+'px,'+stick.y*30+'px)'}function resetStick(){stick.x=stick.y=0;nub.style.transform=''}['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
+generateWorld();render();
+})();
+</script></body></html>
