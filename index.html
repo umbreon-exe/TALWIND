@@ -1,79 +1,337 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#183d35"><title>TALWIND – Die sieben Echos</title>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#183b32">
+<title>TALWIND – Die sieben Echos</title>
 <style>
-:root{--ink:#392b2a;--cream:#fff0c9;--gold:#e8b85d;--red:#b94e43;--green:#356e4e}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#142e2b;color:var(--ink);font-family:Verdana,Arial,sans-serif}body{display:grid;place-items:center}#shell{position:relative;width:min(100vw,177.78vh);height:min(100vh,56.25vw);background:#263f36;overflow:hidden;box-shadow:0 0 0 5px #533b2e,0 0 0 9px #d7a85a}canvas{width:100%;height:100%;display:block;image-rendering:pixelated}#hud{position:absolute;inset:0;pointer-events:none;padding:12px;display:flex;justify-content:space-between;align-items:flex-start}.plate{background:linear-gradient(#fff4d8,#f2d9a0);border:3px solid #684632;box-shadow:inset 0 0 0 2px #d5a45c,3px 4px #382d27;border-radius:5px;padding:7px 11px;font-weight:800;font-size:clamp(10px,1.1vw,15px);line-height:1.45}.plate small{display:block;font-size:10px;color:#876548;font-weight:700}.hearts{color:#c74743;font-size:19px;letter-spacing:2px}.rightHud{text-align:right;max-width:40%}#quest{margin-top:6px}#rightActions{position:absolute;right:15px;bottom:16px;display:flex;flex-direction:column;gap:10px;align-items:center}#rightActions button{pointer-events:auto;width:clamp(48px,6vw,66px);height:clamp(48px,6vw,66px);border-radius:50%;border:4px solid #65452f;background:radial-gradient(circle at 35% 25%,#fff0bb,#d99a48 72%);box-shadow:0 5px #52372b, inset 0 0 0 2px #f9d78d;color:#593a2b;font-weight:1000;font-size:clamp(10px,1vw,13px);text-shadow:0 1px #fff1c9}#rightActions button:active{transform:translateY(3px);box-shadow:0 2px #52372b}#stick{position:absolute;left:15px;bottom:15px;width:112px;height:112px;border-radius:50%;background:#fff0c9aa;border:3px solid #76533a88;display:none;touch-action:none}#nub{position:absolute;left:33px;top:33px;width:40px;height:40px;border-radius:50%;background:linear-gradient(#fff1c9,#d9a45a);border:3px solid #65452f;box-shadow:0 3px #65452f}#dialog{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:min(66%,650px);display:none;pointer-events:auto;text-align:left}.dialogInner{background:linear-gradient(#fff4d9,#f4dfae);border:4px solid #684632;box-shadow:inset 0 0 0 2px #d9ad67,4px 5px #352c27;border-radius:5px;padding:12px 16px}.dialogInner strong{color:#a7473d;letter-spacing:1px}.dialogInner p{margin:6px 0 0;font-size:clamp(12px,1.2vw,16px);line-height:1.5}#dialog button{float:right;border:2px solid #65452f;background:#b94e43;color:#fff1cc;border-radius:4px;padding:6px 12px;font-weight:900}#overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(#173d35d9,#16352fef);padding:12px}.menu{width:min(92%,760px);max-height:96%;overflow:auto;background:linear-gradient(145deg,#fff1cb,#e9c17a);border:6px solid #65452f;box-shadow:inset 0 0 0 3px #d99d50,0 10px 0 #172e28;border-radius:8px;padding:clamp(14px,3vw,28px);text-align:center}.logo{font-family:Georgia,serif;font-size:clamp(42px,8vw,76px);font-weight:1000;letter-spacing:5px;color:#b84c3f;text-shadow:2px 2px #ffedb6,5px 6px #67412f;margin:0}.sub{font-family:Georgia,serif;color:#5d4936;font-weight:bold;letter-spacing:3px}.menu p{line-height:1.5}.heroes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}.heroCard{border:3px solid #9a7148;background:#f8e5b7;border-radius:6px;padding:8px 4px;cursor:pointer;min-width:0;color:#49372c}.heroCard.selected{border-color:#a84339;background:#fff3ce;box-shadow:0 0 0 2px #e3b75d}.heroArt{height:48px;display:grid;place-items:center;font-size:34px;filter:drop-shadow(2px 3px #92704b)}.heroCard b{display:block;font-size:clamp(10px,1.2vw,14px)}.heroCard small{display:block;font-size:clamp(8px,.9vw,11px);line-height:1.3;margin-top:4px}.mainBtn{background:linear-gradient(#d35e4d,#a63c36);border:3px solid #633b30;box-shadow:0 4px #57372d;color:#fff0c9;padding:12px 25px;border-radius:5px;font-size:15px;font-weight:1000;letter-spacing:1px;cursor:pointer}.mainBtn:active{transform:translateY(3px);box-shadow:0 1px #57372d}.hint{font-size:11px;color:#765d43}@media(pointer:coarse){#stick{display:block}}@media(max-width:600px){.heroes{gap:4px}.heroCard{padding:5px 2px}.heroArt{height:34px;font-size:26px}.heroCard small{display:none}#hud{padding:6px}.plate{padding:4px 7px}#rightActions{right:7px;bottom:10px;gap:7px}#stick{left:8px;bottom:8px;width:94px;height:94px}#nub{left:27px;top:27px;width:34px;height:34px}#dialog{width:78%;bottom:8px}}
-</style></head><body><div id="shell"><canvas id="world" width="960" height="540"></canvas>
-<div id="hud"><div class="plate"><div class="hearts" id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroName">LYRA</span><small id="heroSkill">Windläuferin · Windstoß</small></div><div class="rightHud"><div class="plate">✦ <span id="seeds">0</span> / 3 Echosamen<small id="area">WINDRUH · DAS GRÜNE TAL</small></div><div class="plate" id="quest">Finde Mira am Dorfbrunnen</div></div></div>
-<div id="stick"><div id="nub"></div></div><div id="rightActions"><button id="skillBtn">FÄHIG-<br>KEIT</button><button id="attackBtn">KLANG-<br>KLIN­GE</button><button id="useBtn">AKTION</button></div>
-<div id="dialog"><div class="dialogInner"><button id="next">WEITER ▸</button><strong id="speaker">MIRA</strong><p id="speech"></p></div></div>
-<div id="overlay"><div class="menu"><h1 class="logo">TALWIND</h1><div class="sub">DIE SIEBEN ECHOS</div><p>Ein Abenteuer durch Avarra · Allein spielbar, für gemeinsames Spiel vorbereitet</p><h3>Wähle deinen Helden</h3><div class="heroes" id="heroes">
-<div class="heroCard selected" data-hero="0"><div class="heroArt">🧝🏻‍♀️</div><b>Lyra</b><small>Windläuferin<br>Schneller Sprint</small></div>
-<div class="heroCard" data-hero="1"><div class="heroArt">🛡️</div><b>Bram</b><small>Felswächter<br>Starker Schild</small></div>
-<div class="heroCard" data-hero="2"><div class="heroArt">🏹</div><b>Kael</b><small>Waldhüter<br>Fernschuss</small></div>
-<div class="heroCard" data-hero="3"><div class="heroArt">🔮</div><b>Nima</b><small>Echomagierin<br>Magischer Impuls</small></div>
-<div class="heroCard" data-hero="4"><div class="heroArt">🗡️</div><b>Rook</b><small>Schattenklinge<br>Ausweichrolle</small></div></div>
-<button class="mainBtn" id="start">ABENTEUER BEGINNEN</button><p class="hint">WASD / Pfeiltasten bewegen · J Angriff · K Fähigkeit · E Aktion · Controller unterstützt</p><p class="hint">Die Geschichte lässt sich allein erleben. Koop für bis zu vier Personen ist als spätere Erweiterung vorgesehen.</p></div></div>
+:root{--ink:#342820;--cream:#fff1ce;--gold:#edbd61;--wood:#62442f;--red:#b8473e;--green:#31664a;--mint:#a8d88a}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#15342e;color:var(--ink);font-family:Verdana,Arial,sans-serif}
+body{display:grid;place-items:center;touch-action:none}
+#shell{position:relative;width:min(100vw,177.7778vh);height:min(100vh,56.25vw);overflow:hidden;background:#254639;box-shadow:0 0 0 5px #59402e,0 0 0 9px #e9bd67}
+#world{display:block;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;inset:0;pointer-events:none;padding:12px;display:flex;justify-content:space-between;align-items:flex-start}
+.plate{background:linear-gradient(#fff6df,#f1d59b);border:3px solid #60432f;box-shadow:inset 0 0 0 2px #d8a85a,3px 4px #352b24;border-radius:5px;padding:8px 12px;font-weight:800;font-size:clamp(10px,1.05vw,15px);line-height:1.35}
+.plate small{display:block;margin-top:3px;color:#806344;font-size:10px;font-weight:700;letter-spacing:.4px}
+#heroPlate{min-width:150px}#hearts{font-size:20px;color:#c64c45;letter-spacing:2px;line-height:1.1}
+#topMid{position:absolute;left:50%;top:12px;transform:translateX(-50%);text-align:center;max-width:45%}
+#topMid .plate{font-size:clamp(10px,1.05vw,14px);letter-spacing:.5px}
+#questText{font-size:clamp(10px,1vw,13px);font-weight:700;line-height:1.4}
+#bossBar{display:none;position:absolute;top:70px;left:50%;transform:translateX(-50%);width:min(42%,440px);height:18px;background:#382e2b;border:3px solid #59402e;border-radius:5px;overflow:hidden}
+#bossFill{height:100%;width:100%;background:linear-gradient(90deg,#b83c38,#ec7650)}
+#bossName{position:absolute;top:48px;left:50%;transform:translateX(-50%);color:#fff0c9;font-size:12px;font-weight:900;text-shadow:1px 2px #34251e;letter-spacing:1px}
+#rightActions{position:absolute;right:14px;bottom:16px;display:flex;flex-direction:column;align-items:center;gap:9px}
+.actionBtn{position:relative;width:clamp(54px,6.1vw,72px);height:clamp(54px,6.1vw,72px);border:4px solid #5b402d;border-radius:18px;background:linear-gradient(145deg,#fff1c1 0%,#e9b65c 58%,#bb7841 100%);box-shadow:0 5px 0 #493427,inset 0 0 0 2px #ffedb2;color:#493326;font-weight:1000;display:grid;place-items:center;cursor:pointer;text-shadow:0 1px #fff5d7;touch-action:manipulation}
+.actionBtn .symbol{font-family:Georgia,serif;font-size:clamp(22px,2.5vw,29px);line-height:1}
+.actionBtn .actionLabel{font-size:clamp(8px,.85vw,11px);letter-spacing:.4px}
+.actionBtn .keycap{position:absolute;right:-6px;top:-7px;border:2px solid #684a31;border-radius:5px;background:#fff3d0;padding:2px 5px;font-size:10px}
+.actionBtn.primary{background:linear-gradient(145deg,#ffe5a1,#df8c47 68%,#a64b39);color:#fff7d9;text-shadow:1px 2px #673d2d}
+.actionBtn.skill{background:linear-gradient(145deg,#e9dcff,#a68bce 65%,#66518d)}
+.actionBtn:active{transform:translateY(3px);box-shadow:0 2px #493427}
+#actionHint{position:absolute;right:100px;bottom:25px;width:120px;text-align:right;color:#fff6d8;font-size:11px;font-weight:800;text-shadow:1px 2px #344c38;line-height:1.3;pointer-events:none}
+#leftControls{position:absolute;left:14px;bottom:14px;display:flex;align-items:end;gap:10px}
+#stick{width:112px;height:112px;border:3px solid #694d35a8;border-radius:50%;background:radial-gradient(circle,#fff0c988,#355a438c);display:none;touch-action:none;position:relative}
+#nub{position:absolute;left:33px;top:33px;width:40px;height:40px;border-radius:50%;border:3px solid #69482f;background:linear-gradient(#fff1cb,#dba85a);box-shadow:0 3px #493427}
+#menuToggle{pointer-events:auto;border:3px solid #59402e;border-radius:8px;background:linear-gradient(#fff1ce,#e8c17b);box-shadow:0 4px #433329;color:#503a29;padding:10px 13px;font-weight:900;cursor:pointer}
+#dialog{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);width:min(64%,650px);display:none;pointer-events:auto}
+.dialogBox{background:linear-gradient(#fff6e1,#f1dcae);border:4px solid #62442f;box-shadow:inset 0 0 0 2px #d9ad66,4px 5px #382b24;border-radius:7px;padding:13px 16px}
+.dialogBox strong{color:#a7473d;letter-spacing:1px;font-size:13px}
+.dialogBox p{margin:6px 0 10px;font-size:clamp(12px,1.2vw,16px);line-height:1.5}
+.dialogBox button{float:right}
+.uiBtn{border:3px solid #62442f;border-radius:6px;background:linear-gradient(#d15d4c,#a63e36);box-shadow:0 4px #493328;color:#fff0cd;padding:8px 13px;font-weight:900;cursor:pointer}
+.uiBtn:active{transform:translateY(2px);box-shadow:0 2px #493328}
+#toast{position:absolute;left:50%;top:92px;transform:translateX(-50%);display:none;background:#fff0c9;border:3px solid #61452f;border-radius:6px;padding:8px 14px;font-weight:900;box-shadow:0 4px #423127;pointer-events:none}
+#panelShade,#titleScreen{position:absolute;inset:0;background:#153a31d9;display:grid;place-items:center;padding:14px}
+.menuCard{width:min(94%,790px);max-height:96%;overflow:auto;background:linear-gradient(145deg,#fff3d1,#eac17c);border:6px solid #60432e;box-shadow:inset 0 0 0 3px #d9a04e,0 9px #102c25;border-radius:9px;padding:clamp(14px,2.4vw,25px);text-align:center}
+.logo{font-family:Georgia,serif;font-size:clamp(42px,7vw,72px);font-weight:1000;letter-spacing:5px;color:#b84d40;text-shadow:2px 2px #fff1c9,5px 6px #64452e;margin:0}
+.subtitle{font-family:Georgia,serif;font-weight:900;letter-spacing:3px;color:#624a34}
+.intro{font-size:clamp(12px,1.15vw,15px);line-height:1.55;max-width:660px;margin:10px auto 14px}
+.heroGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:13px 0}
+.heroCard{border:3px solid #987044;background:linear-gradient(#faeac2,#edd19b);border-radius:7px;padding:7px 4px;cursor:pointer;color:#463429;min-width:0}
+.heroCard.selected{border-color:#b6443b;background:linear-gradient(#fff5d8,#f6d899);box-shadow:0 0 0 2px #e3ad57,0 3px #62442f}
+.heroCard canvas{width:64px;height:78px;image-rendering:pixelated;margin:auto;display:block}
+.heroCard b{display:block;font-size:clamp(10px,1.1vw,14px);margin-top:2px}
+.heroCard small{display:block;font-size:clamp(8px,.8vw,10px);line-height:1.35;margin-top:3px;min-height:27px}
+.heroCard .stat{font-size:9px;color:#7b5b3d;font-weight:900}
+#startGame{font-size:16px;padding:13px 26px;margin-top:5px}
+.smallNote{font-size:11px;color:#765d43;line-height:1.4}
+#panelShade{display:none;background:#102a25b8;z-index:10}
+#drawer{width:min(92%,560px);background:linear-gradient(145deg,#fff4d8,#ecd09a);border:5px solid #62442f;box-shadow:inset 0 0 0 2px #d8a75d,0 8px #172e28;border-radius:8px;padding:18px}
+#drawer h2{margin:0 0 8px;color:#a6463c;font-family:Georgia,serif}
+#drawer p{line-height:1.55}
+#drawer .drawerButtons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+#drawer .close{float:right;background:#6d5036;color:#fff0cb;border:2px solid #4e3626;border-radius:5px;padding:6px 10px;font-weight:900}
+#sideMenu{position:absolute;right:14px;top:96px;display:none;flex-direction:column;gap:7px;z-index:5}
+.sideButton{pointer-events:auto;min-width:138px;text-align:left;border:3px solid #503a2b;border-radius:7px;background:linear-gradient(100deg,#fff0c8,#d9aa63);box-shadow:0 4px #422f26;padding:8px 10px;color:#4a3527;font-weight:900;cursor:pointer}
+.sideButton span{display:inline-block;width:25px;color:#a54438;font-size:18px}
+.sideButton:active{transform:translateY(2px);box-shadow:0 2px #422f26}
+@media(pointer:coarse){#stick{display:block}}
+@media(max-width:700px){#hud{padding:6px}.plate{padding:5px 7px}#heroPlate{min-width:110px}#hearts{font-size:16px}#topMid{top:55px;max-width:65%}#bossName{top:88px}#bossBar{top:108px;width:58%}#rightActions{right:7px;bottom:9px;gap:6px}.actionBtn{width:51px;height:51px;border-radius:15px}.actionBtn .symbol{font-size:22px}#leftControls{left:7px;bottom:8px}#stick{width:92px;height:92px}#nub{left:26px;top:26px;width:34px;height:34px}#dialog{width:82%;bottom:8px}#sideMenu{right:7px;top:108px}.sideButton{min-width:116px;padding:6px 8px;font-size:11px}.heroGrid{gap:4px}.heroCard{padding:5px 2px}.heroCard canvas{width:50px;height:62px}.heroCard small{display:none}.heroCard .stat{font-size:8px}}
+@media(max-height:520px){.menuCard{padding:8px 14px}.heroCard canvas{height:53px}.heroGrid{margin:6px 0}.intro{margin:5px auto}.heroCard small{display:none}}
+</style>
+</head>
+<body>
+<div id="shell">
+<canvas id="world" width="960" height="540" aria-label="TALWIND-Spielwelt"></canvas>
+<div id="hud">
+ <div class="plate" id="heroPlate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroName">LYRA</span><small id="heroTitle">WINDLÄUFERIN · LV 1</small></div>
+ <div id="topMid"><div class="plate">WINDRUH · DAS GRÜNE TAL<small id="questText">Finde Mira am Dorfbrunnen</small></div></div>
+ <div class="plate" style="text-align:right">✦ <span id="seedCount">0</span>/3 Echosamen<small><span id="coins">125</span> Windtaler</small></div>
+</div>
+<div id="bossName"></div><div id="bossBar"><div id="bossFill"></div></div>
+<div id="sideMenu">
+ <button class="sideButton" data-panel="quest"><span>☷</span> Questbuch</button>
+ <button class="sideButton" data-panel="inventory"><span>▣</span> Rucksack</button>
+ <button class="sideButton" data-panel="map"><span>⌖</span> Karte</button>
+ <button class="sideButton" data-panel="settings"><span>⚙</span> Optionen</button>
+ <button class="sideButton" data-panel="coop"><span>♧</span> Koop-Modus</button>
+</div>
+<div id="rightActions">
+ <button class="actionBtn skill" id="skillButton" aria-label="Heldenfähigkeit"><span class="keycap">K</span><span class="symbol">✧</span><span class="actionLabel">FÄHIGKEIT</span></button>
+ <button class="actionBtn primary" id="attackButton" aria-label="Angriff"><span class="keycap">J</span><span class="symbol">⚔</span><span class="actionLabel">ANGRIFF</span></button>
+ <button class="actionBtn" id="dodgeButton" aria-label="Ausweichrolle"><span class="keycap">SHIFT</span><span class="symbol">➤</span><span class="actionLabel">ROLLE</span></button>
+ <button class="actionBtn" id="useButton" aria-label="Interagieren"><span class="keycap">E</span><span class="symbol">A</span><span class="actionLabel">AKTION</span></button>
+</div>
+<div id="leftControls"><div id="stick"><div id="nub"></div></div><button id="menuToggle">☰ MENÜ</button></div>
+<div id="dialog"><div class="dialogBox"><button class="uiBtn" id="dialogNext">WEITER ▸</button><strong id="speaker">MIRA</strong><p id="speech"></p></div></div>
+<div id="toast"></div>
+<div id="panelShade"><div id="drawer"><button class="close" id="closeDrawer">✕</button><h2 id="drawerTitle">Questbuch</h2><div id="drawerContent"></div><div class="drawerButtons" id="drawerButtons"></div></div></div>
+<div id="titleScreen">
+ <div class="menuCard">
+  <h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div>
+  <p class="intro">Ein geheimnisvoller Wind ist aus Avarra verschwunden. Der Dorfbrunnen verstummt, die Wälder verlieren ihre Farben und uralte Schreine erwachen. Wähle deinen Helden und finde heraus, wer die sieben Echos gestohlen hat.</p>
+  <h3 style="margin:8px 0 3px">WÄHLE DEINEN HELDEN</h3>
+  <div class="heroGrid" id="heroGrid">
+   <button class="heroCard selected" data-hero="0"><canvas width="64" height="78"></canvas><b>LYRA</b><small>Windläuferin<br>Windstoß · sehr schnell</small><div class="stat">TEMPO ★★★★★</div></button>
+   <button class="heroCard" data-hero="1"><canvas width="64" height="78"></canvas><b>BRAM</b><small>Felswächter<br>Steinhaut · starke Abwehr</small><div class="stat">ABWEHR ★★★★★</div></button>
+   <button class="heroCard" data-hero="2"><canvas width="64" height="78"></canvas><b>KAEL</b><small>Waldhüter<br>Sternenschuss · Fernkampf</small><div class="stat">REICHWEITE ★★★★★</div></button>
+   <button class="heroCard" data-hero="3"><canvas width="64" height="78"></canvas><b>NIMA</b><small>Echomagierin<br>Echowelle · Magie</small><div class="stat">MAGIE ★★★★★</div></button>
+   <button class="heroCard" data-hero="4"><canvas width="64" height="78"></canvas><b>ROOK</b><small>Schattenklinge<br>Schattenrolle · flink</small><div class="stat">AGILITÄT ★★★★★</div></button>
+  </div>
+  <button class="uiBtn" id="startGame">ABENTEUER BEGINNEN</button>
+  <button class="uiBtn" id="continueGame" style="display:none;background:linear-gradient(#6b9b61,#3e7047)">SPIEL FORTSETZEN</button>
+  <p class="smallNote">Allein spielbar · Gamepad, Tastatur und Touch-Steuerung · Koop für bis zu vier Personen ist als spätere Erweiterung vorgesehen.</p>
+  <p class="smallNote">WASD / Pfeile bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle</p>
+ </div>
+</div>
 </div>
 <script>
 (()=>{'use strict';
-const c=document.querySelector('#world'),ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;const S=2,tw=32,th=32,MW=84,MH=60;const cam={x:0,y:0};let started=false,last=0,selected=0,dialog=false,seedCount=0,hp=5,attackT=0,skillT=0,inv=0,toastT=0;const key={};const stick={x:0,y:0};
-const heroes=[{name:'LYRA',title:'Windläuferin',skill:'Windstoß',color:'#e8b6a1',speed:158,desc:'Ein schneller Windstoß schiebt dich nach vorn.'},{name:'BRAM',title:'Felswächter',skill:'Steinhaut',color:'#9d9b82',speed:112,desc:'Steinhaut schützt dich kurz vor Gegnern.'},{name:'KAEL',title:'Waldhüter',skill:'Sternenschuss',color:'#78a66a',speed:132,desc:'Ein grüner Lichtpfeil trifft Gegner aus der Ferne.'},{name:'NIMA',title:'Echomagierin',skill:'Echowelle',color:'#a78bd0',speed:126,desc:'Eine magische Welle vertreibt Gegner in deiner Nähe.'},{name:'ROOK',title:'Schattenklinge',skill:'Schattenrolle',color:'#657e9a',speed:146,desc:'Eine kurze Rolle macht dich vorübergehend unverwundbar.'}];
-const player={x:42*tw,y:31*th,vx:0,vy:0,face:1,walk:0};const npcs=[{x:41*tw,y:29*th,name:'MIRA',color:'#c76c54',line:'Die sieben Echos sind verschwunden. Drei Echosamen können den alten Brunnen wieder erwecken. Hilfst du unserem Dorf?'},{x:32*tw,y:34*th,name:'TOMKE',color:'#5b92a8',line:'Am Flussufer wachsen blaue Sternblumen. Die alten Wege führen überall hin – schau dich um!'},{x:53*tw,y:27*th,name:'EDA',color:'#d49b53',line:'Hinter dem Apfelgarten liegt ein vergessener Schrein. Dort soll ein Echo wohnen.'},{x:47*tw,y:38*th,name:'FINN',color:'#8c79ad',line:'Die kleinen Schleime sehen harmlos aus. Aber pass auf, wenn sie sich ducken!'}];
-const seeds=[{x:25*tw,y:28*th},{x:58*tw,y:18*th},{x:66*tw,y:44*th,got:false}];const enemies=[{x:69*tw,y:24*th,hp:3},{x:73*tw,y:30*th,hp:3},{x:65*tw,y:40*th,hp:3},{x:76*tw,y:44*th,hp:4}];
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));function rect(x,y,w,h,col){ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),w,h)}function line(x,y,w,h,col){rect(x,y,w,h,col)}
-function tile(x,y,col){rect(x*tw,y*tw,tw,tw,col)}
-function grass(x,y){tile(x,y,((x*13+y*7)%5===0)?'#58a957':'#68b85d');for(let k=0;k<4;k++){let px=x*tw+(x*17+y*11+k*9)%29,py=y*tw+(x*7+y*19+k*13)%29;rect(px,py,2,2,k%2?'#8bd16d':'#4c984d')}if((x*3+y*11)%19===0){rect(x*tw+8,y*tw+10,5,2,'#9bd878');rect(x*tw+10,y*tw+7,2,6,'#9bd878')}}
-function path(x,y){tile(x,y,'#ddcda4');rect(x*tw,y*tw,tw,2,'#f4e8c8');rect(x*tw,y*tw+30,tw,2,'#c6b68f');for(let i=0;i<3;i++){rect(x*tw+3+i*10,y*tw+7,1,21,'#c9b991');rect(x*tw+4+i*10,y*tw+8,7,1,'#eee0bd')}}
-function water(x,y){tile(x,y,'#2589c8');rect(x*tw+4,y*tw+5,11,2,'#64c6ed');rect(x*tw+20,y*tw+19,8,2,'#83d5ef');rect(x*tw+13,y*tw+26,6,2,'#1673b1');if((x+y)%3===0)rect(x*tw+5,y*tw+14,3,2,'#d1f5ef')}
-function tree(x,y,kind=0){let X=x*tw,Y=y*tw;rect(X+12,Y+21,10,13,'#805037');rect(X+8,Y+9,20,18,'#276e48');rect(X+4,Y+5,24,19,kind?'#28794c':'#318b50');rect(X+8,Y+1,18,16,'#42a65a');rect(X+12,Y+3,10,6,'#75c969');rect(X+6,Y+12,6,7,'#56b961');rect(X+22,Y+12,5,6,'#1e603f');rect(X+13,Y+21,3,3,'#a4d56a');rect(X+10,Y+27,3,2,'#553c2d');}
-function flower(x,y,col){let X=x*tw,Y=y*tw;rect(X+14,Y+15,2,9,'#327e43');rect(X+10,Y+11,4,4,col);rect(X+18,Y+11,4,4,col);rect(X+14,Y+7,4,4,'#fff4d0');rect(X+14,Y+14,4,4,'#f7c94f');}
-function bush(x,y){let X=x*tw,Y=y*tw;rect(X+5,Y+12,22,13,'#2d7b48');rect(X+8,Y+7,16,15,'#43a956');rect(X+11,Y+9,6,5,'#82d16a');rect(X+21,Y+14,5,4,'#23613c')}
-function house(x,y,roof){let X=x*tw,Y=y*tw;rect(X+3,Y+18,58,42,'#c49a65');rect(X+7,Y+22,50,34,'#ead4a7');rect(X+2,Y+16,60,7,'#5a4030');rect(X+5,Y+5,54,19,roof);rect(X+11,Y,42,12,roof);rect(X+16,Y-3,30,6,roof);for(let r=0;r<3;r++)for(let q=0;q<4;q++)rect(X+8+q*12,Y+7+r*5,9,2,r%2?'#8d3d36':'#e88a65');rect(X+12,Y+28,11,13,'#5d9db2');rect(X+13,Y+29,9,11,'#b4e8e0');rect(X+44,Y+28,10,13,'#5d9db2');rect(X+45,Y+29,8,11,'#b4e8e0');rect(X+27,Y+35,12,25,'#75482f');rect(X+35,Y+46,2,2,'#f6c65b');rect(X+27,Y+35,12,2,'#b77a4a');rect(X+18,Y+3,5,3,'#f5c978');rect(X+42,Y+8,5,3,'#f5c978')}
-function fence(x,y,len=1){for(let i=0;i<len;i++){let X=(x+i)*tw,Y=y*tw;rect(X+2,Y+8,28,4,'#9a6539');rect(X+2,Y+21,28,4,'#9a6539');rect(X+4,Y+4,5,25,'#754a2e');rect(X+23,Y+4,5,25,'#754a2e');rect(X+3,Y+4,7,3,'#d4a46a');rect(X+22,Y+4,7,3,'#d4a46a')}}
-function fountain(x,y){let X=x*tw,Y=y*tw;rect(X+2,Y+14,60,36,'#8c897b');rect(X+7,Y+10,50,34,'#c6c2a8');rect(X+11,Y+14,42,25,'#2c9bd0');rect(X+18,Y+19,27,3,'#7fe1ed');rect(X+29,Y+4,5,18,'#aaa999');rect(X+24,Y+9,15,5,'#d6d3bd');rect(X+28,Y,7,7,'#e3e1cf');rect(X+30,Y-6,3,9,'#9ce7f1');}
-function sign(x,y){let X=x*tw,Y=y*tw;rect(X+14,Y+14,4,19,'#785033');rect(X+3,Y+3,27,16,'#9b623a');rect(X+5,Y+5,23,11,'#e4bd79');rect(X+9,Y+8,15,2,'#8d4936');}
-function generateWorld(){for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)grass(x,y);
-for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(x>=7&&x<=10&&y<26||x>=4&&x<=8&&y>=35&&y<59)water(x,y)}
-// River bend and pebble banks
-for(let y=0;y<26;y++){for(let x=6;x<=11;x++)if(x===6||x===11) {rect(x*tw,y*tw,tw,tw,'#a8a078');rect(x*tw+5,y*tw+5,20,20,'#6c9b59')}} 
-// Main village plaza and branching paths
-for(let y=26;y<=37;y++)for(let x=10;x<MW;x++)path(x,y);
-for(let y=5;y<27;y++)for(let x=39;x<=42;x++)path(x,y);
-for(let y=37;y<49;y++)for(let x=39;x<=42;x++)path(x,y);
-for(let y=27;y<=36;y++)for(let x=26;x<=28;x++)path(x,y);
-for(let y=20;y<=25;y++)for(let x=10;x<=20;x++)path(x,y);
-for(let y=0;y< MH;y++)for(let x=0;x<MW;x++){if((x*5+y*3)%47===0&&!(x>10&&x<60&&y>20&&y<40))bush(x,y)}
-// Homes and gardens
-house(24,10,'#287d83');house(49,10,'#b94c42');house(15,42,'#c58a45');house(54,43,'#638c72');
-fountain(34,27);sign(29,30);sign(46,33);
-fence(57,17,6);fence(57,22,6);for(let x=58;x<63;x++)for(let y=18;y<22;y++){bush(x,y);if((x+y)%2===0)flower(x,y,'#d48bd0')}
-fence(49,40,5);fence(49,45,5);for(let x=50;x<54;x++)for(let y=41;y<45;y++)if((x+y)%2===0)flower(x,y,'#f3b2cb');
-fence(17,48,5);fence(17,53,5);for(let x=18;x<21;x++)for(let y=49;y<53;y++)flower(x,y,'#eecb63');
-for(let i=0;i<38;i++){let x=(i*17+3)%MW,y=(i*23+4)%MH;if((x<6||x>61||y<5||y>53)&&!(x>7&&x<12))tree(x,y,i%3===0)}
-for(let i=0;i<28;i++){let x=(i*19+13)%MW,y=(i*11+7)%MH;if(x>12&&x<77&&y>4&&y<55)flower(x,y,['#fff0c2','#f0a4c1','#b8a0e8'][i%3])}
-for(let x=0;x<MW;x+=3){if(x<7||x>62){tree(x,55,1);if(x+1<MW)tree(x+1,56,1)}}
-for(let i=0;i<10;i++){let x=64+i%5,y=8+Math.floor(i/5)*3;tree(x,y,0)}
-// bridge crossing the river
-for(let y=27;y<=34;y++){rect(6*tw,y*tw,6*tw,tw,'#9b683e');rect(6*tw,y*tw,6*tw,4,'#d5a46a');rect(6*tw,y*tw+27,6*tw,5,'#67442f');for(let x=6;x<12;x+=2){rect(x*tw,y*tw+5,4,20,'#b77d48')}}
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+const mapImage=new Image();mapImage.src='assets/windruh.webp';
+const W=960,H=540,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const heroes=[
+ {name:'LYRA',title:'Windläuferin',skill:'Windstoß',speed:172,coat:'#3b958c',light:'#8dd6bd',dark:'#245e5c',cape:'#4db3a3',hair:'#d9a45b',item:'#d8eaff',desc:'Ein schneller Windstoß nach vorn. Ideal zum Ausweichen und für flinke Angriffe.'},
+ {name:'BRAM',title:'Felswächter',skill:'Steinhaut',speed:124,coat:'#8f8766',light:'#d2bd8a',dark:'#514b3d',cape:'#6c6047',hair:'#654a36',item:'#b2b7ac',desc:'Wird kurz unverwundbar und stößt Gegner in der Nähe zurück.'},
+ {name:'KAEL',title:'Waldhüter',skill:'Sternenschuss',speed:145,coat:'#5d8f51',light:'#a8c76c',dark:'#31563b',cape:'#3f7547',hair:'#76543b',item:'#e2d09a',desc:'Schießt einen magischen Pfeil weit nach vorn. Gut gegen entfernte Gegner.'},
+ {name:'NIMA',title:'Echomagierin',skill:'Echowelle',speed:136,coat:'#8e70b7',light:'#d0b8f0',dark:'#4b3e75',cape:'#7254a2',hair:'#49354d',item:'#a7e7f0',desc:'Eine magische Welle trifft Gegner im Umkreis und heilt einen Herzpunkt.'},
+ {name:'ROOK',title:'Schattenklinge',skill:'Schattenrolle',speed:160,coat:'#536b83',light:'#9fbad0',dark:'#34485d',cape:'#394d68',hair:'#423a48',item:'#e8edf0',desc:'Eine weite Schattenrolle macht Rook kurz unverwundbar.'}
+];
+let selected=0,started=false,last=0,dialogOpen=false,panelOpen=false,paused=false;
+const keys={},stick={x:0,y:0},player={x:476,y:338,faceX:0,faceY:-1,walk:0,hp:5,attack:0,skill:0,roll:0,inv:0,coins:125,potions:3,xp:0};
+let questStage=0,seeds=0,chestFound=false,win=false;
+const seedItems=[{x:310,y:213,got:false},{x:792,y:303,got:false},{x:669,y:449,got:false}];
+const npcs=[
+ {x:345,y:270,name:'MIRA',coat:'#c56b50',hair:'#76513d',line:'Der Wind hat seine sieben Echos verloren. Seitdem verstummt unser Brunnen. Drei Echosamen können ihn erwecken. Hilfst du uns, den ersten Ton zurückzubringen?'},
+ {x:260,y:355,name:'TOMKE',coat:'#608eaa',hair:'#493c32',line:'Ich habe am alten Flussufer eine blaue Blume gesehen. Sie leuchtet, sobald ein Echo in der Nähe ist.'},
+ {x:730,y:284,name:'EDA',coat:'#d29a52',hair:'#8a4e3c',line:'Die Äpfel im Garten schmecken plötzlich nach Nebel. Irgendetwas stimmt mit dem alten Schrein nicht.'},
+ {x:635,y:388,name:'FINN',coat:'#8b78ae',hair:'#58445c',line:'Die grünen Schleime hüpfen immer zweimal, bevor sie angreifen. Warte auf den richtigen Moment!'}
+];
+const enemies=[
+ {x:740,y:390,hp:3,max:3,kind:'slime',speed:48,hit:0,attack:0},
+ {x:812,y:420,hp:3,max:3,kind:'slime',speed:48,hit:0,attack:0},
+ {x:675,y:455,hp:4,max:4,kind:'moss',speed:42,hit:0,attack:0}
+];
+const boss={x:850,y:248,hp:0,max:14,active:false,hit:0,attack:0};
+const shots=[],particles=[];
+function px(g,x,y,w,h,color){g.fillStyle=color;g.fillRect(Math.round(x),Math.round(y),w,h)}
+function drawHeroSprite(g,h,x,y,scale=2,step=0){
+ g.save();g.translate(x,y+(step?Math.sin(step)*1:0));g.scale(scale,scale);
+ // ground shadow, cape, boots and legs
+ px(g,2,19,12,2,'#294b3c');
+ px(g,4,9,8,8,h.cape);px(g,3,11,2,5,h.dark);px(g,13,11,1,5,h.dark);
+ px(g,4,16,3,4,'#49382e');px(g,10,16,3,4,'#49382e');
+ px(g,4,19,4,2,'#d4b17c');px(g,10,19,4,2,'#d4b17c');
+ px(g,4,9,8,8,h.coat);px(g,3,10,2,5,h.dark);px(g,12,10,2,5,h.dark);
+ px(g,5,10,6,1,h.light);px(g,5,14,6,1,h.dark);px(g,7,11,2,3,h.light);
+ px(g,2,11,2,3,'#efbd86');px(g,13,11,2,3,'#efbd86');
+ // neck and head
+ px(g,7,7,3,3,'#d89a72');px(g,5,2,7,7,'#efbd8a');px(g,4,3,1,4,h.hair);px(g,12,3,1,4,h.hair);
+ px(g,5,1,7,2,h.hair);px(g,4,3,3,2,h.hair);px(g,10,3,3,1,h.hair);
+ px(g,6,4,1,1,'#45352f');px(g,10,4,1,1,'#45352f');px(g,8,6,1,1,'#b9755b');
+ // signature gear per hero
+ if(selected===0){px(g,3,7,2,5,h.item);px(g,13,7,2,5,h.item);px(g,4,0,8,1,'#e8cf8b');px(g,5,-1,6,2,'#e8cf8b');px(g,2,12,2,4,'#aee9e5')}
+ if(selected===1){px(g,13,8,3,8,'#8b908b');px(g,14,9,2,6,'#c5c7b6');px(g,14,11,2,2,'#7a8a82');px(g,5,0,7,2,'#857d68');px(g,6,-1,5,2,'#c4b48a')}
+ if(selected===2){px(g,2,5,3,10,'#654b34');px(g,1,6,1,8,h.item);px(g,3,4,1,2,h.item);px(g,13,8,2,2,'#b99462');px(g,5,0,7,2,'#416f44');px(g,4,2,9,1,'#8dbb68')}
+ if(selected===3){px(g,1,5,2,2,h.item);px(g,14,5,2,2,h.item);px(g,2,7,1,4,'#c9b5ee');px(g,13,7,1,4,'#c9b5ee');px(g,4,0,9,2,'#513c66');px(g,7,-2,3,3,'#e1d2fc')}
+ if(selected===4){px(g,2,9,2,6,h.item);px(g,13,9,2,6,h.item);px(g,5,0,8,2,'#4a5366');px(g,4,2,10,1,'#9bb0c1');px(g,6,5,6,1,h.dark)}
+ g.restore();
 }
-function drawPerson(x,y,color,kind=0){let X=Math.round(x),Y=Math.round(y);rect(X+7,Y+24,18,4,'#38543d');rect(X+9,Y+9,14,15,color);rect(X+8,Y+2,16,12,'#604333');rect(X+10,Y+4,12,8,kind===0?'#d7a27a':'#8d6549');rect(X+11,Y+6,3,3,'#fff0c6');rect(X+18,Y+6,3,3,'#fff0c6');rect(X+12,Y+7,1,2,'#3d332d');rect(X+19,Y+7,1,2,'#3d332d');rect(X+9,Y+23,6,7,'#4d4b67');rect(X+18,Y+23,6,7,'#4d4b67')}
-function drawHero(){let h=heroes[selected],x=player.x,y=player.y;rect(x+6,y+26,22,5,'#294b38');rect(x+10,y+8,14,18,h.color);rect(x+8,y+2,18,13,'#6b4934');rect(x+11,y+5,12,8,'#f1c99b');rect(x+12,y+7,2,2,'#292b34');rect(x+20,y+7,2,2,'#292b34');rect(x+9,y+22,7,9,'#42516a');rect(x+19,y+22,7,9,'#42516a');if(selected===0){rect(x+5,y+4,5,15,'#78c9dc');rect(x+24,y+4,5,15,'#78c9dc')}if(selected===1){rect(x+25,y+10,7,17,'#a6a99a');rect(x+26,y+12,5,12,'#d6d4bd')}if(selected===2){rect(x+26,y+8,3,20,'#8a613c');rect(x+27,y+8,7,3,'#c6a16c')}if(selected===3){rect(x+4,y+6,4,4,'#d9a6ff');rect(x+27,y+6,4,4,'#d9a6ff')}if(selected===4){rect(x+25,y+10,8,3,'#d6e5ee');rect(x+30,y+8,3,8,'#d6e5ee')}}
-function drawEnemy(e){let x=e.x,y=e.y;rect(x+5,y+20,22,4,'#37523a');rect(x+4,y+8,24,14,'#4d9957');rect(x+8,y+3,16,12,'#79c66b');rect(x+10,y+9,3,4,'#fff3c8');rect(x+20,y+9,3,4,'#fff3c8');rect(x+11,y+10,2,3,'#273a32');rect(x+21,y+10,2,3,'#273a32')}
-function openDialog(name,text){dialog=true;document.querySelector('#speaker').textContent=name;document.querySelector('#speech').textContent=text;document.querySelector('#dialog').style.display='block'}
-function closeDialog(){dialog=false;document.querySelector('#dialog').style.display='none'}
-function action(){if(dialog){closeDialog();return}let npc=npcs.find(n=>Math.hypot(n.x-player.x,n.y-player.y)<58);if(npc){openDialog(npc.name,npc.line);return}let seed=seeds.find(s=>!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<48);if(seed){seed.got=true;seedCount++;document.querySelector('#seeds').textContent=seedCount;if(seedCount===3){document.querySelector('#quest').textContent='Kehre zu Mira am Brunnen zurück';openDialog('ECHO DES BRUNNENS','Drei Samen beginnen zu leuchten. Der alte Brunnen singt wieder – bring die Nachricht zu Mira!')}else openDialog('ECHOSAMEN','Ein kleiner Samen pulsiert in deiner Hand. Noch '+(3-seedCount)+' fehlen.');return}openDialog('AVARRA','Der Wind trägt ein leises Flüstern aus dem Osten. Vielleicht wartet dort das nächste Echo.')}
-function attack(){if(attackT>0)return;attackT=.28;for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<58)e.hp--}
-function ability(){if(skillT>0)return;skillT=3.8;let h=heroes[selected];if(selected===0){player.x+=player.face*85}else if(selected===1){inv=2.1}else if(selected===2){for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<190)e.hp--}else if(selected===3){for(let e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<125)e.hp--}else{player.x+=player.face*125;inv=1.3}toast(h.skill+'!')}
-function toast(t){document.querySelector('#quest').textContent=t;toastT=2}
-function solid(x,y){if(x<0||y<0||x>MW*tw-25||y>MH*tw-30)return true;let tx=Math.floor(x/tw),ty=Math.floor(y/tw);if((tx>=7&&tx<=10&&ty<26)||(tx>=4&&tx<=8&&ty>=35&&ty<59))return true;let buildings=[[24,10],[49,10],[15,42],[54,43]];for(let [bx,by] of buildings)if(x>bx*tw+2&&x<(bx+2)*tw+30&&y>by*tw+15&&y<(by+2)*tw+15)return true;return false}
-function move(dt){let x=(key.d||key.ArrowRight?1:0)-(key.a||key.ArrowLeft?1:0)+stick.x,y=(key.s||key.ArrowDown?1:0)-(key.w||key.ArrowUp?1:0)+stick.y;let gp=navigator.getGamepads?.()[0];if(gp){let ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.15){x=ax;y=ay}if(gp.buttons[0]?.pressed&&!move.a){action();move.a=1}if(!gp.buttons[0]?.pressed)move.a=0;if(gp.buttons[1]?.pressed&&!move.b){attack();move.b=1}if(!gp.buttons[1]?.pressed)move.b=0;if(gp.buttons[2]?.pressed&&!move.k){ability();move.k=1}if(!gp.buttons[2]?.pressed)move.k=0}let d=Math.hypot(x,y);if(d>1){x/=d;y/=d}let h=heroes[selected],sp=h.speed*(selected===0&&key.Shift?1.45:1);let nx=player.x+x*sp*dt,ny=player.y+y*sp*dt;if(x)player.face=Math.sign(x);if(!solid(nx+8,player.y+25)&&!solid(nx+23,player.y+29))player.x=nx;if(!solid(player.x+8,ny+25)&&!solid(player.x+23,ny+29))player.y=ny;player.walk+=dt*10;for(let e of enemies)if(e.hp>0){let dx=player.x-e.x,dy=player.y-e.y,dist=Math.hypot(dx,dy);if(dist<145&&dist>1){e.x+=dx/dist*23*dt;e.y+=dy/dist*23*dt}if(dist<29&&inv<=0){hp=Math.max(0,hp-1);inv=1.2;document.querySelector('#hearts').textContent='♥ '.repeat(hp)+'♡ '.repeat(5-hp);if(hp===0){hp=5;player.x=42*tw;player.y=31*tw;toast('Du findest zurück zum Brunnen.')}}}attackT=Math.max(0,attackT-dt);skillT=Math.max(0,skillT-dt);inv=Math.max(0,inv-dt);toastT=Math.max(0,toastT-dt);if(toastT===0&&seedCount<3)document.querySelector('#quest').textContent=seedCount===0?'Finde Mira am Dorfbrunnen': 'Sammle die Echosamen ('+seedCount+'/3)';cam.x=clamp(player.x-c.width/2,0,MW*tw-c.width);cam.y=clamp(player.y-c.height/2,0,MH*tw-c.height)}
-function render(){ctx.clearRect(0,0,c.width,c.height);ctx.save();ctx.translate(-Math.floor(cam.x),-Math.floor(cam.y));generateWorld();for(let n of npcs)drawPerson(n.x,n.y,n.color);for(let e of enemies)if(e.hp>0)drawEnemy(e);for(let s of seeds)if(!s.got){rect(s.x+14,s.y+5,5,12,'#f3d65c');rect(s.x+8,s.y+7,5,5,'#fff3ae');rect(s.x+20,s.y+1,5,5,'#fff3ae')}drawHero();ctx.restore();if(attackT>0){ctx.strokeStyle='#fff0a2';ctx.lineWidth=5;ctx.beginPath();ctx.arc(c.width/2+player.face*30,c.height/2,36,-1,1);ctx.stroke()}}
-function loop(t){if(!started)return;let dt=Math.min(.04,(t-last)/1000||0);last=t;if(!dialog)move(dt);render();requestAnimationFrame(loop)}
-document.querySelectorAll('.heroCard').forEach(el=>el.onclick=()=>{selected=+el.dataset.hero;document.querySelectorAll('.heroCard').forEach(c=>c.classList.toggle('selected',c===el))});
-document.querySelector('#start').onclick=()=>{document.querySelector('#overlay').style.display='none';started=true;last=performance.now();requestAnimationFrame(loop)};
-document.querySelector('#next').onclick=closeDialog;document.querySelector('#useBtn').onclick=action;document.querySelector('#attackBtn').onclick=attack;document.querySelector('#skillBtn').onclick=ability;
-addEventListener('keydown',e=>{key[e.key]=1;if([' ','Enter'].includes(e.key)){e.preventDefault();if(!e.repeat)action()}if(e.key.toLowerCase()==='j'&&!e.repeat)attack();if(e.key.toLowerCase()==='k'&&!e.repeat)ability();});addEventListener('keyup',e=>key[e.key]=0);
-const stickEl=document.querySelector('#stick'),nub=document.querySelector('#nub');stickEl.addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);stickMove(e)});stickEl.addEventListener('pointermove',e=>{if(e.buttons)stickMove(e)});function stickMove(e){let r=stickEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),m=Math.min(30,d);stick.x=d>7?dx/d*m/30:0;stick.y=d>7?dy/d*m/30:0;nub.style.transform='translate('+stick.x*30+'px,'+stick.y*30+'px)'}function resetStick(){stick.x=stick.y=0;nub.style.transform=''}['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
-generateWorld();render();
-})();
-</script></body></html>
+function drawPerson(n,x,y,color,hair,phase=0){
+ const bob=Math.sin(phase)*1;
+ px(ctx,x+8,y+29+bob,18,4,'#38573c');
+ px(ctx,x+10,y+11+bob,14,15,color);px(ctx,x+9,y+23+bob,5,8,'#524b5b');px(ctx,x+19,y+23+bob,5,8,'#524b5b');
+ px(ctx,x+10,y+3+bob,14,12,hair);px(ctx,x+11,y+5+bob,12,9,'#efbd87');
+ px(ctx,x+12,y+7+bob,2,2,'#3e342d');px(ctx,x+19,y+7+bob,2,2,'#3e342d');
+ px(ctx,x+10,y+2+bob,14,3,hair);px(ctx,x+9,y+4+bob,3,5,hair);
+}
+function drawSlime(e){
+ const bob=Math.sin(performance.now()/170+e.x)*2;
+ px(ctx,e.x+5,e.y+26,27,4,'#38543b');
+ px(ctx,e.x+3,e.y+11+bob,31,17,e.kind==='moss'?'#3b7e4c':'#469451');
+ px(ctx,e.x+7,e.y+5+bob,23,14,e.kind==='moss'?'#68b564':'#80c96f');
+ px(ctx,e.x+10,e.y+11+bob,5,6,'#fff4ca');px(ctx,e.x+23,e.y+11+bob,5,6,'#fff4ca');
+ px(ctx,e.x+12,e.y+13+bob,2,3,'#283d31');px(ctx,e.x+25,e.y+13+bob,2,3,'#283d31');
+ px(ctx,e.x+3,e.y+23+bob,7,3,'#2f6e42');px(ctx,e.x+27,e.y+23+bob,7,3,'#2f6e42');
+ if(e.hp<e.max){px(ctx,e.x+3,e.y,31,4,'#49352b');px(ctx,e.x+4,e.y+1,29*e.hp/e.max,2,'#cc5845')}
+}
+function drawBoss(){
+ const b=boss,x=b.x,y=b.y;
+ px(ctx,x-10,y+47,68,8,'#304c35');
+ px(ctx,x+1,y+14,45,35,'#586d44');px(ctx,x+6,y+5,36,24,'#75965a');
+ px(ctx,x+12,y+11,8,8,'#f2d9a0');px(ctx,x+31,y+11,8,8,'#f2d9a0');
+ px(ctx,x+15,y+13,4,5,'#342c29');px(ctx,x+33,y+13,4,5,'#342c29');
+ px(ctx,x+17,y+29,17,4,'#3c4939');px(ctx,x+20,y+2,4,7,'#d4c28b');px(ctx,x+30,y,4,8,'#d4c28b');
+ px(ctx,x-2,y+25,9,16,'#50633f');px(ctx,x+42,y+25,11,16,'#50633f');
+ px(ctx,x+3,y+47,10,5,'#45372d');px(ctx,x+34,y+47,10,5,'#45372d');
+ if(b.hp<b.max){px(ctx,x,y-9,50,5,'#49362d');px(ctx,x+1,y-8,48*b.hp/b.max,3,'#ca5544')}
+}
+function spawnParticles(x,y,color,n=7){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-.5)*95,vy:(Math.random()-.8)*90,life:.55,color})}
+function toast(message){const el=document.querySelector('#toast');el.textContent=message;el.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display='none',1900)}
+function saveGame(){
+ const data={selected,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,questStage,seeds:seedItems.map(s=>s.got),chestFound};
+ try{localStorage.setItem('talwind-save-v2',JSON.stringify(data));toast('Spielstand gespeichert.')}catch(e){toast('Speichern ist in diesem Browser nicht verfügbar.')}
+}
+function loadGame(){
+ try{const d=JSON.parse(localStorage.getItem('talwind-save-v2')||'null');if(!d)return false;selected=clamp(d.selected||0,0,4);player.x=clamp(d.x||476,30,930);player.y=clamp(d.y||338,35,510);player.hp=clamp(d.hp||5,1,5);player.coins=d.coins||125;player.potions=d.potions??3;player.xp=d.xp||0;questStage=d.questStage||0;seedItems.forEach((s,i)=>s.got=!!(d.seeds&&d.seeds[i]));seeds=seedItems.filter(s=>s.got).length;chestFound=!!d.chestFound;document.querySelector('#continueGame').style.display='inline-block';return true}catch(e){return false}
+}
+function updateHUD(){
+ document.querySelector('#heroName').textContent=heroes[selected].name;
+ document.querySelector('#heroTitle').textContent=heroes[selected].title.toUpperCase()+' · LV '+(1+Math.floor(player.xp/100));
+ document.querySelector('#hearts').textContent='♥ '.repeat(player.hp)+'♡ '.repeat(5-player.hp);
+ document.querySelector('#seedCount').textContent=seedItems.filter(s=>s.got).length;
+ document.querySelector('#coins').textContent=player.coins;
+ const q=questStage===0?'Finde Mira am Dorfbrunnen':questStage===1?'Sammle die drei Echosamen':questStage===2?'Aktiviere den Brunnen mit den Echosamen':questStage===3?'Besiege den Stille-Wächter im Osten': 'Das erste Echo ist erwacht – sprich mit Mira';
+ document.querySelector('#questText').textContent=q;
+ document.querySelector('#skillButton').style.opacity=player.skill>0?.55:1;
+ document.querySelector('#skillButton').querySelector('.actionLabel').textContent=player.skill>0?player.skill.toFixed(1)+'s':'FÄHIGKEIT';
+ if(boss.active){document.querySelector('#bossName').textContent='STILLE-WÄCHTER';document.querySelector('#bossBar').style.display='block';document.querySelector('#bossFill').style.width=(100*boss.hp/boss.max)+'%'}else{document.querySelector('#bossBar').style.display='none';document.querySelector('#bossName').textContent=''}
+}
+function openDialog(name,text){dialogOpen=true;document.querySelector('#speaker').textContent=name;document.querySelector('#speech').textContent=text;document.querySelector('#dialog').style.display='block'}
+function closeDialog(){dialogOpen=false;document.querySelector('#dialog').style.display='none'}
+function interact(){
+ if(dialogOpen){closeDialog();return}
+ const close=npcs.find(n=>Math.hypot(n.x-player.x,n.y-player.y)<68);
+ if(close){
+  if(close.name==='MIRA'&&questStage===0){questStage=1;openDialog('MIRA','Die sieben Echos wurden aus ihren Schreinen gerissen. Wenn wir drei Echosamen zum Brunnen bringen, kann er wieder singen. Danach führt uns sein Klang zum ersten Schrein.');toast('Neue Quest: Drei Echosamen')}
+  else if(close.name==='MIRA'&&questStage===1){openDialog('MIRA','Die Samen verstecken sich in den Gärten und am Rand des Dorfplatzes. Halte nach einem goldenen Schimmer Ausschau.')}
+  else if(close.name==='MIRA'&&questStage===2){openDialog('MIRA','Lege die drei Samen in die kleine Schale am Brunnen. Der Klang wird den alten Weg öffnen.')}
+  else if(close.name==='MIRA'&&questStage===4){openDialog('MIRA','Du hast das erste Echo zurückgebracht! Doch die Stille hat sechs weitere Schreine verdunkelt. Unsere Reise hat gerade erst begonnen.')}
+  else openDialog(close.name,close.line);
+  return;
+ }
+ const seed=seedItems.find(s=>!s.got&&Math.hypot(s.x-player.x,s.y-player.y)<42);
+ if(seed){seed.got=true;spawnParticles(seed.x,seed.y,'#f5d86b',13);toast('Echosamen gefunden!');const count=seedItems.filter(s=>s.got).length;if(count===3){questStage=2;openDialog('ECHO DES BRUNNENS','Drei Samen sind vereint. Der Brunnen beginnt leise zu singen. Kehre zum Brunnen in der Dorfmitte zurück.')}else openDialog('ECHOSAMEN','Ein kleines Echo tanzt in deiner Hand. Noch '+(3-count)+' fehlen.');updateHUD();saveGame();return;}
+ if(!chestFound&&Math.hypot(190-player.x,360-player.y)<52){chestFound=true;player.coins+=75;player.potions++;spawnParticles(190,360,'#f3ca62',18);openDialog('ALTE TRUHE','Du findest 75 Windtaler und einen Heiltrank. Der Deckel trägt das Zeichen eines vergessenen Schreins.');saveGame();updateHUD();return;}
+ if(questStage===2&&Math.hypot(480-player.x,278-player.y)<92){questStage=3;boss.active=true;boss.hp=boss.max;openDialog('DER BRUNNEN','Das Wasser steigt auf. Im Osten erwacht ein Wächter aus Moos und Stein!');toast('Bosskampf: Stille-Wächter');updateHUD();return;}
+ if(boss.active&&Math.hypot(boss.x-player.x,boss.y-player.y)<90){openDialog('STILLE-WÄCHTER','Ein tiefer Ton erzittert im Boden. Weiche seinen Schlägen aus und greife an, wenn er sich öffnet.');return;}
+ openDialog('AVARRA','Der Wind flüstert: „Sieben Echos, sieben Wege. Höre genau hin.“');
+}
+function damageEnemy(e,amount=1){if(e.hp<=0)return;e.hp-=amount;e.hit=.2;spawnParticles(e.x+15,e.y+12,'#d8ed9c',5);if(e.hp<=0){player.xp+=24;player.coins+=8;spawnParticles(e.x+15,e.y+12,'#e8c65e',12);toast('+24 EP · +8 Windtaler')}}
+function attack(){
+ if(player.attack>0||dialogOpen)return;player.attack=.34;
+ let hit=false;
+ for(const e of enemies){if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<66){damageEnemy(e);hit=true}}
+ if(boss.active&&Math.hypot(boss.x-player.x,boss.y-player.y)<83){boss.hp=Math.max(0,boss.hp-1);boss.hit=.2;spawnParticles(boss.x+20,boss.y+20,'#d7e9a2',7);hit=true;if(boss.hp===0){boss.active=false;questStage=4;player.xp+=120;player.coins+=100;toast('Erstes Echo gerettet!');openDialog('DAS ERSTE ECHO','Ein warmer Lichtstrahl steigt aus dem Wächter auf. Du hörst eine Melodie, die älter ist als Avarra. Sechs Echos warten noch auf dich.');saveGame()}}
+ if(!hit)spawnParticles(player.x+16+player.faceX*25,player.y+18+player.faceY*20,'#fff0b4',3);
+}
+function ability(){
+ if(player.skill>0||dialogOpen)return;
+ const h=heroes[selected];player.skill=4.2;const dx=player.faceX,dy=player.faceY;
+ if(selected===0){player.x=clamp(player.x+dx*132,20,940);player.y=clamp(player.y+dy*132,20,520);player.inv=1;spawnParticles(player.x,player.y,'#8de4df',14);toast('Windstoß!')}
+ if(selected===1){player.inv=2.4;spawnParticles(player.x+15,player.y+18,'#c8c5a2',16);for(const e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<115){damageEnemy(e,2);e.x+=Math.sign(e.x-player.x)*35}toast('Steinhaut!')}
+ if(selected===2){shots.push({x:player.x+16,y:player.y+17,vx:dx*430,vy:dy*430,life:.6,damage:3,color:'#b7e783'});toast('Sternenschuss!')}
+ if(selected===3){for(const e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<155)damageEnemy(e,2);if(player.hp<5)player.hp++;spawnParticles(player.x+16,player.y+17,'#c9a7f2',24);toast('Echowelle!')}
+ if(selected===4){player.x=clamp(player.x+dx*165,20,940);player.y=clamp(player.y+dy*165,20,520);player.inv=1.7;for(const e of enemies)if(e.hp>0&&Math.hypot(e.x-player.x,e.y-player.y)<52)damageEnemy(e,2);spawnParticles(player.x+16,player.y+18,'#8b9cc9',16);toast('Schattenrolle!')}
+ updateHUD();
+}
+function dodge(){if(player.roll>0||dialogOpen)return;player.roll=.32;player.inv=Math.max(player.inv,.55);player.x=clamp(player.x+player.faceX*64,18,940);player.y=clamp(player.y+player.faceY*64,18,520);spawnParticles(player.x+16,player.y+32,'#d8e9be',7)}
+function solid(x,y){
+ if(x<10||y<10||x>946||y>526)return true;
+ const boxes=[{x:247,y:72,w:120,h:145},{x:700,y:72,w:158,h:148},{x:438,y:224,w:86,h:70},{x:760,y:120,w:130,h:60}];
+ return boxes.some(b=>x>b.x&&x<b.x+b.w&&y>b.y&&y<b.y+b.h);
+}
+function move(dt){
+ let x=(keys.d||keys.ArrowRight?1:0)-(keys.a||keys.ArrowLeft?1:0)+stick.x;
+ let y=(keys.s||keys.ArrowDown?1:0)-(keys.w||keys.ArrowUp?1:0)+stick.y;
+ const pads=navigator.getGamepads?navigator.getGamepads():[],gp=pads&&pads[0];
+ if(gp&&gp.connected){const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.15){x=ax;y=ay}
+  const a=!!gp.buttons[0]?.pressed,b=!!gp.buttons[1]?.pressed,k=!!gp.buttons[2]?.pressed;
+  if(a&&!move.pa){interact();move.pa=1}if(!a)move.pa=0;if(b&&!move.pb){attack();move.pb=1}if(!b)move.pb=0;if(k&&!move.pk){ability();move.pk=1}if(!k)move.pk=0;
+ }
+ const mag=Math.hypot(x,y);if(mag>1){x/=mag;y/=mag}
+ if(mag>.08){player.faceX=Math.abs(x)>Math.abs(y)?Math.sign(x):0;player.faceY=Math.abs(y)>=Math.abs(x)?Math.sign(y):0;player.walk+=dt*11}
+ const speed=heroes[selected].speed*(player.roll>0?2.4:1);
+ const nx=player.x+x*speed*dt,ny=player.y+y*speed*dt;
+ if(!solid(nx+8,player.y+27)&&!solid(nx+24,player.y+30))player.x=nx;
+ if(!solid(player.x+8,ny+27)&&!solid(player.x+24,ny+30))player.y=ny;
+}
+function update(dt){
+ if(!dialogOpen&&!panelOpen&&!paused)move(dt);
+ player.attack=Math.max(0,player.attack-dt);player.skill=Math.max(0,player.skill-dt);player.roll=Math.max(0,player.roll-dt);player.inv=Math.max(0,player.inv-dt);
+ for(const e of enemies){if(e.hp<=0)continue;e.hit=Math.max(0,e.hit-dt);e.attack=Math.max(0,e.attack-dt);const dx=player.x-e.x,dy=player.y-e.y,d=Math.hypot(dx,dy);if(d<185&&d>1){e.x+=dx/d*e.speed*dt;e.y+=dy/d*e.speed*dt}if(d<40&&e.attack<=0&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=1;e.attack=1.15;spawnParticles(player.x+16,player.y+20,'#e66a5c',7)}}
+ if(boss.active){boss.hit=Math.max(0,boss.hit-dt);boss.attack=Math.max(0,boss.attack-dt);const dx=player.x-boss.x,dy=player.y-boss.y,d=Math.hypot(dx,dy);if(d<220&&d>1){boss.x+=dx/d*34*dt;boss.y+=dy/d*34*dt}if(d<64&&boss.attack<=0&&player.inv<=0){player.hp=Math.max(0,player.hp-2);player.inv=1.2;boss.attack=1.5;spawnParticles(player.x+16,player.y+20,'#e45b4f',13)}}
+ for(let i=shots.length-1;i>=0;i--){const s=shots[i];s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;for(const e of enemies)if(e.hp>0&&Math.hypot(e.x-s.x,e.y-s.y)<38){damageEnemy(e,s.damage);s.life=0}if(boss.active&&Math.hypot(boss.x-s.x,boss.y-s.y)<55){boss.hp=Math.max(0,boss.hp-s.damage);s.life=0;if(boss.hp===0){boss.active=false;questStage=4;player.xp+=120;player.coins+=100;openDialog('DAS ERSTE ECHO','Der Stille-Wächter zerfällt zu Licht. Das erste Echo kehrt zurück!');saveGame()}}if(s.life<=0)shots.splice(i,1)}
+ for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=120*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
+ if(player.hp<=0){player.hp=5;player.x=476;player.y=338;toast('Mira hat dich zum Brunnen zurückgebracht.');saveGame()}
+ updateHUD();
+}
+function render(){
+ ctx.clearRect(0,0,W,H);
+ if(mapImage.complete&&mapImage.naturalWidth){ctx.drawImage(mapImage,0,0,W,H)}else{ctx.fillStyle='#6eb85e';ctx.fillRect(0,0,W,H)}
+ // Tiny animated water glints make the painted map feel alive
+ const t=performance.now()/500;ctx.fillStyle='#c5f4ee';for(let i=0;i<8;i++){const x=30+(i*71)%150,y=30+(i*37)%440;ctx.fillRect(x+Math.sin(t+i)*4,y,4,2)}
+ for(const n of npcs)drawPerson(n,n.x,n.y,n.coat,n.hair,performance.now()/700);
+ for(const e of enemies)if(e.hp>0)drawSlime(e);
+ for(const s of seedItems)if(!s.got){const pulse=1+Math.sin(performance.now()/180+s.x)*.2;px(ctx,s.x+13,s.y+7,7,18* pulse,'#f1ca53');px(ctx,s.x+8,s.y+10,5,5,'#fff4b1');px(ctx,s.x+21,s.y+3,5,5,'#fff4b1');px(ctx,s.x+12,s.y+20,9,2,'#4d8750')}
+ if(!chestFound){px(ctx,174,344,40,25,'#875531');px(ctx,178,336,33,13,'#c48a50');px(ctx,191,345,6,10,'#f3ca67')}
+ if(boss.active)drawBoss();
+ drawHeroSprite(ctx,heroes[selected],Math.round(player.x),Math.round(player.y-2),2,player.walk);
+ if(player.attack>0){ctx.strokeStyle='#fff1af';ctx.lineWidth=8;ctx.beginPath();ctx.arc(player.x+16+player.faceX*28,player.y+19+player.faceY*20,36,-1.0,.95);ctx.stroke()}
+ for(const s of shots){ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(s.x,s.y,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff6d7';ctx.beginPath();ctx.arc(s.x-2,s.y-2,2,0,Math.PI*2);ctx.fill()}
+ for(const p of particles){ctx.globalAlpha=clamp(p.life/.55,0,1);px(ctx,p.x,p.y,4,4,p.color)}ctx.globalAlpha=1;
+ if(player.inv>0&&Math.floor(performance.now()/80)%2===0){ctx.fillStyle='#ffffff55';ctx.fillRect(player.x,player.y-2,34,46)}
+}
+function loop(t){if(!started)return;const dt=Math.min(.04,(t-last)/1000||0);last=t;if(!paused&&!panelOpen)update(dt);render();requestAnimationFrame(loop)}
+function selectHero(i){selected=i;document.querySelectorAll('.heroCard').forEach(card=>card.classList.toggle('selected',+card.dataset.hero===selected));updateHUD()}
+function openPanel(kind){
+ panelOpen=true;const title=document.querySelector('#drawerTitle'),content=document.querySelector('#drawerContent'),buttons=document.querySelector('#drawerButtons');buttons.innerHTML='';
+ const addBtn=(text,fn)=>{const b=document.createElement('button');b.className='uiBtn';b.textContent=text;b.onclick=fn;buttons.appendChild(b)};
+ if(kind==='quest'){title.textContent='Questbuch';content.innerHTML='<p><b>Hauptquest: Das erste Echo</b><br>'+(questStage===0?'Finde Mira und frage nach dem verstummten Brunnen.':questStage===1?'Finde drei Echosamen in Windruh.':questStage===2?'Bringe die Samen zum Brunnen in der Dorfmitte.':questStage===3?'Besiege den Stille-Wächter im Osten.':'Das erste Echo ist gerettet. Sechs Schreine warten noch.')+'</p><p><b>Nebenaufgabe: Dorfgeflüster</b><br>Sprich mit Tomke, Eda und Finn, um mehr über Avarra zu erfahren.</p>'}
+ else if(kind==='inventory'){title.textContent='Rucksack';content.innerHTML='<p>🧪 Heiltränke: <b>'+player.potions+'</b> · ✦ Echosamen: <b>'+seedItems.filter(s=>s.got).length+'/3</b> · ◈ Windtaler: <b>'+player.coins+'</b></p><p>Ein Heiltrank stellt ein Herz wieder her. Drücke <b>H</b> oder benutze den Knopf unten.</p>';addBtn('Heiltrank benutzen',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+1);updateHUD();openPanel('inventory')}else toast('Du brauchst einen Trank und musst verletzt sein.')})}
+ else if(kind==='map'){title.textContent='Karte von Windruh';content.innerHTML='<p>Du befindest dich im Dorf Windruh, im Grünen Tal von Avarra.</p><p>✦ Brunnen: Mitte des Dorfplatzes<br>✦ Echosamen: Gärten und Dorfplatzrand<br>✦ Alter Schrein: hinter dem östlichen Garten</p><p>Weitere Regionen öffnen sich im Verlauf der Geschichte.</p>'}
+ else if(kind==='settings'){title.textContent='Optionen';content.innerHTML='<p>Steuerung: WASD / Pfeiltasten oder Gamepad-Stick.</p><p>Aktion: E · Angriff: J · Fähigkeit: K · Rolle: Shift · Heiltrank: H</p><label><input id="reduceShake" type="checkbox"> Bildschirm-Effekte reduzieren</label><p class="smallNote">Grafik und Text bleiben separat gerendert, damit alle Menüs gut lesbar sind.</p>';addBtn('Spielstand speichern',saveGame)}
+ else if(kind==='coop'){title.textContent='Gemeinsam spielen';content.innerHTML='<p><b>Koop für bis zu vier Personen ist geplant.</b></p><p>Die fünf Helden und ihre Fähigkeiten sind bereits getrennt angelegt. Später können bis zu vier Spieler gemeinsam eine Gruppe bilden und ihre Fähigkeiten kombinieren.</p><p>Online-Verbindungen, Einladungen und gemeinsame Spielstände sind in dieser Version noch nicht implementiert.</p>'}
+ addBtn('Schließen',closePanel);document.querySelector('#panelShade').style.display='grid';
+}
+function closePanel(){panelOpen=false;document.querySelector('#panelShade').style.display='none'}
+document.querySelectorAll('.heroCard').forEach(card=>{const i=+card.dataset.hero;card.onclick=()=>selectHero(i);const g=card.querySelector('canvas').getContext('2d');drawHeroSprite(g,heroes[i],16,8,3,0)});
+document.querySelector('#startGame').onclick=()=>{document.querySelector('#titleScreen').style.display='none';started=true;last=performance.now();openDialog('MIRA','Willkommen in Windruh, '+heroes[selected].name+'. Der Wind hat sieben Echos verloren. Sprich mit mir am Brunnen – ich brauche deine Hilfe.');requestAnimationFrame(loop);saveGame()};
+document.querySelector('#continueGame').onclick=()=>{if(loadGame()){document.querySelector('#titleScreen').style.display='none';started=true;last=performance.now();requestAnimationFrame(loop);toast('Abenteuer fortgesetzt.')}};
+document.querySelector('#dialogNext').onclick=closeDialog;
+document.querySelector('#useButton').onclick=interact;document.querySelector('#attackButton').onclick=attack;document.querySelector('#skillButton').onclick=ability;document.querySelector('#dodgeButton').onclick=dodge;
+document.querySelector('#menuToggle').onclick=()=>{document.querySelector('#sideMenu').style.display=document.querySelector('#sideMenu').style.display==='flex'?'none':'flex'};
+document.querySelectorAll('[data-panel]').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
+document.querySelector('#closeDrawer').onclick=closePanel;
+document.querySelector('#panelShade').addEventListener('click',e=>{if(e.target.id==='panelShade')closePanel()});
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();keys[k]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(!e.repeat){if(k==='e'||k===' ')interact();if(k==='j')attack();if(k==='k')ability();if(k==='shift')dodge();if(k==='h'&&player.potions>0&&player.hp<5){player.potions--;player.hp++;toast('Heiltrank benutzt.');updateHUD()};if(k==='escape'){if(dialogOpen)closeDialog();else if(panelOpen)closePanel();else openPanel('quest')}}});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const stickEl=document.querySelector('#stick'),nub=document.querySelector('#nub');
+function moveStick(e){const r=stickEl.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),m=Math.min(31,d);stick.x=d>6?dx/d*m/31:0;stick.y=d>6?dy/d*m/31:0;nub.style.transform='translate('+stick.x*31+'px,'+stick.y*31+'px)'}
+function resetStick(){stick.x=stick.y=0;nub.style.transform=''}
+stickEl.addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);moveStick(e)});stickEl.addEventListener('pointermove',e=>{if(e.buttons)moveStick(e)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
+if(localStorage.getItem('talwind-save-v2'))document.querySelector('#continueGame').style.display='inline-block';
+updateHUD();render();
+})();</script>
+</body></html>
