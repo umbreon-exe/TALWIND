@@ -371,8 +371,12 @@ function talk(n){
 function roomNPCAction(n){
  if(currentRoom==='shop'){openShop();return}
  if(currentRoom==='inn'){if(side.letter===2){side.letter=3;inventory.meals++;player.hp=Math.min(5,player.hp+1);showDialogue('RUNA','Tomkes Antwort! Danke, dass du den Brief gebracht hast. Nimm eine warme Pastete und etwas Kraft für deinen Weg.');showToast('Geschenk: Pastete + 1 Herz');saveGame()}else{showDialogue('RUNA','Setz dich an den Tisch. Eine Pastete kostet heute nichts – du siehst aus, als hättest du einen langen Weg hinter dir.');if(!side.freeMeal){side.freeMeal=true;inventory.meals++;player.hp=Math.min(5,player.hp+1);showToast('Runa schenkt dir eine Mahlzeit und ein Herz')}}return}
- if(currentRoom==='library'){showDialogue('SELA','In den alten Büchern steht: Der Weg zum Schrein öffnet sich nur, wenn drei blaue Waldblüten zusammenkommen.');return}
- if(currentRoom==='garden'){talk(world.npcs.find(n=>n.id==='eda')||{id:'eda'});return}
+ if(currentRoom==='library'){showDialogue('SELA','In den alten Büchern steht: Drei blaue Waldblüten öffnen den Weg zum Echo-Schrein. Auf der Rückseite ist eine Karte eingezeichnet.');return}
+ if(currentRoom==='garden'||currentRoom==='clinic'){talk(world.npcs.find(n=>n.id==='eda')||{id:'eda'});return}
+ if(currentRoom==='mira'||currentRoom==='home2'){const id=roomNPC&&roomNPC.npc;const resident=world.npcs.find(v=>v.id===id);if(resident){talk(resident);return}}
+ if(currentRoom==='tailor'){talk(world.npcs.find(n=>n.id==='lina')||{id:'lina'});return}
+ if(currentRoom==='smith'){talk(world.npcs.find(n=>n.id==='orin')||{id:'orin'});return}
+ if(currentRoom==='bakery'){talk(world.npcs.find(n=>n.id==='tavi')||{id:'tavi'});return}
  showDialogue(roomNPC.title,'Willkommen! Schön, dass du vorbeischaust.');
 }
 function openShop(){
@@ -540,7 +544,7 @@ function makeWorld(id){
   ];
   for(const [bid,x,y,ww,hh,style,name] of houses)w.buildings.push({id:bid,x:x*T,y:y*T,w:ww*T,h:hh*T,style,name,doorX:(x+ww/2)*T,doorY:(y+hh)*T+4});
   // Orchard, parks, fences, flower beds and small street props.
-  for(let y=3;y<39;y+=5){w.decor.push({type:'tree',x:7*T,y:y*T,solid:true});w.decor.push({type:'tree',x:60*T,y:y*T,solid:true})}
+  for(let y=3;y<39;y+=5){w.decor.push({type:'tree',x:7*T,y:y*T,solid:true});if(y<17||y>25)w.decor.push({type:'tree',x:60*T,y:y*T,solid:true})}
   for(let x=9;x<59;x+=6){w.decor.push({type:'tree',x:x*T,y:2*T,solid:true});if(x%2===1)w.decor.push({type:'tree',x:x*T,y:38*T,solid:true})}
   for(let x=49;x<59;x+=2)for(let y=13;y<18;y+=2)w.decor.push({type:'appleTree',x:x*T,y:y*T,solid:true});
   for(let x=8;x<15;x+=2)for(let y=13;y<17;y+=2)w.decor.push({type:'flowerBed',x:x*T,y:y*T});
@@ -848,10 +852,10 @@ function interact(){
  const px=player.x+12,py=player.y+31;
  if(room){
   if(player.y>205&&Math.abs(px-VW/2)<70){insideDoor();return}
-  const resident=roomNPC?world.npcs.find(n=>n.id===roomNPC.npc):null;
-  if(resident&&Math.hypot(resident.x-px,resident.y-py)<65){roomNPCAction();return}
-  if(currentRoom==='shop'){openShop();return}
-  showDialogue(roomNPC?roomNPC.title:'Haus','Du schaust dich um. Auf dem Tisch liegen kleine Dinge aus dem Alltag.');return;
+  // Interior residents are drawn at a local room position, independent of their outdoor coordinates.
+  if(Math.hypot(232-px,119-py)<64){roomNPCAction();return}
+  if(currentRoom==='shop'&&Math.hypot(390-px,145-py)<90){openShop();return}
+  showDialogue(roomNPC?roomNPC.title:'Haus','Du schaust dich um. In jeder Stube gibt es kleine Details und Dinge aus dem Alltag.');return;
  }
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<42);
  if(b){enterRoom(b);return}
