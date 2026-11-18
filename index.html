@@ -272,7 +272,7 @@ function drawRoom(){
  // Door threshold and room nameplate
  pixel(214,237,52,20,'#765036');pixel(220,240,40,16,'#bd8a54');pixel(226,244,28,12,'#533729');
  pixel(160,15,160,15,'#60432f');pixel(164,18,152,9,'#e4c58d');
- drawHero(232,180,performance.now()/1000);
+ drawHero(player.x-8,player.y-18,performance.now()/1000);
  if(roomNPC){const loc={mira:[236,115],runa:[230,112],pavo:[230,112],lina:[230,112],sela:[230,112],orin:[230,112],eda:[230,112],tavi:[230,112]}[currentRoom]||[230,112];drawPerson({color:'#a65b52',hair:'#715039',phase:0,kind:'villager'},loc[0],loc[1],performance.now())}
  ctx.fillStyle='#fff0ce';ctx.font='bold 9px Verdana';ctx.textAlign='center';ctx.fillText(roomNPC.title,VW/2,28);ctx.textAlign='left';
 }
