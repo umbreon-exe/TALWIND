@@ -1019,7 +1019,7 @@ function insideDoor(){
  if(!room)return;room=null;currentRoom=null;roomNPC=null;player.x=insideDoorSpawn.x;player.y=insideDoorSpawn.y;updateCamera();showToast('Zurück auf dem Dorfplatz');updateQuest();
 }
 function nearbyPrompt(){
- if(room)return player.y>VH-80&&Math.abs(player.x+12-VW/2)<48?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
+ if(room)return player.y>VH-55&&Math.abs(player.x+12-VW/2)<48?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
  const px=player.x+12,py=player.y+31;
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b)return b.name+' betreten';
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
@@ -1100,7 +1100,7 @@ function move(dt){
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
  // In Häusern führt die Tür am unteren Bildschirmrand direkt nach draußen.
  // Der Spieler muss nur nach unten in die Tür laufen; keine Aktionstaste nötig.
- if(room&&player.faceY>0&&player.y>=VH-80&&Math.abs(player.x+12-VW/2)<48){
+ if(room&&player.faceY>0&&player.y>=VH-55&&Math.abs(player.x+12-VW/2)<48){
   insideDoor();
   return;
  }
