@@ -676,7 +676,9 @@ function drawRoom(now){
  if(resident)drawPerson(resident,220,94,now);
  drawHero(player.x,player.y,now);
  ctx.fillStyle='#fff0cd';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,25);
- ctx.font='bold 9px monospace';ctx.fillStyle='#fff1c9';ctx.fillText('E · Hinausgehen',VW/2,VH-8);ctx.textAlign='left';
+ // Offene Ausgangstür in der Mitte der unteren Wand.
+ pixel(VW/2-34,VH-20,68,20,'#35291f');pixel(VW/2-27,VH-19,54,18,'#b98554');pixel(VW/2-22,VH-18,44,18,'#182b3c');pixel(VW/2-29,VH-2,58,3,'#e7c77f');
+ ctx.font='bold 9px monospace';ctx.fillStyle='#fff1c9';ctx.fillText('ZUR TÜR LAUFEN',VW/2,VH-27);ctx.textAlign='left';
 }
 function drawShrine(now){
  for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#77796f':'#858477');pixel(x+2,y+2,12,12,'#999587')}
