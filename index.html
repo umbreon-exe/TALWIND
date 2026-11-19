@@ -87,7 +87,7 @@ const heroes=[
 {name:'ROOK',role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
 ];
 const palette={grass:'#68ad5c',grass2:'#5fa454',darkGrass:'#3e814b',path:'#d8c79d',pathEdge:'#b6a77f',stone:'#9b9a85',water:'#288bc6',waterLight:'#65c8e9',wood:'#93613a',wall:'#e4cea0',roof:'#b94f41'};
-let selected=0,started=false,last=0,zone='windruh',room=null,dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0;
+let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0;
 const keys={},stick={x:0,y:0},camera={x:0,y:0};
 const player={x:32*T-12,y:21*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,atk:0,skill:0};
 const saveKey='talwind-world-save-v4';
@@ -364,7 +364,7 @@ function gameLoop(now){
 function startGame(){document.getElementById('titleScreen').classList.add('hidden');started=true;last=performance.now();updateQuest();showDialogue('MIRA','Willkommen in Windruh! Sprich mit mir am Brunnen. Ich erzähle dir, was mit den sieben Echos geschehen ist.');requestAnimationFrame(gameLoop);saveGame()}
 function buildHeroCards(){
  const grid=document.getElementById('heroGrid');grid.innerHTML='';
- heroes.forEach((h,i)=>{let card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');card.innerHTML='<canvas width="55" height="70"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';let g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;const p=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};p(15,54,26,5,'#3b5c3b');p(17,37,22,18,h.cape);p(17,38,22,17,h.coat);p(18,51,8,11,'#61452f');p(31,51,8,11,'#61452f');p(18,19,21,21,'#efbf90');p(17,14,24,13,h.hair);p(18,24,4,3,'#40332b');p(32,24,4,3,'#40332b');p(17,38,22,3,h.detail);if(h.female){p(14,20,4,24,h.hair);p(38,20,4,24,h.hair);p(20,10,17,4,h.detail)}else{p(17,12,23,4,h.hair);p(14,38,4,10,'#d89b78');p(39,38,4,10,'#d89b78')}if(i===1){p(39,35,8,23,'#b9c1b0')}if(i===2){p(10,25,5,29,'#805a37')}if(i===3){p(24,6,10,8,'#ddd0ff')}if(i===4){p(38,38,7,13,'#cadde1')}card.onclick=()=>{selected=i;buildHeroCards();updateQuest()};grid.appendChild(card)})
+ heroes.forEach((h,i)=>{let card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');card.innerHTML='<canvas width="55" height="70"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';let g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;const p=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};p(15,54,26,5,'#3b5c3b');p(17,37,22,18,h.cape);p(17,38,22,17,h.coat);p(18,51,8,11,'#61452f');p(31,51,8,11,'#61452f');p(18,19,21,21,'#efbf90');p(17,14,24,13,h.hair);p(18,24,4,3,'#40332b');p(32,24,4,3,'#40332b');p(17,38,22,3,h.detail);if(h.female){p(14,20,4,24,h.hair);p(38,20,4,24,h.hair);p(20,10,17,4,h.detail)}else{p(17,12,23,4,h.hair);p(14,38,4,10,'#d89b78');p(39,38,4,10,'#d89b78')}if(i===1){p(39,35,8,23,'#b9c1b0')}if(i===2){p(10,25,5,29,'#805a37')}if(i===3){p(24,6,10,8,'#ddd0ff')}if(i===4){p(38,38,7,13,'#cadde1')}card.onclick=()=>{selected=i;heroChosen=true;buildHeroCards();updateQuest();saveGame()};grid.appendChild(card)})
 }
 function keyDown(e){
  const k=e.key.toLowerCase();keys[k]=true;
@@ -382,7 +382,7 @@ addEventListener('keydown',keyDown);addEventListener('keyup',e=>keys[e.key.toLow
 document.getElementById('nextBtn').onclick=closeDialogue;document.getElementById('useBtn').onclick=interact;document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
 document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));
 document.getElementById('closePanel').onclick=closePanel;document.getElementById('startBtn').onclick=startGame;
-document.getElementById('continueBtn').onclick=()=>{if(loadGame()){buildHeroCards();startGame()}else showToast('Kein Spielstand gefunden')};
+document.getElementById('continueBtn').onclick=()=>{const chosenHero=selected,hasNewChoice=heroChosen;if(loadGame()){if(hasNewChoice)selected=chosenHero;buildHeroCards();updateQuest();startGame()}else showToast('Kein Spielstand gefunden')};
 const stickEl=document.getElementById('stick'),nub=document.getElementById('nub');
 function moveStick(e){const r=stickEl.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy),m=Math.min(30,d);stick.x=d>5?dx/d*m/30:0;stick.y=d>5?dy/d*m/30:0;nub.style.transform='translate('+stick.x*30+'px,'+stick.y*30+'px)'}
 function resetStick(){stick.x=stick.y=0;nub.style.transform=''}
