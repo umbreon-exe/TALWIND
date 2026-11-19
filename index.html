@@ -450,7 +450,7 @@ function drawPerson(n,x,y,now){
 }
 function drawHero(x,y,now){
  const frame=Math.floor(player.walk*1.7)%4,step=[0,2,0,-2][frame],bob=player.walk>.05?([0,-1,0,-1][frame]):Math.sin(now/470)*.35;
- const px=Math.round(x),py=Math.round(y+bob),skin=PALETTE.skin,boot='#49382f',hair=heroes[selected].hair;
+ const px=Math.round(x-camera.x),py=Math.round(y-camera.y+bob),skin=PALETTE.skin,boot='#49382f',hair=heroes[selected].hair;
  drawSoftShadow(x+14,y+36,14,5,.3);
  pixel(px+7+step,py+26,7,9,boot);pixel(px+18-step,py+26,7,9,boot);
  pixel(px+6+step,py+32,8,3,'#d4b47e');pixel(px+18-step,py+32,8,3,'#d4b47e');
