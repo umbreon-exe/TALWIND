@@ -1802,6 +1802,12 @@ function expandLargeRegion(w,id){
   // Deterministic forest clusters. Keep roads, clearings, ponds, residents and all
   // four encounter areas open so the player can always reach the creatures.
   const safeSpots=[[28,40],[37,61],[85,35],[46,74],[93,66],[53,37],[60,47],[66,50],[42,31],[77,26]];
+  // Clear older generated trees out of encounter clearings and NPC meeting spots.
+  w.decor=w.decor.filter(o=>{
+   if(!['tree','pine','appleTree'].includes(o.type))return true;
+   const tx=o.x/T,ty=o.y/T;
+   return !safeSpots.some(([sx,sy])=>Math.abs(tx-sx)<6&&Math.abs(ty-sy)<6);
+  });
   const inSafe=(x,y)=>safeSpots.some(([sx,sy])=>Math.abs(x-sx)<6&&Math.abs(y-sy)<6);
   const nearTrail=(x,y)=>(
    (Math.abs(y-40)<4&&x<55)||
