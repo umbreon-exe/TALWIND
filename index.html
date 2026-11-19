@@ -150,7 +150,8 @@ body{display:grid;place-items:center;touch-action:none}
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
 <div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
-<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
+<div class="overlay" id="mainMenu"><div class="card"><img src="assets/windruh.svg" width="480" height="220" alt="Windruh" style="display:block;width:min(100%,480px);height:auto;max-height:220px;object-fit:cover;margin:0 auto 12px;border:3px solid #d6a64e"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Ein Abenteuer beginnt. Erkunde Windruh, überquere den Fluss und entdecke vier Wege in die Welt von Avarra.</p><button class="uiButton" id="openHeroMenuBtn">SPIEL STARTEN</button><p class="smallNote">Wähle im nächsten Menü deinen Helden und starte deine Reise.</p></div></div>
+<div class="overlay hidden" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
 <div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
 
 <div class="overlay hidden" id="gameOver" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
@@ -254,7 +255,7 @@ const sideQuests={
  frost:{state:0,items:0,need:3},
  watch:{state:0,items:0,need:2}
 };
-const seedSpots=[{x:16*T+8,y:16*T+8,found:false},{x:46*T+8,y:25*T+8,found:false},{x:57*T+8,y:22*T+8,found:false}];
+const seedSpots=[{x:32*T+8,y:30*T+8,found:false},{x:62*T+8,y:39*T+8,found:false},{x:73*T+8,y:36*T+8,found:false}];
 const flowerSpots=[{x:24*T+8,y:30*T+8,found:false},{x:58*T+8,y:13*T+8,found:false},{x:58*T+8,y:49*T+8,found:false}];
 const rooms={
  mira:{title:'Miras gemütliches Haus',kind:'home',npc:'mira'},
@@ -277,7 +278,7 @@ function makeNPC(id,name,tx,ty,color,hair,kind,line,extra){
  return Object.assign({id,name,x:tx*T+8,y:ty*T+8,color,hair,kind,line,homeX:tx*T+8,homeY:ty*T+8,phase:rand((tx+ty+id.length)*913)()*6},extra||{});
 }
 function makeWorld(id){
- const sizes={windruh:[64,44],wald:[88,64],sumpf:[72,56],hoehle:[72,54],eispass:[80,56],shrine:[45,25]};
+ const sizes={windruh:[96,72],wald:[88,64],sumpf:[72,56],hoehle:[72,54],eispass:[80,56],shrine:[45,25]};
  const size=sizes[id]||sizes.windruh,W=size[0],H=size[1];
  const names={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',eispass:'Frostgrat',shrine:'Echo-Schrein'};
  const ground={windruh:0,wald:5,sumpf:9,hoehle:6,eispass:8,shrine:3}[id];
@@ -290,8 +291,7 @@ function makeWorld(id){
  const fillGround=()=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)set(x,y,ground)};
  fillGround();
  if(id==='windruh'){
-  // Village edges are deliberately finished with fences, trees and river banks.
-  for(let y=0;y<H;y++){set(3,y,2);set(4,y,4);set(5,y,4)}
+  // Windruh is built as a compact village core; the surrounding river and four bridges are added below.
   rect(5,19,57,6,1);rect(7,25,53,3,1);
   rect(26,13,15,15,3);rect(30,10,7,21,3);
   for(const x of [13,22,34,45,55])rect(x-1,9,3,10,1);
@@ -308,7 +308,7 @@ function makeWorld(id){
    ['clinic',52,30,6,5,'cream','Kräuterstube']
   ];
   for(const [bid,x,y,ww,hh,style,name] of houses)w.buildings.push({id:bid,x:x*T,y:y*T,w:ww*T,h:hh*T,style,name,doorX:(x+ww/2)*T,doorY:(y+hh)*T+5});
-  w.decor.push({type:'fountain',x:30*T,y:17*T,solid:true},{type:'bridge',x:3*T,y:19*T},
+  w.decor.push({type:'fountain',x:30*T,y:17*T,solid:true},
    {type:'bench',x:25*T,y:27*T},{type:'bench',x:40*T,y:16*T},{type:'lamp',x:26*T,y:17*T},
    {type:'lamp',x:39*T,y:25*T},{type:'lamp',x:16*T,y:23*T},{type:'lamp',x:48*T,y:24*T},
    {type:'sign',x:17*T,y:23*T},{type:'barrel',x:28*T,y:29*T},{type:'barrel',x:37*T,y:29*T},
@@ -349,11 +349,9 @@ function makeWorld(id){
   for(let i=0;i<210;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4)add(i%9===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
   add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('shrine',78,28,false);
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
-  w.exits.push({x:0,y:27*T,w:24,h:104,to:'windruh',tx:59*T,ty:22*T,label:'Zurück nach Windruh',open:()=>true});
-  w.exits.push({x:80*T,y:9*T,w:26,h:55,to:'sumpf',tx:5*T,ty:27*T,label:'Zum Nebelmoor',open:()=>true});
-  w.exits.push({x:80*T,y:44*T,w:26,h:55,to:'hoehle',tx:5*T,ty:26*T,label:'Zur Flüsterhöhle',open:()=>true});
-  w.exits.push({x:37*T,y:0,w:64,h:56,to:'eispass',tx:38*T,ty:2*T,label:'Zum Frostgrat',open:()=>true});
-  w.exits.push({x:75*T,y:27*T,w:40,h:78,to:'shrine',tx:12*T,ty:18*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
+  w.exits.push({x:38*T,y:0,w:70,h:24,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
+  path(44,61,44,32,2,1);path(44,32,29,32,2,1);
+  w.exits.push({x:40*T,y:61*T,w:70,h:24,to:'hoehle',tx:5*T,ty:26*T,label:'Zum Höhlenpfad',open:()=>true});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
  }else if(id==='sumpf'){
@@ -368,7 +366,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('moor_iona','Iona',20,9,'violet','silver','elder','Der Nebel trägt Stimmen aus alten Zeiten. Bleib auf den hellen Steinen – dort ist der Boden fest.',{quest:'reed'}),makeNPC('moor_pip','Pip',47,39,'gold','brown','child','Ich suche leuchtende Sumpflichter. Manche zeigen versteckte Pfade.',{quest:'shell'})];
   for(let i=0;i<3;i++)w.items.push({id:'reed'+i,kind:'quest',key:'reed',x:(12+i*5)*T,y:(18+(i%2)*3)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'shell'+i,kind:'quest',key:'shell',x:(52+i*7)*T,y:(26+i*5)*T,found:false});
-  w.exits.push({x:0,y:25*T,w:24,h:110,to:'wald',tx:78*T,ty:14*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:0,y:25*T,w:24,h:110,to:'windruh',tx:92*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='hoehle'){
   // Cave: stone paths, crystals and columns.
   fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);path(22,26,31,15,1,3);path(31,15,39,25,1,3);path(39,25,47,15,1,3);path(22,26,10,39,1,3);path(10,39,19,35,1,3);
@@ -379,7 +377,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
   for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystal',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'rune',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
-  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:76*T,y:34*T,w:28,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='eispass'){
   // Frostgrat: snow fields, icy water, firs and safe switchback trails.
   fillGround();for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*13+y*5)%29<3)set(x,y,2);
@@ -391,12 +389,34 @@ function makeWorld(id){
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
   w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
-  w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:2*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:76*T,y:34*T,w:28,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
   w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
   w.npcs=[makeNPC('echo','Echo-Wächter',22,7,'gold','blue','guardian','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen.')];
-  w.exits.push({x:11*T,y:21*T,w:16*T,h:58,to:'wald',tx:76*T,ty:29*T,label:'Zurück in den Flüsterwald',open:()=>true});
+  w.exits.push({x:19*T,y:23*T,w:16*T,h:58,to:'windruh',tx:48*T,ty:60*T,label:'Zurück nach Windruh',open:()=>true});
+ }
+ // Rebuild Windruh as a larger island village, with one river ring and four clear exits.
+ if(id==='windruh'){
+  const old=w.tiles,shifted=new Uint8Array(W*H);
+  for(let yy=0;yy<44;yy++)for(let xx=0;xx<64;xx++)shifted[(yy+14)*W+xx+16]=old[yy*W+xx];
+  w.tiles=shifted;
+  const ox=16*T,oy=14*T;
+  for(const o of w.decor){o.x+=ox;o.y+=oy}
+  for(const b of w.buildings){b.x+=ox;b.y+=oy;b.doorX+=ox;b.doorY+=oy}
+  for(const n of w.npcs){n.x+=ox;n.y+=oy;n.homeX+=ox;n.homeY+=oy}
+  for(const item of w.items){item.x+=ox;item.y+=oy}
+  w.exits=[];
+  for(let yy=5;yy<=66;yy++)for(let xx=5;xx<=90;xx++)if(xx<=7||xx>=88||yy<=7||yy>=64)set(xx,yy,2);
+  path(48,35,48,0,2,1);path(48,36,48,71,2,1);path(48,36,0,35,2,1);path(48,36,95,35,2,1);
+  for(let xx=8;xx<88;xx+=3){set(xx,4,4);set(xx,67,4)}
+  for(let yy=10;yy<64;yy+=3){set(4,yy,4);set(91,yy,4)}
+  w.exits.push(
+   {x:45*T,y:0,w:64,h:24,to:'wald',tx:44*T,ty:60*T,label:'Nordweg · Flüsterwald',open:()=>true},
+   {x:94*T,y:32*T,w:28,h:72,to:'sumpf',tx:5*T,ty:27*T,label:'Ostweg · Nebelmoor',open:()=>true},
+   {x:45*T,y:70*T,w:64,h:24,to:'shrine',tx:22*T,ty:21*T,label:'Südweg · Echo-Schrein',open:()=>main.forestFlowers>=3},
+   {x:0,y:32*T,w:24,h:72,to:'eispass',tx:74*T,ty:39*T,label:'Westweg · Frostgrat',open:()=>true}
+  );
  }
  // Every map receives a coherent natural edge, not an empty tile border.
  for(const item of w.items)item.found=!!collectedItems[item.id];
@@ -676,9 +696,12 @@ function drawRoom(now){
  if(resident)drawPerson(resident,220,94,now);
  drawHero(player.x,player.y,now);
  ctx.fillStyle='#fff0cd';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,25);
- // Offene Ausgangstür in der Mitte der unteren Wand.
- pixel(VW/2-34,VH-20,68,20,'#35291f');pixel(VW/2-27,VH-19,54,18,'#b98554');pixel(VW/2-22,VH-18,44,18,'#182b3c');pixel(VW/2-29,VH-2,58,3,'#e7c77f');
- ctx.font='bold 9px monospace';ctx.fillStyle='#fff1c9';ctx.fillText('ZUR TÜR LAUFEN',VW/2,VH-27);ctx.textAlign='left';
+ // Eine echte, sichtbare Türöffnung in der unteren Wand; nur dieser Korridor ist begehbar.
+ pixel(0,VH-48,VW,48,'#50382b');pixel(0,VH-44,VW,4,'#a77b4e');
+ pixel(0,VH-40,VW/2-42,40,'#765039');pixel(VW/2+42,VH-40,VW/2-42,40,'#765039');
+ pixel(VW/2-42,VH-40,84,40,'#2c2430');pixel(VW/2-36,VH-37,72,37,'#b98554');pixel(VW/2-29,VH-34,58,34,'#17283a');
+ pixel(VW/2-46,VH-44,7,44,'#e4bd70');pixel(VW/2+39,VH-44,7,44,'#e4bd70');pixel(VW/2-46,VH-44,92,6,'#f0d18a');pixel(VW/2-36,VH-3,72,3,'#f5d98e');
+ ctx.font='bold 10px monospace';ctx.fillStyle='#fff1c9';ctx.fillText('AUSGANG',VW/2,VH-53);ctx.textAlign='left';
 }
 function drawShrine(now){
  for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#77796f':'#858477');pixel(x+2,y+2,12,12,'#999587')}
@@ -805,7 +828,7 @@ function updateEnemies(dt,now){
 }
 function canOccupy(x,y){
  if(zone==='shrine')return x>20&&x<VW-20&&y>24&&y<VH-22;
- if(room)return x>35&&x<VW-35&&y>50&&y<VH-22;
+ if(room){if(x<=35||x>=VW-35||y<=50)return false;const inDoor=Math.abs(x+12-VW/2)<34;return y<VH-52||(inDoor&&y<VH-18)}
  const pts=[[x+6,y+27],[x+18,y+27],[x+6,y+34],[x+18,y+34],[x+12,y+31]];
  return !pts.some(p=>pointBlocked(p[0],p[1]));
 }
@@ -992,7 +1015,7 @@ function openPanel(kind){
   title.textContent='RUCKSACK';text.innerHTML='<p>✦ Echosamen: '+inventory.seeds+'<br>❀ Blaue Waldblüten: '+inventory.blueHerb+'<br>✉ Briefe: '+inventory.letters+'<br>🍓 Beeren: '+inventory.berries+'<br>🥧 Mahlzeiten: '+inventory.meals+'<br>❄ Frostblüten: '+inventory.frostPetal+'<br>◈ Wachtzeichen: '+inventory.watchSigil+'<br>🧪 Heiltränke: '+player.potions+'<br>◈ Windtaler: '+player.coins+'</p>';
   action('Heiltrank benutzen',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);showToast('Zwei Herzen wiederhergestellt');openPanel('bag');saveGame(activeSlot)}else showToast('Du brauchst einen Heiltrank und musst verletzt sein.')});
  }else if(kind==='map'){
-  title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra</b></p><p>🟢 Windruh – lebendige Stadt, Marktplatz, Gärten und Häuser<br>🌲 Flüsterwald – Waldwege, Bach und verborgene Lichtungen<br>☘ Nebelmoor – Schilfstege und Moorlichter<br>✧ Flüsterhöhle – Kristalle und alte Runen<br>❄ Frostgrat – Eiswege und Schneefelder<br>✦ Echo-Schrein – ein uralter Ort hinter dem Waldtor</p><p>Die Außenbereiche erreichst du über die Wege im Flüsterwald.</p>';
+  title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra · Windruh und die vier Himmelswege</b></p><p>⬆ Norden: Flüsterwald<br>➡ Osten: Nebelmoor<br>⬇ Süden: Echo-Schrein (öffnet sich nach den drei Waldblüten)<br>⬅ Westen: Frostgrat</p><p>Windruh liegt als eigene Stadt auf einer Insel, vollständig von einem Fluss umgeben. Jeder der vier Wege führt über eine Brücke direkt in ein eigenes, großes Gebiet. Die Flüsterhöhle bleibt als Nebenpfad im Wald erreichbar.</p>';
  }else if(kind==='save'||kind==='load'){
   title.textContent=kind==='save'?'SPIELSTAND SPEICHERN':'SPIELSTAND LADEN';
   const slots=readSlots();text.innerHTML='<p>Wähle einen von drei Speicherplätzen. Alte Spielstände werden automatisch in Platz 1 übernommen.</p>';
@@ -1019,7 +1042,7 @@ function insideDoor(){
  if(!room)return;room=null;currentRoom=null;roomNPC=null;player.x=insideDoorSpawn.x;player.y=insideDoorSpawn.y;updateCamera();showToast('Zurück auf dem Dorfplatz');updateQuest();
 }
 function nearbyPrompt(){
- if(room)return player.y>VH-55&&Math.abs(player.x+12-VW/2)<48?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
+ if(room)return player.y>VH-58&&Math.abs(player.x+12-VW/2)<34?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
  const px=player.x+12,py=player.y+31;
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b)return b.name+' betreten';
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
@@ -1098,9 +1121,10 @@ function move(dt){
  if(canOccupy(player.x+dx,player.y))player.x+=dx;
  if(canOccupy(player.x,player.y+dy))player.y+=dy;
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
+ if(!room){const px=player.x+12,py=player.y+31;const exit=world.exits.find(e=>px>=e.x-12&&px<=e.x+e.w+12&&py>=e.y-18&&py<=e.y+e.h+18);if(exit&&exit.open()){changeZone(exit.to,exit.tx,exit.ty);return}}
  // In Häusern führt die Tür am unteren Bildschirmrand direkt nach draußen.
  // Der Spieler muss nur nach unten in die Tür laufen; keine Aktionstaste nötig.
- if(room&&player.faceY>0&&player.y>=VH-55&&Math.abs(player.x+12-VW/2)<48){
+ if(room&&player.faceY>0&&player.y>=VH-58&&Math.abs(player.x+12-VW/2)<34){
   insideDoor();
   return;
  }
@@ -1118,8 +1142,8 @@ function retryFromCheckpoint(){
   player.hp=3;
   player.inv=2;
   player.rolling=0;
-  player.x=zone==='windruh'?31*T:zone==='shrine'?220:Math.floor(world.width*.45)*T;
-  player.y=zone==='windruh'?27*T:zone==='shrine'?300:Math.floor(world.height*.5)*T;
+  player.x=zone==='windruh'?48*T:zone==='shrine'?220:Math.floor(world.width*.45)*T;
+  player.y=zone==='windruh'?36*T:zone==='shrine'?300:Math.floor(world.height*.5)*T;
   makeMonsters();
  }
  gameOver=false;
@@ -1210,8 +1234,9 @@ function addPanelControls(){
  document.getElementById('closePanel').onclick=closePanel;
 }
 function init(){
- world=makeWorld('windruh');player.x=31*T;player.y=27*T;updateCamera();makeMonsters();makeParticles();buildHeroCards();
+ world=makeWorld('windruh');player.x=48*T;player.y=36*T;updateCamera();makeMonsters();makeParticles();buildHeroCards();
  if(hasAnySave())document.getElementById('continueBtn').style.display='inline-block';
+ document.getElementById('openHeroMenuBtn').onclick=()=>{document.getElementById('mainMenu').classList.add('hidden');document.getElementById('titleScreen').classList.remove('hidden')};
  document.getElementById('startBtn').onclick=startGame;
  document.getElementById('retryBtn').onclick=retryFromCheckpoint;
  document.getElementById('continueBtn').onclick=()=>{if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}else showToast('Kein Spielstand gefunden')};
