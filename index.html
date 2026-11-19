@@ -349,9 +349,9 @@ function makeWorld(id){
   for(let i=0;i<210;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4)add(i%9===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
   add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('shrine',78,28,false);
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
-  w.exits.push({x:38*T,y:0,w:70,h:24,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:38*T,y:0,w:70,h:42,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
   path(44,61,44,32,2,1);path(44,32,29,32,2,1);
-  w.exits.push({x:40*T,y:61*T,w:70,h:24,to:'hoehle',tx:5*T,ty:26*T,label:'Zum Höhlenpfad',open:()=>true});
+  w.exits.push({x:40*T,y:61*T,w:70,h:30,to:'hoehle',tx:5*T,ty:26*T,label:'Zum Höhlenpfad',open:()=>true});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
  }else if(id==='sumpf'){
@@ -377,7 +377,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
   for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystal',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'rune',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
-  w.exits.push({x:76*T,y:34*T,w:28,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:75*T,y:34*T,w:64,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='eispass'){
   // Frostgrat: snow fields, icy water, firs and safe switchback trails.
   fillGround();for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*13+y*5)%29<3)set(x,y,2);
@@ -412,9 +412,9 @@ function makeWorld(id){
   for(let xx=8;xx<88;xx+=3){set(xx,4,4);set(xx,67,4)}
   for(let yy=10;yy<64;yy+=3){set(4,yy,4);set(91,yy,4)}
   w.exits.push(
-   {x:45*T,y:0,w:64,h:24,to:'wald',tx:44*T,ty:60*T,label:'Nordweg · Flüsterwald',open:()=>true},
+   {x:45*T,y:0,w:64,h:42,to:'wald',tx:44*T,ty:60*T,label:'Nordweg · Flüsterwald',open:()=>true},
    {x:94*T,y:32*T,w:28,h:72,to:'sumpf',tx:5*T,ty:27*T,label:'Ostweg · Nebelmoor',open:()=>true},
-   {x:45*T,y:70*T,w:64,h:24,to:'shrine',tx:22*T,ty:21*T,label:'Südweg · Echo-Schrein',open:()=>main.forestFlowers>=3},
+   {x:45*T,y:70*T,w:64,h:36,to:'shrine',tx:22*T,ty:14*T,label:'Südweg · Echo-Schrein',open:()=>main.forestFlowers>=3},
    {x:0,y:32*T,w:24,h:72,to:'eispass',tx:74*T,ty:39*T,label:'Westweg · Frostgrat',open:()=>true}
   );
  }
@@ -1071,7 +1071,7 @@ function interact(){
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
- if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',5*T,30*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',44*T,60*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
