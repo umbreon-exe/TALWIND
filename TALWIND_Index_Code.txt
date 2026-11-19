@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#24543c">
+<title>TALWIND – Die sieben Echos</title>
+<style>
+:root{--ink:#35291f;--paper:#fff1cf;--gold:#e8b765;--wood:#67472e;--red:#aa4439;--green:#315f43}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#173c32;color:var(--ink);font-family:Verdana,Arial,sans-serif}
+body{display:grid;place-items:center;touch-action:none}
+#game{position:relative;width:min(100vw,177.7778vh);height:min(100vh,56.25vw);overflow:hidden;background:#67aa58;border:5px solid #65472e;box-shadow:0 0 0 4px #e7bd6b}
+#world{display:block;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;inset:10px 10px auto;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.plate{background:linear-gradient(#fff6e0,#efd59d);border:3px solid #62442f;box-shadow:inset 0 0 0 2px #d7a85d,3px 4px #392b20;border-radius:5px;padding:7px 10px;font-size:clamp(10px,1vw,14px);font-weight:900;line-height:1.35}
+.plate small{display:block;color:#806243;font-size:10px;margin-top:3px;font-weight:700}
+#hearts{color:#c14c43;font-size:18px;letter-spacing:2px}
+#questLine{position:absolute;top:72px;left:50%;transform:translateX(-50%);max-width:58%;text-align:center;white-space:normal}
+#rightActions{position:absolute;right:10px;bottom:12px;display:grid;gap:7px}
+.act{width:64px;height:60px;border:3px solid #60432d;border-radius:14px;background:linear-gradient(145deg,#fff2c8,#e2aa55 76%,#b9773d);box-shadow:0 4px #493225,inset 0 0 0 2px #ffe9a8;color:#493326;font-weight:1000;display:grid;place-items:center;cursor:pointer;touch-action:manipulation}
+.act b{font-size:22px;line-height:1}.act small{font-size:9px;letter-spacing:.4px}.act.purple{background:linear-gradient(145deg,#f1e4ff,#aa91d1 75%,#6a548e)}.act.red{background:linear-gradient(145deg,#ffe7b4,#d66b4d 75%,#9a3f37);color:#fff5d9}.act:active{transform:translateY(3px);box-shadow:0 1px #493225}
+#menuButtons{position:absolute;left:10px;top:112px;display:grid;gap:6px}
+.menuBtn{min-width:124px;text-align:left;border:3px solid #61442e;border-radius:6px;background:linear-gradient(#fff4d1,#e5bd77);box-shadow:0 3px #493225;color:#4b3628;padding:7px 9px;font-weight:900;cursor:pointer;font-size:11px}
+#stick{position:absolute;left:12px;bottom:12px;width:104px;height:104px;border:3px solid #66482f;border-radius:50%;background:#fff0c766;display:none;touch-action:none}
+#nub{position:absolute;left:30px;top:30px;width:38px;height:38px;border:3px solid #684a30;border-radius:50%;background:linear-gradient(#fff2cf,#dca95d);box-shadow:0 2px #543928}
+#dialog{position:absolute;left:50%;bottom:13px;transform:translateX(-50%);width:min(70%,680px);display:none;pointer-events:auto;background:linear-gradient(#fff6e0,#efd8a8);border:4px solid #65462f;box-shadow:inset 0 0 0 2px #d8ab62,4px 5px #35291f;border-radius:6px;padding:12px 15px}
+#dialog strong{color:#a7453b;font-size:12px;letter-spacing:1px}#dialog p{margin:6px 0 10px;line-height:1.5;font-size:clamp(12px,1.1vw,15px)}
+.uiButton{border:3px solid #64442e;border-radius:6px;background:linear-gradient(#cf5b48,#a23d34);box-shadow:0 3px #4b3226;color:#fff1cf;padding:8px 13px;font-weight:900;cursor:pointer}
+.uiButton:active{transform:translateY(2px);box-shadow:0 1px #4b3226}
+#toast{position:absolute;top:106px;left:50%;transform:translateX(-50%);display:none;background:#fff1cd;border:3px solid #60432d;border-radius:5px;padding:8px 13px;box-shadow:0 4px #3d2c20;font-weight:900;pointer-events:none;text-align:center}
+.overlay{position:absolute;inset:0;background:#12382fe8;display:grid;place-items:center;padding:12px;z-index:8}
+.card{width:min(94%,780px);max-height:96%;overflow:auto;background:linear-gradient(145deg,#fff4d5,#e9c17c);border:6px solid #60432e;box-shadow:inset 0 0 0 3px #d4a45b,0 9px #102d26;border-radius:8px;padding:clamp(14px,2.5vw,25px);text-align:center}
+.logo{font:bold clamp(44px,7vw,74px) Georgia,serif;color:#af493d;letter-spacing:5px;text-shadow:2px 2px #fff1cb,5px 6px #69462f;margin:0}
+.subtitle{font-family:Georgia,serif;letter-spacing:3px;font-weight:900;color:#694d35}
+.intro{line-height:1.5;font-size:clamp(12px,1.1vw,15px);max-width:670px;margin:10px auto 16px}
+.heroGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:13px 0}
+.heroCard{border:3px solid #967044;border-radius:6px;background:linear-gradient(#faeccb,#edd09a);padding:7px 3px;cursor:pointer;color:#473528;min-width:0}
+.heroCard.selected{border-color:#ad453a;box-shadow:0 0 0 2px #e5b65b;background:#fff2d1}
+.heroCard canvas{display:block;width:55px;height:70px;margin:auto;image-rendering:pixelated}
+.heroCard b{display:block;font-size:clamp(10px,1vw,13px)}.heroCard small{display:block;font-size:9px;line-height:1.35;margin-top:4px}
+.smallNote{font-size:10px;line-height:1.45;color:#765d43}
+#panel{display:none;z-index:9}.panelCard{width:min(92%,620px);background:linear-gradient(#fff3d5,#ecd09a);border:5px solid #61432d;box-shadow:inset 0 0 0 2px #d8aa60,0 8px #172f27;padding:18px;border-radius:7px;max-height:90%;overflow:auto}
+#panel h2{font-family:Georgia,serif;color:#a7463c;margin:0 0 10px}
+#panel p{line-height:1.55}#panel .row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.hidden{display:none!important}
+@media(pointer:coarse){#stick{display:block}}
+@media(max-width:650px){#hud{inset:5px 5px auto}.plate{padding:5px 7px;font-size:10px}#hearts{font-size:15px}#questLine{top:61px;max-width:66%}#menuButtons{left:5px;top:102px;gap:4px}.menuBtn{min-width:100px;font-size:9px;padding:6px}.act{width:51px;height:49px;border-radius:12px}.act b{font-size:18px}.act small{font-size:8px}#rightActions{right:5px;bottom:6px;gap:5px}#stick{left:6px;bottom:6px;width:91px;height:91px}#nub{left:25px;top:25px;width:35px;height:35px}#dialog{width:88%;bottom:7px}.heroGrid{gap:3px}.heroCard{padding:5px 1px}.heroCard canvas{width:43px;height:57px}.heroCard small{font-size:8px}}
+
+/* TALWIND pixel HUD refresh */
+#hud{gap:10px}
+.plate{font-family:ui-monospace,Consolas,monospace;border-radius:0;border:3px solid #513727;box-shadow:inset 0 0 0 2px #f8dda0, inset 0 -4px 0 #c78b4a, 3px 4px 0 #30271f;background:repeating-linear-gradient(0deg,#fff1c9 0 4px,#f6dfad 4px 8px);letter-spacing:.25px}
+#questLine{font-family:ui-monospace,Consolas,monospace;border-radius:0;max-width:min(58%,560px);font-size:11px}
+#menuButtons{top:116px;gap:7px}
+.menuBtn{font-family:ui-monospace,Consolas,monospace;border-radius:0;border:3px solid #523728;background:repeating-linear-gradient(0deg,#f3d79d 0 4px,#e9c17b 4px 8px);box-shadow:inset 0 0 0 1px #fff0c8,3px 4px 0 #35291f;font-size:11px;letter-spacing:.2px;padding:8px 10px;min-width:132px}
+.act{border-radius:0;border:3px solid #4b3225;box-shadow:inset 0 0 0 2px #fff0c3,0 4px 0 #34251d;font-family:ui-monospace,Consolas,monospace}
+.act b{font-size:23px;text-shadow:1px 1px #fff1c9}
+.card,.panelCard{border-radius:0}
+.heroCard{border-radius:0}
+#dialog{border-radius:0;font-family:ui-monospace,Consolas,monospace}
+.uiButton{border-radius:0;font-family:ui-monospace,Consolas,monospace;box-shadow:inset 0 0 0 1px #f6dca2,0 3px 0 #452c22}
+#toast{border-radius:0;font-family:ui-monospace,Consolas,monospace}
+#controlHint{position:absolute;left:145px;bottom:14px;z-index:2;color:#fff4d0;background:#274c38d9;border:2px solid #e4c27d;padding:6px 8px;font:10px ui-monospace,monospace;text-shadow:1px 1px #263626;pointer-events:none}
+#gamepadState{position:absolute;right:92px;bottom:18px;color:#fff0c9;font:9px ui-monospace,monospace;text-shadow:1px 1px #27392d;pointer-events:none}
+@media(max-width:650px){#controlHint{left:102px;bottom:8px;max-width:116px;font-size:8px;padding:4px}#gamepadState{right:68px;bottom:9px;font-size:8px}#menuButtons{top:101px}.menuBtn{min-width:99px;font-size:9px;padding:6px}}
+
+/* TALWIND VISUAL OVERHAUL – inspired by the bright village reference */
+:root{--ink:#f5e9cc;--paper:#17263a;--gold:#f0c36b;--wood:#68452e;--red:#d64f47;--green:#2d7049}
+#game{border:5px solid #3a2b23;box-shadow:0 0 0 3px #e7be65,0 10px 35px #081b1a}
+#world{image-rendering:pixelated}
+.plate{color:#fff2d3;background:linear-gradient(180deg,#263c59 0%,#14243a 100%);border:3px solid #d6a64d;box-shadow:inset 0 0 0 2px #5e7892,inset 0 -4px 0 #0c1728,3px 4px 0 #101a25;text-shadow:1px 1px #172438}
+.plate small{color:#b8c7d7}
+#hearts{color:#ff615e;text-shadow:1px 2px #7e252d;font-size:20px}
+#heroLabel{color:#ffe2a0}
+#levelLabel{color:#a8d9c1}
+#questLine{left:10px;top:88px;transform:none;max-width:265px;text-align:left;padding:8px 10px;font-size:11px;background:linear-gradient(180deg,#243c58,#12243b);border-color:#d9a64c;color:#fff1cf;white-space:normal}
+#menuButtons{left:10px;right:auto;top:145px;gap:6px}
+.menuBtn{font-family:ui-monospace,Consolas,monospace;color:#fff0d0;background:linear-gradient(180deg,#354e6a,#192b43);border:2px solid #d4a44d;box-shadow:inset 0 0 0 1px #71859a,2px 3px 0 #101b2b;border-radius:3px;font-size:10px;min-width:125px;padding:7px 9px;text-shadow:1px 1px #101b2b}
+.act{color:#fff0ce;background:linear-gradient(150deg,#3b5d7b,#182b46 80%);border:3px solid #d4a34c;box-shadow:inset 0 0 0 2px #7189a0,0 4px 0 #101b29;font-family:ui-monospace,Consolas,monospace}
+.act.purple{background:linear-gradient(150deg,#73599e,#30264d 80%)}.act.red{background:linear-gradient(150deg,#bd5b54,#602e38 80%)}
+.act b{color:#fff0c9;text-shadow:1px 2px #202b3c}
+.card,.panelCard{color:#f6e7c7;background:linear-gradient(145deg,#233b58,#101f34);border:5px solid #d6a64e;box-shadow:inset 0 0 0 3px #7188a0,0 9px #091725}
+.logo{color:#ffd779;text-shadow:2px 2px #fff0c5,4px 5px #70451f}
+.subtitle{color:#c9dceb}
+.intro{color:#e5dfca}
+.heroCard{color:#f7edcf;background:linear-gradient(180deg,#314b68,#172a43);border:2px solid #bd9652;box-shadow:inset 0 0 0 1px #6e829a}
+.heroCard.selected{background:linear-gradient(180deg,#725a31,#3b2d22);border:3px solid #ffdb73;box-shadow:0 0 0 2px #f1bd55,0 0 12px #f6d67899}
+.heroCard b{color:#ffe4a2}.heroCard small{color:#d2dbe0}
+.smallNote{color:#c2cfdb}
+#dialog{color:#fff0d1;background:linear-gradient(180deg,#243e5d,#12233a);border:4px solid #d3a14c;box-shadow:inset 0 0 0 2px #758aa0,4px 5px #0a1724}
+#dialog strong{color:#ffd77d}#dialog p{color:#fff0d1}
+.uiButton{color:#fff0d1;background:linear-gradient(180deg,#bd6c42,#743c34);border:2px solid #f1c76d;box-shadow:inset 0 0 0 1px #f7dfa3,0 3px #321f1a}
+#toast{color:#fff1cf;background:#1c3551;border:3px solid #e2b453;box-shadow:0 4px #0b1827}
+#panel h2{color:#ffdc8b}
+#panel p{color:#f4e8ce}
+#controlHint{background:#172b43e8;border:2px solid #d6a64e;color:#fff0d0}
+#gamepadState{color:#fff0d0}
+@media(max-width:650px){
+ #questLine{left:5px;top:61px;max-width:45%;font-size:9px}
+ #menuButtons{left:5px;top:112px}
+ .menuBtn{min-width:94px;font-size:8px;padding:5px}
+ .heroCard canvas{width:43px;height:57px}
+}
+
+
+/* Interaction fix and clarity pass */
+#questLine{z-index:4;pointer-events:none}
+#menuButtons{z-index:14;pointer-events:auto}
+#menuButtons .menuBtn{position:relative;z-index:15;pointer-events:auto;touch-action:manipulation;min-height:38px}
+#panel:not(.hidden){display:grid!important;pointer-events:auto;z-index:30}
+#panel .panelCard{pointer-events:auto;max-width:min(94vw,680px)}
+#panel button{pointer-events:auto;touch-action:manipulation}
+.menuBtn:focus-visible,.act:focus-visible,.uiButton:focus-visible{outline:3px solid #fff0a8;outline-offset:2px}
+.menuBtn:active{transform:translateY(2px);filter:brightness(1.15)}
+.act.cooldown{filter:saturate(.55);opacity:.82}
+.act.cooldown small{color:#ffe18a}
+#rollBtn{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#rollBtn:disabled{cursor:default}
+#panel .mapRoute{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+#panel .mapZone{padding:11px 10px;border:2px solid #b99053;background:linear-gradient(145deg,#304d68,#182b43);color:#f7edcf;min-height:75px;text-align:left}
+#panel .mapZone.current{border:3px solid #ffda78;box-shadow:0 0 0 2px #f6c75f66;background:linear-gradient(145deg,#4c604e,#263d36)}
+#panel .mapZone b{display:block;color:#ffdf93;margin-bottom:5px}
+#panel .mapZone small{color:#d5dfdc;line-height:1.4}
+#panel .mapLegend{font-size:11px;color:#d7e0e5}
+@media(max-width:650px){
+ #menuButtons{top:112px;gap:5px}
+ #menuButtons .menuBtn{min-height:34px}
+ #panel .mapRoute{gap:5px}
+ #panel .mapZone{padding:8px;font-size:11px;min-height:68px}
+}
+
+
+#titleArt{display:block;width:min(100%,480px);height:auto;aspect-ratio:16/9;object-fit:cover;image-rendering:pixelated;border:3px solid #d6a64e;box-shadow:4px 5px #091725;margin:0 auto 12px}
+#titleScreen .card{max-height:96vh;overflow-y:auto}
+@media(max-height:700px){#titleArt{max-height:150px;width:auto;max-width:100%}.intro{margin:6px auto 9px}.heroGrid{margin:7px 0}}
+#menuButtons .menuBtn{min-height:34px}
+</style></head>
+<body><main id="game">
+<canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
+<div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
+<div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
+<div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
+<div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
+<div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
+<div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
+<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.webp" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p></div></div>
+<div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
+</main>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+const VW=720,VH=405,T=16;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rand=(seed)=>{let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}};
+const heroes=[
+{name:'LYRA',role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
+{name:'BRAM',role:'Felswächter',speed:78,hair:'#654632',coat:'#a38d63',cape:'#766346',detail:'#c6c4a9',skill:'Steinhaut',desc:'Ein Schutzschild hält Treffer ab und stößt Gegner weg.'},
+{name:'KAEL',role:'Waldhüter',speed:91,hair:'#79533b',coat:'#5b8e4b',cape:'#376b45',detail:'#e6cf9b',skill:'Sternenschuss',desc:'Ein leuchtender Schuss trifft ein Ziel auf größere Entfernung.'},
+{name:'NIMA',role:'Echomagierin',speed:87,hair:'#49334f',coat:'#9272b8',cape:'#6a4f95',detail:'#cdb9ef',skill:'Echowelle',desc:'Eine Welle trifft Gegner in der Nähe und schenkt ein Herz.',female:true},
+{name:'ROOK',role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
+];
+const PALETTE={
+ grass:'#68ad5c',grassLight:'#83c76b',grassDark:'#3d7d49',forest:'#427c4a',forestDark:'#285b3d',
+ path:'#d8c79d',pathLight:'#efe1bd',pathDark:'#ad9a70',water:'#288bc6',waterLight:'#72d2eb',
+ sand:'#c5aa77',stone:'#9b9a85',stoneDark:'#686d67',wood:'#93613a',woodDark:'#5c3d2a',
+ wall:'#e4cea0',wallShade:'#b48b5d',roof:'#b94f41',skin:'#edbd90',shadow:'#203d2b',
+ ice:'#9dd5df',iceLight:'#def8f2',iceDark:'#4d8397',bog:'#426d65',bogWater:'#356d78',
+ crystal:'#7ed8e2',gold:'#f4cf79',red:'#d85c50'
+};
+const keys={},stick={x:0,y:0},camera={x:0,y:0};
+let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,roomNPC=null,currentRoom=null;
+let dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0,currentPrompt='';
+let activeSlot=0,worldTransition=null,particles=[],particleClock=0,gameLoopRunning=false;
+const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0};
+const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
+const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
+const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
+const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0};
+const collectedItems={};
+const sideQuests={
+ reed:{state:0,items:0,need:3},
+ shell:{state:0,items:0,need:2},
+ crystal:{state:0,items:0,need:3},
+ rune:{state:0,items:0,need:2},
+ frost:{state:0,items:0,need:3},
+ watch:{state:0,items:0,need:2}
+};
+const seedSpots=[{x:16*T+8,y:16*T+8,found:false},{x:46*T+8,y:25*T+8,found:false},{x:57*T+8,y:22*T+8,found:false}];
+const flowerSpots=[{x:24*T+8,y:30*T+8,found:false},{x:58*T+8,y:13*T+8,found:false},{x:58*T+8,y:49*T+8,found:false}];
+const rooms={
+ mira:{title:'Miras gemütliches Haus',kind:'home',npc:'mira'},
+ inn:{title:'Zum singenden Krug',kind:'inn',npc:'runa'},
+ shop:{title:'Krämerladen',kind:'shop',npc:'pavo'},
+ tailor:{title:'Linas Nähstube',kind:'tailor',npc:'lina'},
+ library:{title:'Alte Bibliothek',kind:'library',npc:'sela'},
+ smith:{title:'Orins Werkstatt',kind:'smith',npc:'orin'},
+ bakery:{title:'Tavis Bäckerei',kind:'bakery',npc:'tavi'},
+ garden:{title:'Gartenhaus',kind:'garden',npc:'eda'},
+ home2:{title:'Haus am Apfelgarten',kind:'home',npc:'finn'},
+ clinic:{title:'Kräuterstube',kind:'garden',npc:'eda'}
+};
+let world=null,insideDoorSpawn={x:31*T,y:29*T};
+let monsters=[],bossState={hp:60,maxHp:60,phase:1,attackType:'Schallwelle',windup:0,cooldown:1.2,active:false,ring:0};
+let lastKnownHp=5,damageFlash=0,finaleShown=false;
+
+function makeNPC(id,name,tx,ty,color,hair,kind,line,extra){
+ return Object.assign({id,name,x:tx*T+8,y:ty*T+8,color,hair,kind,line,homeX:tx*T+8,homeY:ty*T+8,phase:rand((tx+ty+id.length)*913)()*6},extra||{});
+}
+function makeWorld(id){
+ const sizes={windruh:[64,44],wald:[88,64],sumpf:[72,56],hoehle:[72,54],eispass:[80,56],shrine:[45,25]};
+ const size=sizes[id]||sizes.windruh,W=size[0],H=size[1];
+ const names={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',eispass:'Frostgrat',shrine:'Echo-Schrein'};
+ const ground={windruh:0,wald:5,sumpf:9,hoehle:6,eispass:8,shrine:3}[id];
+ const w={id,name:names[id],width:W,height:H,ground,tiles:new Uint8Array(W*H),decor:[],buildings:[],npcs:[],exits:[],items:[],solids:[]};
+ const set=(x,y,t)=>{if(x>=0&&y>=0&&x<W&&y<H)w.tiles[y*W+x]=t};
+ const rect=(x,y,ww,hh,t)=>{for(let yy=y;yy<y+hh;yy++)for(let xx=x;xx<x+ww;xx++)set(xx,yy,t)};
+ const add=(type,x,y,solid)=>w.decor.push({type,x:x*T,y:y*T,solid:!!solid});
+ const path=(x1,y1,x2,y2,r,t)=>{const steps=Math.max(Math.abs(x2-x1),Math.abs(y2-y1));for(let i=0;i<=steps;i++){const x=Math.round(x1+(x2-x1)*i/Math.max(steps,1)),y=Math.round(y1+(y2-y1)*i/Math.max(steps,1));for(let oy=-r;oy<=r;oy++)for(let ox=-r;ox<=r;ox++)if(ox*ox+oy*oy<=r*r+1)set(x+ox,y+oy,t||1)}};
+ const oval=(cx,cy,rx,ry,inner,edge)=>{for(let y=cy-ry-1;y<=cy+ry+1;y++)for(let x=cx-rx-1;x<=cx+rx+1;x++){const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);if(d<=1)set(x,y,inner);else if(d<=1.38)set(x,y,edge)}};
+ const fillGround=()=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)set(x,y,ground)};
+ fillGround();
+ if(id==='windruh'){
+  // Village edges are deliberately finished with fences, trees and river banks.
+  for(let y=0;y<H;y++){set(3,y,2);set(4,y,4);set(5,y,4)}
+  rect(5,19,57,6,1);rect(7,25,53,3,1);
+  rect(26,13,15,15,3);rect(30,10,7,21,3);
+  for(const x of [13,22,34,45,55])rect(x-1,9,3,10,1);
+  for(const x of [11,22,33,44,55])rect(x-1,27,3,10,1);
+  rect(27,16,12,10,3);
+  rect(8,13,8,4,7);rect(9,14,6,2,0);rect(47,13,12,5,7);rect(48,14,10,3,0);
+  rect(43,35,10,4,7);rect(44,36,8,2,0);
+  const houses=[
+   ['mira',10,4,6,5,'teal','Miras Haus'],['inn',19,4,7,6,'red','Zum singenden Krug'],
+   ['shop',31,4,6,5,'ochre','Pavos Krämerladen'],['library',42,4,6,5,'blue','Alte Bibliothek'],
+   ['home2',52,7,6,5,'green','Haus am Apfelgarten'],
+   ['tailor',8,30,6,5,'violet','Linas Nähstube'],['smith',18,30,7,5,'slate','Orins Werkstatt'],
+   ['bakery',30,30,6,5,'orange','Tavis Bäckerei'],['garden',41,30,6,5,'green','Gartenhaus'],
+   ['clinic',52,30,6,5,'cream','Kräuterstube']
+  ];
+  for(const [bid,x,y,ww,hh,style,name] of houses)w.buildings.push({id:bid,x:x*T,y:y*T,w:ww*T,h:hh*T,style,name,doorX:(x+ww/2)*T,doorY:(y+hh)*T+5});
+  w.decor.push({type:'fountain',x:30*T,y:17*T,solid:true},{type:'bridge',x:3*T,y:19*T},
+   {type:'bench',x:25*T,y:27*T},{type:'bench',x:40*T,y:16*T},{type:'lamp',x:26*T,y:17*T},
+   {type:'lamp',x:39*T,y:25*T},{type:'lamp',x:16*T,y:23*T},{type:'lamp',x:48*T,y:24*T},
+   {type:'sign',x:17*T,y:23*T},{type:'barrel',x:28*T,y:29*T},{type:'barrel',x:37*T,y:29*T},
+   {type:'stall',x:26*T,y:13*T},{type:'stall',x:38*T,y:13*T},{type:'well',x:57*T,y:25*T},
+   {type:'bush',x:16*T,y:15*T},{type:'bush',x:60*T,y:28*T});
+  for(let y=3;y<40;y+=5){add('tree',7,y,true);if(y<18||y>27)add('tree',60,y,true)}
+  for(let x=9;x<60;x+=6){add('tree',x,2,true);if(x%2)add('tree',x,41,true)}
+  for(let x=48;x<59;x+=2)for(let y=13;y<18;y+=2)add('appleTree',x,y,true);
+  for(let x=8;x<15;x+=2)for(let y=13;y<17;y+=2)add('flowerBed',x,y,false);
+  for(let x=44;x<53;x+=2)for(let y=35;y<39;y+=2)add('crop',x,y,false);
+  for(let x=8;x<15;x+=2){add('fence',x,12,true);add('fence',x,18,true)}
+  for(let x=47;x<60;x+=2){add('fence',x,12,true);add('fence',x,19,true)}
+  for(let i=0;i<55;i++){const x=8+(i*13)%52,y=4+(i*17)%36;if((x<17||x>48||y<16||y>28)&&!(x>51&&y>28))add(i%5===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
+  w.npcs=[
+   makeNPC('mira','Mira',31,24,'rose','auburn','mother','Die sieben Echos sind verstummt. Drei Echosamen können den Brunnen wieder erwecken. Hilfst du mir?'),
+   makeNPC('tomke','Tomke',8,22,'blue','brown','fisher','Am Fluss treiben manchmal blaue Blüten. Eine davon soll Heilkräfte besitzen.'),
+   makeNPC('eda','Eda',47,27,'gold','silver','gardener','Mein Garten wird blass. Bring mir drei blaue Waldblüten, dann schenke ich dir ein Kräuterpaket.'),
+   makeNPC('finn','Finn',38,25,'violet','dark','child','Ich habe etwas Glänzendes beim alten Brunnen gesehen.'),
+   makeNPC('runa','Runa',26,15,'red','brown','innkeeper','Im Krug ist immer ein Platz frei. Bring später Tomke einen Brief von mir.'),
+   makeNPC('pavo','Pavo',40,15,'green','black','merchant','Tränke, Beeren und warme Pasteten! Alles für deine Reise.'),
+   makeNPC('lina','Lina',15,27,'violet','blonde','tailor','Ich nähe farbenfrohe Reiseumhänge.'),
+   makeNPC('orin','Orin',26,27,'slate','ginger','craftsman','Alte Werkzeuge erzählen Geschichten.'),
+   makeNPC('sela','Sela',45,27,'blue','black','librarian','In der Bibliothek liegt eine Karte zum Flüsterwald.'),
+   makeNPC('tavi','Tavi',56,27,'orange','brown','baker','Frisches Brot macht jeden Weg leichter.'),
+   makeNPC('wulf','Wulf',18,23,'green','brown','guard','Der Fluss ist ruhig. Die alte Brücke hält noch.'),
+   makeNPC('pippa','Pippa',42,24,'rose','black','villager','Hast du schon die kleinen Blumen am Brunnen entdeckt.')
+  ];
+  w.exits.push({x:62*T,y:18*T,w:26,h:95,to:'wald',tx:5*T,ty:30*T,label:'Pfad zum Flüsterwald',open:()=>main.stage>=2});
+ }else if(id==='wald'){
+  // Forest is its own large, complete map, not part of the village scenery.
+  rect(0,29,88,6,1);path(29,32,29,7,2,1);path(29,32,57,13,1,1);path(29,32,57,49,1,1);path(29,7,40,7,2,1);
+  path(57,13,78,13,1,1);path(57,49,78,49,1,1);
+  oval(13,12,7,5,2,4);oval(74,12,5,4,2,4);oval(14,51,6,4,2,4);
+  const open=[[12,32,7,6],[29,32,7,7],[57,13,7,6],[57,49,7,6],[78,32,6,7]];
+  for(const [cx,cy,rx,ry] of open)for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++)if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<1)set(x,y,5);
+  const rnd=rand(81031);
+  for(let i=0;i<680;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||(Math.abs(y-13)<4&&x>=57)||(Math.abs(y-49)<4&&x>=57)||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'pine':'tree',x,y,true)}
+  for(let i=0;i<210;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4)add(i%9===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
+  add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('shrine',78,28,false);
+  w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
+  w.exits.push({x:0,y:27*T,w:24,h:104,to:'windruh',tx:59*T,ty:22*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:80*T,y:9*T,w:26,h:55,to:'sumpf',tx:5*T,ty:27*T,label:'Zum Nebelmoor',open:()=>true});
+  w.exits.push({x:80*T,y:44*T,w:26,h:55,to:'hoehle',tx:5*T,ty:26*T,label:'Zur Flüsterhöhle',open:()=>true});
+  w.exits.push({x:37*T,y:0,w:64,h:56,to:'eispass',tx:38*T,ty:2*T,label:'Zum Frostgrat',open:()=>true});
+  w.exits.push({x:75*T,y:27*T,w:40,h:78,to:'shrine',tx:12*T,ty:18*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
+  // Three main-quest flowers in the forest clearings.
+  w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
+ }else if(id==='sumpf'){
+  // Nebelmoor: shallow water, reed islands and winding stone causeways.
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*7+y*11)%13<4)set(x,y,2);
+  path(3,28,68,28,2,1);path(18,28,18,10,1,1);path(18,10,44,10,1,1);path(44,10,44,42,1,1);path(44,42,68,42,1,1);path(18,20,12,18,1,1);path(18,21,22,18,1,1);path(44,10,52,26,1,1);path(52,26,59,31,1,1);
+  oval(31,28,7,6,5,4);oval(58,15,6,5,5,4);
+  const rnd=rand(1193);
+  for(let i=0;i<220;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(Math.abs(y-28)<4||Math.abs(x-18)<3||Math.abs(x-44)<3||(Math.abs(y-(18+(x-12)*.5))<3&&x>=12&&x<=22)||(Math.abs(y-(26+(x-44)*.71))<3&&x>=44&&x<=59)||w.tiles[y*W+x]===1)continue;add(i%3===0?'reed':'deadTree',x,y,true)}
+  for(let i=0;i<60;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(w.tiles[y*W+x]===1)continue;add(i%2?'mushroom':'fireflyPlant',x,y,false)}
+  add('campfire',48,44,false);add('crystal',15,14,false);add('sign',5,30,false);
+  w.npcs=[makeNPC('moor_iona','Iona',20,9,'violet','silver','elder','Der Nebel trägt Stimmen aus alten Zeiten. Bleib auf den hellen Steinen – dort ist der Boden fest.',{quest:'reed'}),makeNPC('moor_pip','Pip',47,39,'gold','brown','child','Ich suche leuchtende Sumpflichter. Manche zeigen versteckte Pfade.',{quest:'shell'})];
+  for(let i=0;i<3;i++)w.items.push({id:'reed'+i,kind:'quest',key:'reed',x:(12+i*5)*T,y:(18+(i%2)*3)*T,found:false});
+  for(let i=0;i<2;i++)w.items.push({id:'shell'+i,kind:'quest',key:'shell',x:(52+i*7)*T,y:(26+i*5)*T,found:false});
+  w.exits.push({x:0,y:25*T,w:24,h:110,to:'wald',tx:78*T,ty:14*T,label:'Zurück zum Flüsterwald',open:()=>true});
+ }else if(id==='hoehle'){
+  // Cave: stone paths, crystals and columns.
+  fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);path(22,26,31,15,1,3);path(31,15,39,25,1,3);path(39,25,47,15,1,3);path(22,26,10,39,1,3);path(10,39,19,35,1,3);
+  const rnd=rand(7731);
+  for(let i=0;i<200;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*50);if(Math.abs(y-26)<4||Math.abs(x-22)<3||Math.abs(x-55)<3||Math.hypot(x-31,y-15)<5||Math.hypot(x-39,y-25)<5||Math.hypot(x-47,y-15)<5||Math.hypot(x-10,y-39)<5||Math.hypot(x-19,y-35)<5)continue;add(i%3===0?'crystal':'rock',x,y,true)}
+  for(let i=0;i<34;i++){const x=3+Math.floor(rnd()*65),y=3+Math.floor(rnd()*46);if(w.tiles[y*W+x]===3)add('crystal',x,y,false)}
+  add('torch',12,23,false);add('torch',42,12,false);add('torch',60,40,false);
+  w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
+  for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystal',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
+  for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'rune',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
+  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
+ }else if(id==='eispass'){
+  // Frostgrat: snow fields, icy water, firs and safe switchback trails.
+  fillGround();for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*13+y*5)%29<3)set(x,y,2);
+  path(38,53,38,5,2,1);path(38,22,14,22,1,1);path(38,39,68,39,1,1);
+  oval(14,13,7,5,2,4);oval(68,15,6,4,2,4);
+  const rnd=rand(4452);
+  for(let i=0;i<270;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<4||Math.abs(y-22)<3||Math.abs(y-39)<3||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'iceRock':'pine',x,y,true)}
+  for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add('snowTuft',x,y,false)}
+  add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
+  w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
+  w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
+  w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:2*T,label:'Zurück zum Flüsterwald',open:()=>true});
+ }else if(id==='shrine'){
+  rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
+  w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
+  w.npcs=[makeNPC('echo','Echo-Wächter',22,7,'gold','blue','guardian','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen.')];
+  w.exits.push({x:11*T,y:21*T,w:16*T,h:58,to:'wald',tx:76*T,ty:29*T,label:'Zurück in den Flüsterwald',open:()=>true});
+ }
+ // Every map receives a coherent natural edge, not an empty tile border.
+ for(const item of w.items)item.found=!!collectedItems[item.id];
+ if(id!=='shrine'){
+  for(let x=0;x<W;x++){if(w.tiles[x]!==2&&w.tiles[x]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,0,false);if(w.tiles[(H-1)*W+x]!==2)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,H-1,false)}
+  for(let y=1;y<H-1;y++){if(w.tiles[y*W]!==2&&w.tiles[y*W]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'pine',0,y,false);if(w.tiles[y*W+W-1]!==2&&w.tiles[y*W+W-1]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',W-1,y,false)}
+ }
+ return w;
+}
+function pixel(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,w),Math.max(1,h))}
+function drawSoftShadow(x,y,rx,ry,alpha){
+ ctx.save();ctx.globalAlpha=alpha===undefined?.25:alpha;ctx.fillStyle=PALETTE.shadow;ctx.beginPath();ctx.ellipse(x-camera.x,y-camera.y,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function drawGlow(x,y,r,color,alpha){
+ const sx=x-camera.x,sy=y-camera.y,g=ctx.createRadialGradient(sx,sy,1,sx,sy,r);
+ g.addColorStop(0,color);g.addColorStop(1,'rgba(0,0,0,0)');
+ ctx.save();ctx.globalAlpha=alpha===undefined?.38:alpha;ctx.fillStyle=g;ctx.fillRect(sx-r,sy-r,r*2,r*2);ctx.restore();
+}
+function drawTile(tx,ty,id,now){
+ const x=tx*T-camera.x,y=ty*T-camera.y,seed=(tx*73856093^ty*19349663)>>>0;
+ if(id===0||id===5||id===9){
+  const base=id===5?PALETTE.forest:id===9?PALETTE.bog:id===8?'#d7edf0':PALETTE.grass;
+  pixel(x,y,T,T,base);
+  pixel(x+(seed%12),y+((seed>>>5)%12),2,2,id===8?'#f4ffff':id===9?'#6d9683':PALETTE.grassLight);
+  pixel(x+((seed>>>11)%13),y+13,2,1,id===8?'#a7d3dd':id===9?'#355e56':PALETTE.grassDark);
+  if((seed%9)===0)pixel(x+4,y+4,2,5,id===8?'#f4ffff':'#9ad475');
+ }else if(id===1){
+  pixel(x,y,T,T,PALETTE.path);pixel(x,y,T,2,PALETTE.pathLight);pixel(x,y+14,T,2,PALETTE.pathDark);
+  pixel(x+((seed>>>5)%10),y+5,3,2,'#eee1bd');pixel(x+((seed>>>10)%11),y+11,2,2,PALETTE.pathDark);
+ }else if(id===2){
+  pixel(x,y,T,T,PALETTE.water);const wave=Math.floor(now/230+tx*2+ty)%8;
+  pixel(x+wave,y+4,6,1,PALETTE.waterLight);pixel(x+10-wave/2,y+11,4,1,'#4fb6dc');
+ }else if(id===3){
+  pixel(x,y,T,T,PALETTE.stone);pixel(x,y,T,2,'#d3cbb2');pixel(x,y+14,T,2,PALETTE.stoneDark);
+  pixel(x+((seed>>>4)%10),y+5,3,2,'#cfc6a8');pixel(x+((seed>>>8)%11),y+10,2,2,'#888675');
+ }else if(id===4){
+  pixel(x,y,T,T,PALETTE.sand);pixel(x+3,y+4,7,2,'#91b85c');pixel(x+9,y+12,5,2,'#d1bd8d');
+ }else if(id===6){
+  pixel(x,y,T,T,'#62675f');pixel(x+2,y+2,12,12,'#828477');pixel(x+3,y+3,4,1,'#b7b39c');
+ }else if(id===7){
+  pixel(x,y,T,T,'#70b65f');pixel(x+2,y+3,12,10,PALETTE.wood);pixel(x+3,y+4,10,8,'#caa36a');
+ }else if(id===8){
+  pixel(x,y,T,T,'#b5e0e7');pixel(x+2,y+3,11,2,'#e9ffff');pixel(x+5,y+10,7,2,'#82bdcd');
+ }
+}
+function drawTree(x,y,pine,apple){
+ drawSoftShadow(x+13,y+30,13,5,.28);
+ const sx=x-camera.x,sy=y-camera.y;
+ pixel(sx+8,sy+20,7,13,PALETTE.wood);pixel(sx+5,sy+30,13,2,PALETTE.woodDark);
+ if(pine){pixel(sx+5,sy+4,13,8,'#2a6947');pixel(sx+2,sy+10,19,9,'#297349');pixel(sx+5,sy+16,13,8,'#1e5c3c');pixel(sx+8,sy+2,6,4,'#54a65b')}
+ else{pixel(sx+2,sy+8,22,14,'#246c45');pixel(sx+4,sy+3,18,15,'#31864b');pixel(sx+7,sy,13,12,'#3c9952');pixel(sx+8,sy+3,7,4,'#7acb69');pixel(sx+3,sy+11,6,4,'#58b95b');pixel(sx+17,sy+12,4,4,'#226341')}
+ if(apple){pixel(sx+6,sy+9,3,3,'#d64d37');pixel(sx+16,sy+14,3,3,'#df583b');pixel(sx+11,sy+5,3,3,'#d94b39')}
+}
+function drawProp(o,now){
+ const x=o.x-camera.x,y=o.y-camera.y;
+ if(o.type==='tree'||o.type==='pine'||o.type==='appleTree')drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree');
+ else if(o.type==='bush'){drawSoftShadow(o.x+8,o.y+14,9,3,.2);pixel(x+2,y+7,12,7,'#286d43');pixel(x+4,y+3,9,7,'#46a252');pixel(x+6,y+4,3,2,'#83cd68')}
+ else if(o.type==='flower'||o.type==='mushroom'||o.type==='tuft'||o.type==='snowTuft'){pixel(x+7,y+7,2,7,'#367e44');pixel(x+3,y+5,4,3,o.type==='flower'?'#f7e8c2':o.type==='snowTuft'?'#eaffff':'#d77b65');pixel(x+9,y+4,4,4,o.type==='flower'?'#e9a9ca':'#e6c7a4');pixel(x+6,y+2,4,4,o.type==='flower'?'#fff5d0':o.type==='snowTuft'?'#e9ffff':'#a94f4b')}
+ else if(o.type==='flowerBed'||o.type==='crop'){pixel(x,y+10,16,4,PALETTE.wood);pixel(x+1,y+8,14,2,'#b0824e');for(let i=0;i<4;i++)pixel(x+2+i*3,y+2+(i%2)*2,2,6,o.type==='crop'?'#4d994b':['#e9a8c8','#fff0c5','#a9a5df'][i%3])}
+ else if(o.type==='fence'){pixel(x+1,y+5,14,3,PALETTE.wood);pixel(x+1,y+12,14,3,PALETTE.woodDark);pixel(x+2,y+2,3,13,PALETTE.woodDark);pixel(x+11,y+2,3,13,PALETTE.woodDark)}
+ else if(o.type==='bench'){pixel(x+1,y+7,15,4,'#9d693b');pixel(x+2,y+5,13,3,'#ce9860');pixel(x+3,y+11,2,5,PALETTE.woodDark);pixel(x+12,y+11,2,5,PALETTE.woodDark)}
+ else if(o.type==='lamp'||o.type==='torch'){drawGlow(o.x+8,o.y+6,46,'#ffe69b',.25);pixel(x+7,y+5,3,11,PALETTE.woodDark);pixel(x+4,y+1,9,6,'#4d6570');pixel(x+6,y+2,5,3,'#ffe08a');pixel(x+7,y,3,2,'#fff3bd')}
+ else if(o.type==='sign'){pixel(x+7,y+7,3,10,PALETTE.woodDark);pixel(x+1,y+1,15,8,'#805536');pixel(x+2,y+2,13,5,'#d5b276');pixel(x+4,y+3,8,1,'#80523a')}
+ else if(o.type==='barrel'){pixel(x+3,y+3,10,12,PALETTE.wood);pixel(x+4,y+4,8,10,'#bf8b51');pixel(x+3,y+6,10,1,PALETTE.woodDark);pixel(x+3,y+11,10,1,PALETTE.woodDark)}
+ else if(o.type==='stall'){pixel(x+1,y+7,15,8,PALETTE.woodDark);pixel(x+2,y+8,13,5,'#bc8d50');pixel(x,y+2,17,5,'#b64c42');pixel(x+2,y+2,4,5,'#f2d9a5');pixel(x+7,y+2,4,5,'#e5b96c')}
+ else if(o.type==='well'){pixel(x+2,y+8,14,9,'#8a8879');pixel(x+4,y+6,10,8,'#b7b49e');pixel(x+5,y+8,8,5,PALETTE.water);pixel(x+5,y+2,2,7,PALETTE.wood);pixel(x+12,y+2,2,7,PALETTE.wood);pixel(x+4,y+1,11,2,PALETTE.wood)}
+ else if(o.type==='fountain'){drawGlow(o.x+16,o.y+13,70,'#7deaff',.42);pixel(x+1,y+8,30,19,'#8a8a80');pixel(x+4,y+5,24,19,'#c4c3aa');pixel(x+7,y+8,18,13,'#2c9bd0');pixel(x+14,y,5,13,'#d0d0b9');pixel(x+12,y+3,9,3,'#e4dfc6');pixel(x+15,y-4,3,8,'#c0f0f3')}
+ else if(o.type==='bridge'){pixel(x,y+5,32,11,PALETTE.wood);pixel(x+2,y+2,28,3,'#d1a26d');for(let i=0;i<4;i++)pixel(x+4+i*7,y+5,2,11,PALETTE.woodDark)}
+ else if(o.type==='campfire'){drawGlow(o.x+9,o.y+9,58,'#ff9b48',.32);pixel(x+3,y+9,11,4,PALETTE.woodDark);pixel(x+5,y+4,7,7,'#e97842');pixel(x+7,y+2,3,6,'#ffcf63')}
+ else if(o.type==='shrine'){drawGlow(o.x+24,o.y+18,90,'#9cebf2',.38);pixel(x+3,y+20,44,15,'#8a8576');pixel(x+7,y+5,36,19,'#b2a68a');pixel(x+3,y+4,44,6,'#6b5540');pixel(x+11,y+11,6,13,PALETTE.woodDark);pixel(x+31,y+11,6,13,PALETTE.woodDark);pixel(x+20,y+13,9,12,'#283e3c');pixel(x+22,y+15,5,6,'#c9dca0')}
+ else if(o.type==='crystal'){drawGlow(o.x+10,o.y+8,52,'#73e5ed',.34);pixel(x+6,y+2,6,14,PALETTE.crystal);pixel(x+3,y+7,12,8,'#3f9cae');pixel(x+7,y,3,4,'#c1f2ef')}
+ else if(o.type==='altar'){drawGlow(o.x+16,o.y+7,70,'#b7f1e8',.37);pixel(x+3,y+7,26,18,'#948e7a');pixel(x+6,y+3,20,6,'#c9b99b');pixel(x+11,y+1,10,5,'#edda9c')}
+ else if(o.type==='reed'){pixel(x+3,y+2,2,16,'#4b8067');pixel(x+7,y,2,18,'#689779');pixel(x+11,y+4,2,14,'#47735f')}
+ else if(o.type==='deadTree'){drawSoftShadow(o.x+13,o.y+27,12,4,.22);pixel(x+8,y+7,5,25,'#564a39');pixel(x+2,y+6,20,4,'#73644c');pixel(x+5,y+3,4,7,'#73644c')}
+ else if(o.type==='rock'||o.type==='iceRock'){drawSoftShadow(o.x+9,o.y+14,10,3,.25);pixel(x+2,y+7,13,9,o.type==='iceRock'?'#85bdca':'#535a59');pixel(x+4,y+3,8,7,o.type==='iceRock'?'#c4edf0':'#888c85');pixel(x+6,y+4,3,2,'#edfafa')}
+ else if(o.type==='fireflyPlant'){drawGlow(o.x+8,o.y+5,28,'#c7ef9b',.22);pixel(x+6,y+9,3,7,'#478b58');pixel(x+4,y+5,7,5,'#bfdc83')}
+}
+function drawBuilding(b){
+ const x=Math.round(b.x-camera.x),y=Math.round(b.y-camera.y),w=b.w,h=b.h;
+ const palettes={teal:['#55b8ad','#287e78','#174e50'],red:['#e97858','#b64d43','#71383a'],ochre:['#f0bd59','#c4863c','#80502f'],violet:['#b18bd0','#79549b','#49365f'],blue:['#8db9d4','#4d7898','#304e69'],slate:['#a8b5ae','#647d79','#3d5551'],green:['#9ac66b','#5e934d','#365d3d'],orange:['#f19a55','#c7683d','#783f32'],cream:['#ead9ae','#bca77e','#776344']};
+ const c=palettes[b.style]||palettes.red;
+ drawSoftShadow(b.x+b.w/2,b.y+b.h-1,w*.57,9,.32);
+ pixel(x+4,y+28,w-8,h-25,PALETTE.woodDark);pixel(x+8,y+31,w-16,h-31,'#f0d8a8');
+ pixel(x+11,y+34,4,h-37,'#b47e50');pixel(x+w-15,y+34,4,h-37,'#9a704a');
+ pixel(x+15,y+36,w-30,3,'#fff0c7');
+ const winW=Math.min(17,Math.floor((w-42)/2)),winY=y+42;
+ for(const wx of [x+14,x+w-14-winW]){
+  pixel(wx-3,winY-3,winW+6,20,PALETTE.woodDark);pixel(wx,winY,winW,14,'#6faeb7');pixel(wx+2,winY+2,Math.max(3,winW-4),10,'#c8eee0');
+  pixel(wx+Math.floor(winW/2)-1,winY,2,14,PALETTE.woodDark);pixel(wx,winY+6,winW,2,PALETTE.woodDark);
+  pixel(wx-4,winY+16,winW+8,4,PALETTE.wood);pixel(wx,winY+15,3,3,'#e7a2ad');pixel(wx+winW-4,winY+14,3,4,'#f1cf70');
+ }
+ const dx=x+w/2-9,doorY=y+h-30;
+ pixel(dx-4,doorY-3,26,34,PALETTE.woodDark);pixel(dx,doorY,18,30,'#875735');pixel(dx+2,doorY+2,6,26,'#a46e42');pixel(dx+10,doorY+2,6,26,'#74472d');
+ pixel(dx+13,doorY+14,2,3,'#f1d179');pixel(dx-7,doorY+29,32,5,'#c6ad7b');
+ pixel(x-5,y+24,w+10,10,c[2]);pixel(x-3,y+15,w+6,13,c[1]);pixel(x+2,y+8,w-4,12,c[0]);pixel(x+8,y+2,w-16,10,c[0]);pixel(x+17,y-3,w-34,7,c[0]);
+ for(let row=0;row<4;row++){const yy=y+9+row*5;for(let rx=x+5+(row%2)*7;rx<x+w-8;rx+=14){pixel(rx,yy,8,2,row%2?c[1]:c[2]);pixel(rx+3,yy+2,5,1,c[1])}}
+ pixel(x+w/2-2,y,5,4,'#fff0b8');pixel(x+w-22,y-12,9,16,'#895337');pixel(x+w-21,y-14,7,4,'#d9a16a');
+ pixel(x+w/2-10,y+27,20,7,PALETTE.woodDark);pixel(x+w/2-8,y+28,16,4,c[0]);
+}
+function drawPerson(n,x,y,now){
+ const bx=Math.round(x-camera.x),by=Math.round(y-camera.y+Math.sin(now/260+(n.phase||0))*1);
+ drawSoftShadow(x+11,y+29,10,4,.28);
+ const skin=PALETTE.skin,hair=n.hair||'#674333',tunic=n.color||'#578d69',walking=Math.sin(now/95+(n.phase||0))>0;
+ pixel(bx+6,by+22+(walking?2:0),5,7,'#514238');pixel(bx+13,by+22+(walking?0:2),5,7,'#514238');
+ pixel(bx+5,by+27+(walking?2:0),7,3,'#352d29');pixel(bx+12,by+27+(walking?0:2),7,3,'#352d29');
+ pixel(bx+4,by+12,16,13,n.cape||'#456b60');pixel(bx+6,by+11,12,15,tunic);pixel(bx+3,by+14,4,10,tunic);pixel(bx+17,by+14,4,10,tunic);
+ pixel(bx+5,by+19,14,3,n.detail||'#d6b46b');pixel(bx+10,by+20,4,3,PALETTE.woodDark);
+ pixel(bx+2,by+22,4,4,skin);pixel(bx+18,by+22,4,4,skin);
+ pixel(bx+10,by+9,5,5,'#b9785b');pixel(bx+5,by+2,16,12,skin);pixel(bx+3,by+6,3,5,'#d89470');pixel(bx+20,by+6,3,5,'#d89470');
+ pixel(bx+8,by+7,2,2,'#382d29');pixel(bx+16,by+7,2,2,'#382d29');pixel(bx+11,by+11,5,1,'#b76d5d');
+ pixel(bx+4,by+1,18,5,hair);pixel(bx+3,by+4,4,7,hair);pixel(bx+19,by+4,4,7,hair);pixel(bx+7,by,12,3,hair);
+ if(n.kind==='innkeeper'){pixel(bx+3,by-3,18,4,'#b8493e');pixel(bx+8,by-5,9,3,'#fff0d0')}
+ if(n.kind==='merchant'){pixel(bx+3,by-4,18,5,'#4c8d52');pixel(bx+8,by-7,9,4,'#d9b46b')}
+ if(n.kind==='librarian'){pixel(bx+4,by-3,17,4,'#577ca3');pixel(bx+8,by-5,10,3,'#efe0b6')}
+ if(n.kind==='elder'){pixel(bx+4,by+5,17,3,'#e2ded0');pixel(bx+4,by+9,3,6,'#ddd8ca')}
+ if(n.kind==='child'){pixel(bx+7,by-2,12,4,'#e8c46b');pixel(bx+17,by+1,5,6,'#9a5b43')}
+ if(n.kind==='gardener'){pixel(bx+4,by-3,17,4,'#4d8b52');pixel(bx+15,by-6,5,4,'#f0d36e')}
+ if(n.kind==='fisher'){pixel(bx+3,by-3,19,4,'#638da0');pixel(bx+14,by-6,6,4,'#e3c27d')}
+ if(n.kind==='baker'){pixel(bx+4,by-5,17,6,'#fff0d9');pixel(bx+8,by-7,9,3,'#e5d3b3')}
+ if(n.quest){pixel(bx+19,by-8,7,7,'#f4cf79');pixel(bx+21,by-7,3,5,'#78542e')}
+}
+function drawHero(x,y,now){
+ const frame=Math.floor(player.walk*1.7)%4,step=[0,2,0,-2][frame],bob=player.walk>.05?([0,-1,0,-1][frame]):Math.sin(now/470)*.35;
+ const px=Math.round(x-camera.x),py=Math.round(y-camera.y+bob),skin=PALETTE.skin,boot='#49382f',hair=heroes[selected].hair;
+ drawSoftShadow(x+14,y+36,14,5,.3);
+ pixel(px+7+step,py+26,7,9,boot);pixel(px+18-step,py+26,7,9,boot);
+ pixel(px+6+step,py+32,8,3,'#d4b47e');pixel(px+18-step,py+32,8,3,'#d4b47e');
+ if(selected===0){pixel(px+4,py+12,23,16,'#246f69');pixel(px+7,py+13,17,14,'#43ae9e');pixel(px+3,py+14,4,11,'#4bb8a7');pixel(px+24,py+14,4,11,'#398d84');pixel(px+2,py+7,3,23,'#e2f2ef');pixel(px+27,py+7,3,23,'#c7eff0');pixel(px+9,py+20,14,3,'#e8d18d')}
+ else if(selected===1){pixel(px+2,py+11,27,18,'#615a4c');pixel(px+4,py+12,23,15,'#a99a77');pixel(px+4,py+14,6,12,'#d4cdb3');pixel(px+19,py+14,6,12,'#d4cdb3');pixel(px+25,py+12,10,21,'#71827e');pixel(px+27,py+16,6,13,'#e2e0ce');pixel(px+11,py+21,10,3,'#e2d1a8')}
+ else if(selected===2){pixel(px+4,py+12,24,16,'#2d6540');pixel(px+7,py+13,17,14,'#659b50');pixel(px+3,py+15,4,10,'#3d7b48');pixel(px+25,py+14,4,10,'#5c914b');pixel(px+2,py+9,4,22,'#805638');pixel(px+24,py+11,7,19,'#987248');pixel(px+26,py+14,2,15,'#e2cc9b')}
+ else if(selected===3){pixel(px+2,py+11,28,19,'#604681');pixel(px+5,py+13,22,15,'#9876ba');pixel(px+3,py+17,5,9,'#b18bd0');pixel(px+25,py+16,5,10,'#b18bd0');pixel(px+28,py+5,3,28,'#c5b0e3');pixel(px+26,py+2,7,7,'#a4e8eb')}
+ else{pixel(px+4,py+12,23,17,'#263e59');pixel(px+7,py+14,17,14,'#4d6984');pixel(px+3,py+16,4,10,'#33495e');pixel(px+25,py+16,4,10,'#33495e');pixel(px+2,py+15,3,17,'#d4e7e7');pixel(px+28,py+15,3,17,'#a8c4d3');pixel(px+5,py+20,21,4,'#44414b')}
+ const back=player.faceY<0,side=player.faceX!==0;
+ if(back){pixel(px+8,py+1,18,15,'#d89e7d');pixel(px+5,py-1,22,9,hair);pixel(px+4,py+4,6,13,hair);pixel(px+22,py+4,6,13,hair);pixel(px+10,py+9,14,5,hair)}
+ else{pixel(px+6,py+1,18,16,skin);pixel(px+4,py+5,4,6,'#d89978');pixel(px+22,py+5,4,6,'#d89978');pixel(px+5,py,20,6,hair);pixel(px+4,py+3,5,9,hair);pixel(px+22,py+3,5,8,hair);
+  if(side){pixel(px+(player.faceX>0?19:8),py+8,3,2,'#332a28')}else{pixel(px+10,py+8,3,2,'#332a28');pixel(px+19,py+8,3,2,'#332a28')}
+  if(selected===3){pixel(px+4,py-5,23,7,'#4b365e');pixel(px+9,py-9,14,6,'#77509c')}
+  if(selected===2){pixel(px+3,py-4,24,7,'#2f6c43');pixel(px+8,py-7,19,5,'#47884c')}
+  if(selected===4){pixel(px+4,py-4,23,8,'#303b4b');pixel(px+6,py+11,19,5,'#47434b')}
+  if(selected===1){pixel(px+5,py-3,21,7,'#614b38');pixel(px+10,py-2,13,4,'#b9b394')}
+  if(selected===0)pixel(px+11,py-4,12,4,'#e4c982');
+ }
+ if(player.inv>0&&Math.floor(now/85)%2===0){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#fff';ctx.fillRect(px+1,py,30,37);ctx.restore()}
+ if(player.rolling>0){ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle='#e1f6ed';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px+15,py+19,18,12,frame,0,Math.PI*2);ctx.stroke();ctx.restore()}
+ if(damageFlash>0){ctx.save();ctx.globalAlpha=.65;ctx.fillStyle='#fff';ctx.fillRect(px+1,py+1,29,34);ctx.restore()}
+}
+function drawMonster(m,now){
+ const x=Math.round(m.x-camera.x),y=Math.round(m.y-camera.y),f=Math.floor(now/130+m.phase*2)%4,bob=Math.round(Math.sin(now/155+m.phase)*1.5);
+ drawSoftShadow(m.x+17,m.y+31,17,5,.3);
+ const eye=(a,b,c)=>{pixel(a,b,4,4,c||'#fff0be');pixel(a+1,b+1,2,2,'#2c2827')};
+ if(m.type==='wolf'||m.type==='frostWolf'){
+  const fur=m.type==='wolf'?'#898b83':'#9ccbd4';pixel(x+7,y+15+bob,25,14,'#555d5b');pixel(x+10,y+9+bob,19,15,fur);pixel(x+7,y+6+bob,8,10,'#656862');pixel(x+24,y+6+bob,8,10,'#656862');pixel(x+28,y+17+bob,12,8,'#b7a58f');pixel(x+35,y+21+bob,5,4,'#473c37');for(const lx of [9,27]){pixel(x+lx,y+25+(f%2?2:0),5,8,'#514e4a');pixel(x+lx-1,y+31,7,3,'#c2b49d')}eye(x+13,y+14+bob);eye(x+25,y+14+bob)
+ }else if(m.type==='moth'||m.type==='iceSprite'){
+  const wing=(f===1?6:f===3?3:0),col=m.type==='moth'?'#bba8d7':'#9be2e8';pixel(x+1,y+9+wing,13,17-wing,'#8d7aa9');pixel(x+24,y+9+wing,14,17-wing,col);pixel(x+13,y+12+bob,13,18,'#78618e');pixel(x+15,y+7+bob,10,12,'#e4e0ee');eye(x+15,y+15+bob,'#fff4cf');eye(x+24,y+15+bob,'#fff4cf')
+ }else if(m.type==='bramble'||m.type==='thornling'){
+  pixel(x+3,y+15+bob,32,17,'#4e683d');pixel(x+7,y+8+bob,24,19,'#839c51');for(let i=0;i<6;i++){const sway=Math.round(Math.sin(now/180+i*1.7+m.phase)*2);pixel(x+4+i*5,y+4+bob+sway,4,10,'#3e653d')}pixel(x+9,y+26,6,7,'#59442f');pixel(x+24,y+26,6,7,'#59442f');eye(x+12,y+17+bob,'#ffe8ad');eye(x+24,y+17+bob,'#ffe8ad')
+ }else if(m.type==='bogling'){
+  pixel(x+3,y+12+bob,28,17,'#355d3f');pixel(x+6,y+7+bob,22,19,'#759a4c');pixel(x+8,y+4,6,9,'#457c49');pixel(x+22,y+4,6,9,'#457c49');pixel(x+14,y+1,8,8,'#9aaf5b');eye(x+10,y+14,'#ffedb5');eye(x+22,y+14,'#ffedb5')
+ }else if(m.type==='caveBat'){
+  pixel(x+1,y+10,12,10,'#4e3c69');pixel(x+23,y+10,12,10,'#4e3c69');pixel(x+3,y+6,8,12,'#785a93');pixel(x+24,y+6,8,12,'#785a93');pixel(x+11,y+9,14,18,'#49365f');pixel(x+14,y+5,9,11,'#8163a2');eye(x+13,y+14);eye(x+21,y+14)
+ }else if(m.type==='stoneWarden'){
+  pixel(x+2,y+11,34,19,'#5b625d');pixel(x+5,y+5,28,20,'#8e9489');pixel(x+8,y+2,8,8,'#adb3a5');pixel(x+23,y+2,8,8,'#a3a99e');eye(x+10,y+13,'#b8ecdc');eye(x+23,y+13,'#b8ecdc')
+ }else if(m.type==='wisp'){
+  pixel(x+9,y+8,15,17,'#368f9a');pixel(x+12,y+4,10,19,'#80dce0');pixel(x+15,y+1,5,8,'#d9ffff');pixel(x+5,y+12,6,8,'#65b9c4');pixel(x+23,y+13,7,8,'#5aaeb9');eye(x+12,y+12,'#fff8d0');eye(x+20,y+12,'#fff8d0')
+ }else{
+  pixel(x+4,y+16+bob,31,18,'#58784c');pixel(x+8,y+7+bob,23,17,'#849d60');pixel(x+5,y+4,30,5,'#d4c18a');pixel(x+8,y+1,24,4,'#e9d7a0');eye(x+12,y+15,'#ffe7ac');eye(x+25,y+15,'#ffe7ac')
+ }
+ if(m.hp>0&&m.hp<m.maxHp){pixel(x+5,y-7,29,4,'#342b29');pixel(x+6,y-6,27,2,'#e3d9bf');pixel(x+6,y-6,Math.max(1,Math.round(27*m.hp/m.maxHp)),2,PALETTE.red)}
+ if(m.windup>0){ctx.save();ctx.strokeStyle='#ffdf92';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+18,y+18,18+Math.sin(now/60)*4,0,Math.PI*2);ctx.stroke();ctx.restore()}
+}
+function drawSeed(x,y,now,color){const pulse=Math.sin(now/160+x)*1;pixel(x-camera.x+6,y-camera.y+2,4,11+Math.max(0,pulse),color);pixel(x-camera.x+2,y-camera.y+6,4,4,'#fff4bd');pixel(x-camera.x+10,y-camera.y+4,4,4,'#fff4bd')}
+function drawCollectible(item,now){
+ const x=item.x-camera.x,y=item.y-camera.y,bob=Math.sin(now/180+item.x)*2;
+ if(item.kind==='mainFlower'){drawGlow(item.x+8,item.y+7,28,'#78dff0',.32);pixel(x+7,y+2+bob,3,12,'#7bd5df');pixel(x+3,y+4+bob,4,4,'#e7fdff');pixel(x+10,y+5+bob,4,4,'#e7fdff');pixel(x+7,y+1+bob,4,4,'#fff4c7')}
+ else{const c=item.key==='reed'?'#a0d9ac':item.key==='shell'?'#e6c68e':item.key==='crystalShard'?'#82e0ed':item.key==='runeStone'?'#c2a6ef':'#e4f8fb';drawGlow(item.x+8,item.y+8,24,c,.25);pixel(x+4,y+4+bob,9,9,c);pixel(x+6,y+1+bob,5,4,'#f2ffff')}
+}
+function drawRoom(now){
+ pixel(0,0,VW,VH,'#9a704b');for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#c79d6d':'#b98d5f');pixel(x,y+15,16,1,'#916744')}
+ pixel(10,8,460,6,PALETTE.woodDark);pixel(10,8,5,250,PALETTE.woodDark);pixel(465,8,5,250,PALETTE.woodDark);
+ pixel(27,32,426,190,'#ead7ad');pixel(29,32,422,4,'#9a7049');
+ pixel(53,43,54,45,'#78513a');pixel(57,47,46,36,'#78acb0');pixel(61,51,18,28,'#c3e7df');pixel(82,51,17,28,'#9dd2d7');pixel(78,47,3,36,'#795238');
+ pixel(370,43,54,45,'#78513a');pixel(374,47,46,36,'#78acb0');pixel(378,51,18,28,'#c3e7df');pixel(399,51,17,28,'#9dd2d7');
+ if(roomNPC&&['inn','bakery'].includes(roomNPC.kind)){pixel(65,104,350,43,'#6d482f');pixel(71,100,338,12,'#c38b4e');pixel(74,116,332,25,'#95613b');for(let x=84;x<400;x+=48){pixel(x,108,30,5,'#f3d79a');pixel(x+6,116,18,14,'#d4ad72')}}
+ else if(roomNPC&&roomNPC.kind==='shop'){pixel(90,120,280,80,'#815235');pixel(100,126,260,12,'#d3a05e');for(let x=115;x<360;x+=55)pixel(x,141,33,32,'#bd8d50')}
+ else{pixel(65,122,125,82,'#765137');pixel(70,126,115,8,'#c69b61');pixel(324,122,90,82,'#765137');pixel(329,126,80,8,'#c69b61')}
+ pixel(176,218,128,34,'#8a4c39');pixel(182,222,116,26,'#dab57a');pixel(190,228,100,5,'#b77d48');
+ const npcId=roomNPC?roomNPC.npc:null,resident=world.npcs.find(n=>n.id===npcId);
+ if(resident)drawPerson(resident,220,103,now);drawHero(player.x,player.y,now);
+ ctx.fillStyle='#fff0cd';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,28);ctx.fillText('E · Hinausgehen',VW/2,VH-8);ctx.textAlign='left';
+}
+function drawShrine(now){
+ for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#77796f':'#858477');pixel(x+2,y+2,12,12,'#999587')}
+ pixel(55,35,610,300,'#b7aa8e');for(let x=64;x<656;x+=32)pixel(x,42,2,280,'#89795e');
+ pixel(185,125,350,170,'#716653');pixel(195,115,330,15,'#c0b28e');pixel(215,105,290,20,'#e1d3aa');
+ pixel(351,82,18,44,'#8fd8dd');pixel(344,91,32,8,'#d2f3df');pixel(358,66,5,30,'#eff8d8');
+ drawGlow(360,125,180,'#a8f0ea',.25);
+ const guardian=monsters.find(m=>m.type==='guardian'&&m.hp>0);if(guardian)drawMonster(guardian,now);
+ drawHero(player.x,player.y,now);
+ if(bossState.active&&guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 12px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,27);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,49);ctx.strokeStyle='#f4d78b';ctx.lineWidth=4;ctx.beginPath();ctx.arc(360,205,70+Math.sin(now/80)*8,0,Math.PI*2);ctx.stroke()}ctx.restore()}
+ ctx.fillStyle='#fff0c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · Zurück in den Wald',VW/2,VH-13);ctx.textAlign='left';
+}
+function renderScene(now){
+ ctx.clearRect(0,0,VW,VH);
+ if(room){drawRoom(now);return}
+ if(zone==='shrine'){drawShrine(now);return}
+ const sx=Math.max(0,Math.floor(camera.x/T)-2),sy=Math.max(0,Math.floor(camera.y/T)-2);
+ const ex=Math.min(world.width,Math.ceil((camera.x+VW)/T)+2),ey=Math.min(world.height,Math.ceil((camera.y+VH)/T)+2);
+ for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++)drawTile(tx,ty,world.tiles[ty*world.width+tx],now);
+ const items=[];
+ world.decor.forEach(o=>items.push({y:o.y+28,fn:()=>drawProp(o,now)}));
+ world.buildings.forEach(b=>items.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)}));
+ world.items.forEach(item=>{if(!item.found)items.push({y:item.y+14,fn:()=>drawCollectible(item,now)})});
+ world.npcs.forEach(n=>items.push({y:n.y+32,fn:()=>drawPerson(n,n.x,n.y,now)}));
+ if(zone==='windruh'&&main.stage===1)seedSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#f2d45c')})});
+ if(zone==='wald'&&main.stage===3)flowerSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#7cdbed')})});
+ monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>items.push({y:m.y+31,fn:()=>drawMonster(m,now)}));
+ items.push({y:player.y+35,fn:()=>drawHero(player.x,player.y,now)});
+ items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());
+ currentPrompt=nearbyPrompt();
+ if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-10);ctx.textAlign='left'}
+}
+function drawWorld(now){
+ renderScene(now);
+ drawParticles(now);
+ if(worldTransition){
+  const q=clamp((performance.now()-worldTransition.start)/worldTransition.duration,0,1);
+  if(worldTransition.snapshot){ctx.save();ctx.drawImage(worldTransition.snapshot,-q*VW,0);ctx.restore()}
+  if(q>=1)worldTransition=null;
+ }
+}
+function makeParticles(){
+ particles=[];
+ for(let i=0;i<26;i++)particles.push({x:rand(i*113+97)()*VW,y:rand(i*41+33)()*VH,vx:(rand(i*7+1)()-.5)*10,vy:rand(i*9+4)()*8+3,phase:i*.77,size:i%4===0?3:2});
+}
+function updateParticles(dt,now){
+ particleClock+=dt;
+ const city=zone==='windruh',forest=zone==='wald',moor=zone==='sumpf',cave=zone==='hoehle',ice=zone==='eispass',shrine=zone==='shrine';
+ for(const p of particles){
+  p.x+=p.vx*dt;p.y+=p.vy*dt;
+  if(city){p.vx=Math.sin(now/1200+p.phase)*7;p.vy=Math.cos(now/1700+p.phase)*2+1}
+  else if(forest){p.vx=Math.sin(now/850+p.phase)*15;p.vy=Math.cos(now/1300+p.phase)*5+3}
+  else if(moor){p.vx=Math.sin(now/700+p.phase)*7;p.vy=-3}
+  else if(cave||shrine){p.vx=Math.sin(now/850+p.phase)*3;p.vy=-4}
+  else if(ice){p.vx=Math.sin(now/900+p.phase)*11;p.vy=22}
+  if(p.x<-10)p.x=VW+8;if(p.x>VW+10)p.x=-8;if(p.y<-10)p.y=VH+7;if(p.y>VH+10)p.y=-7;
+ }
+}
+function drawParticles(now){
+ const city=zone==='windruh',forest=zone==='wald',moor=zone==='sumpf',cave=zone==='hoehle',ice=zone==='eispass',shrine=zone==='shrine';
+ ctx.save();
+ for(const p of particles){
+  ctx.globalAlpha=.2+.35*(.5+.5*Math.sin(now/400+p.phase));
+  ctx.fillStyle=city?'#f1d5a0':forest?'#d8efaa':moor?'#c8e6aa':cave?'#9de8ed':ice?'#e9ffff':'#bcf5ed';
+  ctx.fillRect(Math.round(p.x),Math.round(p.y),p.size,p.size);
+ }
+ if(shrine){ctx.globalAlpha=.2;ctx.fillStyle='#c5f5ed';for(let i=0;i<9;i++)ctx.fillRect((i*83+Math.sin(now/700+i)*12)%VW,(i*47+Math.cos(now/600+i)*10)%VH,4,4)}
+ ctx.restore();
+}
+function makeMonsters(){
+ monsters=[];
+ const add=(type,z,tx,ty,hp,behavior,phase)=>monsters.push({type,zone:z,x:tx*T,y:ty*T,hp,maxHp:hp,behavior,phase:phase||0,timer:1+monsters.length*.3,windup:0,dead:false,homeX:tx*T,homeY:ty*T,hostile:true});
+ // Forest encounters.
+ add('wolf','wald',12,32,8,'chase',.2);add('moth','wald',58,13,5,'ranged',1.4);add('bramble','wald',58,49,9,'ambush',2.1);add('thornling','wald',29,53,7,'patrol',2.8);
+ // Swamp, cave and ice types are separate entities, never decorations.
+ add('bogling','sumpf',28,17,7,'chase',.3);add('wisp','sumpf',55,40,5,'ranged',1.1);
+ add('caveBat','hoehle',30,15,5,'patrol',.6);add('stoneWarden','hoehle',54,39,12,'ambush',1.8);
+ add('frostWolf','eispass',20,22,10,'chase',.8);add('iceSprite','eispass',63,39,6,'ranged',1.3);
+ monsters.push({type:'guardian',zone:'shrine',x:330,y:166,hp:60,maxHp:60,behavior:'boss',phase:0,timer:1,windup:0,dead:false,hostile:true});
+ bossState={hp:60,maxHp:60,phase:1,attackType:'Schallwelle',windup:0,cooldown:1.2,active:false,ring:0};
+}
+function updateBoss(m,dt,now){
+ if(!m||m.hp<=0||main.stage!==4)return;
+ bossState.active=true;bossState.hp=m.hp;bossState.phase=m.hp<=m.maxHp/2?2:1;
+ if(bossState.windup>0){
+  bossState.windup-=dt;
+  if(bossState.windup<=0){
+   const dx=player.x-m.x,dy=player.y-m.y,d=Math.hypot(dx,dy);
+   const attack=bossState.attackType;
+   let hit=false;
+   if(attack==='Schallwelle')hit=d<(bossState.phase===2?190:150);
+   else if(attack==='Rankenschlag')hit=d<105&&Math.abs(dx)<75;
+   else hit=d>45&&d<(bossState.phase===2?210:165);
+   if(hit&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=.8;damageFlash=.18;updateQuest()}
+   bossState.ring=.55;
+  }
+ }else{
+  bossState.cooldown-=dt;
+  if(bossState.cooldown<=0){
+   const choices=bossState.phase===1?['Schallwelle','Rankenschlag','Echo-Ring']:['Rankenschlag','Echo-Ring','Schallwelle','Echo-Ring'];
+   bossState.attackType=choices[Math.floor(Math.random()*choices.length)];
+   bossState.windup=bossState.phase===2?.72:1.02;
+   bossState.cooldown=bossState.phase===2?.9:1.55;
+   showToast('Wächter: '+bossState.attackType+'!');
+  }
+ }
+ bossState.ring=Math.max(0,bossState.ring-dt);
+}
+function updateEnemies(dt,now){
+ for(const m of monsters){
+  if(m.zone!==zone||m.hp<=0)continue;
+  if(m.type==='guardian'){updateBoss(m,dt,now);continue}
+  const dx=player.x-m.x,dy=player.y-m.y,d=Math.hypot(dx,dy)||1;
+  m.timer-=dt;
+  const speed=m.zone==='eispass'?27:25,limit=zone==='wald'?5*T:4*T;
+  if(m.behavior==='patrol'){
+   m.x+=Math.sin(now/700+m.phase)*14*dt;m.y+=Math.cos(now/900+m.phase)*10*dt;
+  }else if(m.behavior==='chase'&&d<190){m.x+=dx/d*speed*dt;m.y+=dy/d*speed*dt}
+  else if(m.behavior==='ranged'&&d<220&&m.timer<=0){m.windup=.72;m.timer=2.2;showToast('Fernangriff wird vorbereitet!')}
+  else if(m.behavior==='ambush'&&d<120&&m.timer<=0){m.windup=.85;m.timer=2.6;showToast('Achtung – Hinterhalt!')}
+  if(m.windup>0){m.windup-=dt;if(m.windup<=0&&d<(m.behavior==='ranged'?220:95)&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=.7;damageFlash=.16}}
+  m.x=clamp(m.x,m.homeX-limit,m.homeX+limit);m.y=clamp(m.y,m.homeY-limit,m.homeY+limit);
+ }
+}
+function canOccupy(x,y){
+ if(zone==='shrine')return x>20&&x<VW-20&&y>24&&y<VH-22;
+ if(room)return x>35&&x<VW-35&&y>50&&y<VH-22;
+ const pts=[[x+6,y+27],[x+18,y+27],[x+6,y+34],[x+18,y+34],[x+12,y+31]];
+ return !pts.some(p=>pointBlocked(p[0],p[1]));
+}
+function pointBlocked(px,py){
+ if(room||zone==='shrine')return false;
+ const tx=Math.floor(px/T),ty=Math.floor(py/T);
+ if(tx<1||ty<1||tx>=world.width-1||ty>=world.height-1)return true;
+ const tile=world.tiles[ty*world.width+tx];
+ if(tile===2)return true;
+ if((zone==='sumpf'||zone==='eispass')&&(tile===4))return false;
+ for(const b of world.buildings){
+  const body=px>b.x+4&&px<b.x+b.w-4&&py>b.y+28&&py<b.y+b.h-4;
+  if(body){const door=Math.abs(px-b.doorX)<19&&py>b.doorY-28&&py<b.doorY+10;if(!door)return true}
+ }
+ for(const o of world.decor){
+  if(!o.solid)continue;
+  if(['tree','pine','appleTree','deadTree','reed','rock','iceRock'].includes(o.type)){
+   if(px>o.x+3&&px<o.x+23&&py>o.y+20&&py<o.y+35)return true;
+  }else if(o.type==='fountain'&&px>o.x+2&&px<o.x+31&&py>o.y+15&&py<o.y+29)return true;
+  else if(o.type==='shrine'&&px>o.x&&px<o.x+48&&py>o.y+20&&py<o.y+36)return true;
+  else if(o.type==='fence'&&px>o.x&&px<o.x+16&&py>o.y+2&&py<o.y+15)return true;
+ }
+ return false;
+}
+function updateCamera(){
+ if(room||zone==='shrine'){camera.x=0;camera.y=0;return}
+ camera.x=clamp(player.x-VW*.5,0,world.width*T-VW);
+ camera.y=clamp(player.y-VH*.52,0,world.height*T-VH);
+}
+function changeZone(id,x,y){
+ const snapshot=document.createElement('canvas');snapshot.width=VW;snapshot.height=VH;
+ try{snapshot.getContext('2d').drawImage(canvas,0,0)}catch(e){}
+ const from=zone;zone=id;room=null;currentRoom=null;roomNPC=null;
+ world=makeWorld(id);player.x=x;player.y=y;player.inv=.28;
+ camera.x=0;camera.y=0;updateCamera();
+ worldTransition={snapshot,start:performance.now(),duration:420,from,to:id};
+ if(from!==id)showToast('Gebiet: '+world.name);
+ saveGame(activeSlot);
+}
+function makeSaveState(){
+ return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')||{}).hp||60,main,side,inventory,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+}
+function readSlots(){
+ try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
+ return [null,null,null];
+}
+function saveGame(slot){
+ const n=clamp(Number(slot)||0,0,2),slots=readSlots();
+ try{slots[n]={savedAt:new Date().toISOString(),data:makeSaveState()};localStorage.setItem(slotsKey,JSON.stringify(slots));activeSlot=n;showToast('Spielstand '+(n+1)+' gespeichert')}
+ catch(e){showToast('Speichern war nicht möglich')}
+ return true;
+}
+function loadGame(slot){
+ const n=clamp(Number(slot)||0,0,2);
+ try{
+  const slots=readSlots();let d=slots[n]&&slots[n].data;
+  if(!d){const legacy=JSON.parse(localStorage.getItem(saveKey)||'null');if(legacy&&n===0)d=legacy}
+  if(!d)return false;
+  const validZones=['windruh','wald','sumpf','hoehle','eispass','shrine'];
+  const nextZone=validZones.includes(d.zone)?d.zone:'windruh';
+  selected=clamp(Number(d.selected)||0,0,4);zone=nextZone;world=makeWorld(zone);
+  Object.assign(player,{x:Number(d.x)||31*T,y:Number(d.y)||27*T,hp:clamp(Number(d.hp)||5,1,5),coins:Math.max(0,Number(d.coins)||35),potions:Math.max(0,Number(d.potions)||0),xp:Math.max(0,Number(d.xp)||0),inv:0,rolling:0});
+  if(player.x>world.width*T-30||player.y>world.height*T-30||player.x<25||player.y<25){player.x=zone==='windruh'?31*T:zone==='shrine'?360:Math.floor(world.width*.45)*T;player.y=zone==='windruh'?27*T:zone==='shrine'?220:Math.floor(world.height*.5)*T}
+  Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
+  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});
+  for(const item of world.items)item.found=!!collectedItems[item.id];
+  seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
+  currentRoom=null;room=null;roomNPC=null;
+  if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};player.x=220;player.y=175}
+  if(slots[n])activeSlot=n;else{activeSlot=0;slots[0]={savedAt:new Date().toISOString(),data:d};localStorage.setItem(slotsKey,JSON.stringify(slots))}
+  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp)guardian.hp=clamp(Number(d.bossHp),1,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
+ }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
+}
+function hasAnySave(){
+ const slots=readSlots();const first=slots.findIndex(v=>v&&v.data);if(first>=0){activeSlot=first;return true;}
+ try{return !!JSON.parse(localStorage.getItem(saveKey)||'null')}catch(e){return false}
+}
+function showToast(s){
+ const el=document.getElementById('toast');el.textContent=s;el.style.display='block';
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.style.display='none'},1900);
+}
+function showDialogue(name,text){
+ dialogOpen=true;document.getElementById('speaker').textContent=name;document.getElementById('speech').textContent=text;document.getElementById('dialog').style.display='block';
+}
+function closeDialogue(){dialogOpen=false;document.getElementById('dialog').style.display='none'}
+function updateQuest(){
+ const text=main.stage===0?'Erkunde Windruh und sprich mit Mira':main.stage===1?'Finde drei Echosamen ('+main.seeds+'/3)':main.stage===2?'Bringe die Samen zum Brunnen':main.stage===3?'Finde drei Waldblüten ('+main.forestFlowers+'/3)':main.stage===4?'Erwecke das Echo im Schrein':main.stage===5?'Erstes Echo gerettet':'Abschluss · Erstes Echo erwacht';
+ const q=document.getElementById('questLine');q.textContent=(room?roomNPC.title:world.name)+' · Hauptquest '+Math.min(main.stage+1,6)+'/6 · '+text;
+ document.getElementById('heroLabel').textContent=heroes[selected].name+' · '+heroes[selected].role;
+ document.getElementById('hearts').textContent='♥ '.repeat(player.hp)+'♡ '.repeat(5-player.hp);
+ document.getElementById('seedLabel').textContent=main.seeds;document.getElementById('coinLabel').textContent=player.coins;
+ document.getElementById('levelLabel').textContent='STUFE '+(1+Math.floor(player.xp/100))+' · '+player.xp+' EP';
+}
+function rewardQuest(key){
+ const q=sideQuests[key];if(!q||q.state!==1||q.items<q.need)return false;
+ q.state=2;
+ if(key==='reed'){player.coins+=20;player.potions+=1;inventory.reed=Math.max(0,inventory.reed-q.need);showDialogue('IONA','Die Schilflichter leuchten wieder. Hier sind 20 Windtaler und ein Heiltrank.');showToast('Nebenquest: +20 Taler · +1 Heiltrank')}
+ else if(key==='shell'){player.coins+=18;inventory.berries+=3;inventory.shell=Math.max(0,inventory.shell-q.need);showDialogue('PIP','Du hast die Muscheln gefunden! Nimm 18 Taler und drei Flussbeeren.');showToast('Nebenquest: +18 Taler · +3 Beeren')}
+ else if(key==='crystal'){player.coins+=30;player.potions+=1;player.xp+=35;inventory.crystalShard=Math.max(0,inventory.crystalShard-q.need);showDialogue('REN','Die Kristallsplitter sind rein. Du bekommst 30 Taler, einen Trank und 35 EP.');showToast('Nebenquest: +30 Taler · +1 Trank · +35 EP')}
+ else if(key==='rune'){player.coins+=25;player.potions+=1;inventory.runeStone=Math.max(0,inventory.runeStone-q.need);showDialogue('UMA','Die Runensteine gehören wieder zusammen. Hier ist eine Belohnung für deinen Einsatz.');showToast('Nebenquest: +25 Taler · +1 Heiltrank')}
+ else if(key==='frost'){player.coins+=35;player.potions+=2;player.xp+=30;inventory.frostPetal=Math.max(0,inventory.frostPetal-q.need);showDialogue('FREYA','Die Frostblüten wärmen den alten Pfad. Du hast Avarra geholfen. Nimm 35 Taler, zwei Heiltränke und 30 EP.');showToast('Nebenquest: +35 Taler · +2 Tränke · +30 EP')}
+ else{player.coins+=40;player.potions+=1;inventory.watchSigil=Math.max(0,inventory.watchSigil-q.need);showDialogue('ALRIK','Die Wachtzeichen sind wieder an ihrem Platz. Du hast den Pass sicherer gemacht.');showToast('Nebenquest: +40 Taler · +1 Heiltrank')}
+ saveGame(activeSlot);updateQuest();return true;
+}
+function talk(n){
+ if(!n)return;
+ if(n.id==='mira'){
+  if(main.stage===0){main.stage=1;showDialogue('MIRA','Die sieben Echos wurden aus den Schreinen gerissen. Drei Echosamen liegen im Dorf versteckt. Bring sie zum Brunnen – er zeigt uns den Weg in den Flüsterwald.');showToast('Neue Hauptquest: Die drei Echosamen')}
+  else if(main.stage===1)showDialogue('MIRA','Die Echosamen leuchten ganz schwach. Schau in den Gärten, beim Brunnen und am Rand des Dorfes.');
+  else if(main.stage===2)showDialogue('MIRA','Du hast alle Samen! Bringe sie zur Schale am Brunnen in der Mitte des Platzes.');
+  else if(main.stage===5){main.stage=6;showDialogue('MIRA','Du hast das erste Echo zurückgebracht. Der Brunnen singt wieder! Nimm dir diesen kleinen Glücksanhänger. Wir haben noch sechs weitere Schreine vor uns.');if(!side.cat){side.cat=1;inventory.meals++;player.coins+=20;showToast('Geschenk erhalten: Glücksanhänger und 20 Windtaler')}}
+  else showDialogue('MIRA','Der Flüsterwald wartet. Gehe vorsichtig und höre auf die Glühblumen.');
+  updateQuest();saveGame(activeSlot);return;
+ }
+ if(n.id==='eda'){
+  if(side.blueHerb===0){showDialogue('EDA','Mein Garten verliert seine Farbe. Bring mir bitte drei blaue Waldblüten aus dem Flüsterwald. Dafür bekommst du ein selbstgemachtes Kräuterpaket.');side.blueHerb=1}
+  else if(side.blueHerb===1&&main.forestFlowers>=3){side.blueHerb=2;inventory.blueHerb=Math.max(0,inventory.blueHerb-3);player.potions+=2;player.coins+=25;player.xp+=30;showDialogue('EDA','Wunderschön! Die Blüten duften nach Regen. Hier sind zwei Heiltränke und ein paar Taler für deine Mühe.');showToast('Belohnung: 2 Heiltränke, 25 Taler, 30 EP')}
+  else showDialogue('EDA',side.blueHerb===2?'Danke, dass du den Garten gerettet hast. Nimm dir gern eine Beere aus dem Korb.':'Die blauen Blüten findest du im Flüsterwald. Achte auf ihr Leuchten.');
+  updateQuest();saveGame(activeSlot);return;
+ }
+ if(n.id==='runa'){
+  if(side.letter===0){side.letter=1;inventory.letters=1;showDialogue('RUNA','Kannst du Tomke am Fluss diesen Brief bringen? Er wartet auf eine Nachricht von mir. Als Dank bekommst du eine warme Mahlzeit.')}
+  else if(side.letter===1)showDialogue('RUNA','Der Brief muss noch zu Tomke am Fluss. Er sitzt meist auf der Bank nahe der Brücke.');
+  else if(side.letter===2){showDialogue('RUNA','Tomke hat geantwortet! Hier, eine warme Pastete für deinen Weg.');inventory.meals++;side.letter=3}
+  else showDialogue('RUNA','Schön, dich wiederzusehen. Komm herein, wenn du eine Pause brauchst.');
+  saveGame(activeSlot);return;
+ }
+ if(n.id==='tomke'){
+  if(side.letter===1){side.letter=2;inventory.letters=0;player.coins+=15;player.xp+=20;showDialogue('TOMKE','Endlich! Danke, dass du den Brief gebracht hast. Gib Runa meine Antwort. Hier sind 15 Taler als Dank.');showToast('+15 Windtaler · +20 EP')}
+  else if(side.blueHerb===2){showDialogue('TOMKE','Du hast Eda geholfen? Dann nimm diese Flussbeere.');inventory.berries++}
+  else showDialogue('TOMKE',n.line);
+  saveGame(activeSlot);return;
+ }
+ if(n.id==='pavo'){openShop();return}
+ if(n.id==='finn'){if(!side.finnGift){side.finnGift=true;inventory.berries+=2;showDialogue('FINN','Du hast so freundlich gewinkt! Hier, zwei meiner geheimen Süßbeeren. Nicht weitersagen!')}else showDialogue('FINN','Die Beeren wachsen nur bei Regen. Ich passe auf sie auf.');saveGame(activeSlot);return}
+ if(n.quest){
+  const q=sideQuests[n.quest];const intro={
+   reed:'Ich sammle die leuchtenden Schilfblüten am Moorsteg. Bring mir bitte drei davon. Als Dank bekommst du Taler und einen Heiltrank.',
+   shell:'Im Moor liegen zwei alte Flussmuscheln. Kannst du sie finden? Ich tausche sie gegen Beeren und Windtaler.',
+   crystal:'Die Höhle hat drei helle Kristallsplitter verloren. Sammle sie für mich. Ich belohne dich mit Taler, Erfahrung und einem Heiltrank.',
+   rune:'Zwei Runensteine liegen zwischen den Felsen. Bring sie zurück, damit der Weg wieder leuchtet.',
+   frost:'Am Frostgrat sind drei Frostblüten verschwunden. Sammle sie für mich, dann erhältst du Taler, Tränke und Erfahrung.',
+   watch:'Zwei alte Wachtzeichen liegen am Pass. Bring sie zurück, damit ich den Weg wieder sichern kann.'
+  };
+  const complete={reed:'Die Schilflichter leuchten wieder. Danke, dass du mir geholfen hast.',shell:'Die Muscheln passen genau zusammen. Du hast es geschafft!',crystal:'Die Kristallsplitter singen wieder. Das Licht ist zurück.',rune:'Die Runen sind wieder vereint. Der Pfad ist sicher.',frost:'Die Frostblüten strahlen wieder. Danke, dass du sie gefunden hast.',watch:'Die Wachtzeichen sind wieder aufgestellt. Der Pass ist sicher.'};
+  if(q.state===0){q.state=1;showDialogue(n.name.toUpperCase(),intro[n.quest])}
+  else if(q.state===1&&q.items>=q.need){rewardQuest(n.quest)}
+  else if(q.state===2)showDialogue(n.name.toUpperCase(),complete[n.quest]+' Komm gern wieder vorbei.')
+  else showDialogue(n.name.toUpperCase(),'Du hast '+q.items+' von '+q.need+' gefunden. Suche weiter in diesem Gebiet.');
+  saveGame(activeSlot);return;
+ }
+ if(n.id==='echo'){bossState.active=true;showDialogue('ECHO-WÄCHTER','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen. Besiege den Wächter mit deinem Angriff.');return}
+ showDialogue(n.name,n.line||'Schön, dass du vorbeischaust.');
+}
+function roomNPCAction(){
+ if(currentRoom==='shop'){openShop();return}
+ if(currentRoom==='inn'){
+  if(side.letter===2){side.letter=3;inventory.meals++;player.hp=Math.min(5,player.hp+1);showDialogue('RUNA','Tomkes Antwort! Danke, dass du den Brief gebracht hast. Nimm eine warme Pastete und etwas Kraft für deinen Weg.');showToast('Geschenk: Pastete + 1 Herz');saveGame(activeSlot)}
+  else{showDialogue('RUNA','Setz dich an den Tisch. Eine Pastete kostet heute nichts – du siehst aus, als hättest du einen langen Weg hinter dir.');if(!side.freeMeal){side.freeMeal=true;inventory.meals++;player.hp=Math.min(5,player.hp+1);showToast('Runa schenkt dir eine Mahlzeit und ein Herz')}}
+  return;
+ }
+ if(currentRoom==='library'){showDialogue('SELA','In den alten Büchern steht: Drei blaue Waldblüten öffnen den Weg zum Echo-Schrein. Auf der Rückseite ist eine Karte eingezeichnet.');return}
+ const npcId=roomNPC&&roomNPC.npc,n=world.npcs.find(v=>v.id===npcId);
+ if(n){talk(n);return}
+ showDialogue(roomNPC?roomNPC.title:'Haus','Willkommen! Schön, dass du vorbeischaust.');
+}
+function openShop(){
+ panelOpen=true;const panel=document.getElementById('panel');panel.classList.remove('hidden');panel.style.display='grid';
+ document.getElementById('panelTitle').textContent='PAVOS KRÄMERLADEN';
+ document.getElementById('panelText').innerHTML='<p>Ein kleiner Laden mit nützlichen Dingen für unterwegs.</p><p>🧪 Heiltrank – 20 Windtaler<br>🍓 Beerenkorb – 10 Windtaler</p><p>Dein Geldbeutel: <b>'+player.coins+' Windtaler</b></p>';
+ const buttons=document.getElementById('panelButtons');buttons.innerHTML='';
+ const buy=(label,price,fn)=>{const b=document.createElement('button');b.className='uiButton';b.textContent=label+' · '+price+' Taler';b.onclick=()=>{if(player.coins<price){showToast('Dafür fehlen dir noch Windtaler.');return}player.coins-=price;fn();openShop();updateQuest();saveGame(activeSlot)};buttons.appendChild(b)};
+ buy('Heiltrank',20,()=>{player.potions++;showToast('Heiltrank gekauft')});buy('Beerenkorb',10,()=>{inventory.berries+=3;showToast('Drei Beeren gekauft')});
+ const close=document.createElement('button');close.className='uiButton';close.textContent='Schließen';close.onclick=closePanel;buttons.appendChild(close);
+}
+function openPanel(kind){
+ panelOpen=true;const panel=document.getElementById('panel');panel.classList.remove('hidden');panel.style.display='grid';
+ const title=document.getElementById('panelTitle'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');buttons.innerHTML='';
+ const action=(label,fn)=>{const b=document.createElement('button');b.className='uiButton';b.textContent=label;b.onclick=fn;buttons.appendChild(b)};
+ if(kind==='quest'){
+  title.textContent='QUESTBUCH';
+  text.innerHTML='<p><b>Hauptgeschichte: Die sieben Echos</b><br>'+(['Finde Mira am Brunnen.','Sammle drei Echosamen in Windruh.','Bringe die Samen zum Brunnen.','Finde drei blaue Waldblüten im Flüsterwald.','Erwecke das Echo im Schrein.','Das erste Echo ist gerettet. Sechs weitere Schreine warten.','Das erste Echo ist erwacht. Der Abspann ist erreicht.'][main.stage])+'</p><p><b>Nebenquests</b><br>Schilflichter: '+sideQuests.reed.items+'/'+sideQuests.reed.need+' · Flussmuscheln: '+sideQuests.shell.items+'/'+sideQuests.shell.need+'<br>Kristallsplitter: '+sideQuests.crystal.items+'/'+sideQuests.crystal.need+' · Runensteine: '+sideQuests.rune.items+'/'+sideQuests.rune.need+'<br>Frostblüten: '+sideQuests.frost.items+'/'+sideQuests.frost.need+' · Wachtzeichen: '+sideQuests.watch.items+'/'+sideQuests.watch.need+'</p><p><b>Bewohner helfen</b><br>'+(side.blueHerb===0?'Eda hat dich noch nicht um Hilfe gebeten.':side.blueHerb===1?'Eda wartet auf drei blaue Waldblüten.':'Eda hat dir zwei Heiltränke geschenkt.')+'<br>'+(side.letter===0?'Runa hat noch keinen Briefauftrag gegeben.':side.letter===1?'Bringe Runas Brief zu Tomke am Fluss.':side.letter===2?'Gib Runas Antwort in der Taverne ab.':'Der Brief wurde zugestellt.')+'</p>';
+ }else if(kind==='bag'){
+  title.textContent='RUCKSACK';text.innerHTML='<p>✦ Echosamen: '+inventory.seeds+'<br>❀ Blaue Waldblüten: '+inventory.blueHerb+'<br>✉ Briefe: '+inventory.letters+'<br>🍓 Beeren: '+inventory.berries+'<br>🥧 Mahlzeiten: '+inventory.meals+'<br>❄ Frostblüten: '+inventory.frostPetal+'<br>◈ Wachtzeichen: '+inventory.watchSigil+'<br>🧪 Heiltränke: '+player.potions+'<br>◈ Windtaler: '+player.coins+'</p>';
+  action('Heiltrank benutzen',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);showToast('Zwei Herzen wiederhergestellt');openPanel('bag');saveGame(activeSlot)}else showToast('Du brauchst einen Heiltrank und musst verletzt sein.')});
+ }else if(kind==='map'){
+  title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra</b></p><p>🟢 Windruh – lebendige Stadt, Marktplatz, Gärten und Häuser<br>🌲 Flüsterwald – Waldwege, Bach und verborgene Lichtungen<br>☘ Nebelmoor – Schilfstege und Moorlichter<br>✧ Flüsterhöhle – Kristalle und alte Runen<br>❄ Frostgrat – Eiswege und Schneefelder<br>✦ Echo-Schrein – ein uralter Ort hinter dem Waldtor</p><p>Die Außenbereiche erreichst du über die Wege im Flüsterwald.</p>';
+ }else if(kind==='save'||kind==='load'){
+  title.textContent=kind==='save'?'SPIELSTAND SPEICHERN':'SPIELSTAND LADEN';
+  const slots=readSlots();text.innerHTML='<p>Wähle einen von drei Speicherplätzen. Alte Spielstände werden automatisch in Platz 1 übernommen.</p>';
+  slots.forEach((slot,i)=>{
+   const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border:1px solid #b58d55;padding:8px;margin:7px 0;background:#172b43';
+   const info=document.createElement('span');info.style.cssText='font-size:12px;color:#fff0d0';info.textContent='Platz '+(i+1)+' · '+(slot&&slot.data?'Gespeichert: '+new Date(slot.savedAt).toLocaleString('de-DE'):'Leer');
+   const b=document.createElement('button');b.className='uiButton';b.textContent=kind==='save'?'Speichern':'Laden';
+   b.onclick=()=>{if(kind==='save'){saveGame(i);openPanel('save')}else if(loadGame(i)){closePanel();buildHeroCards();updateQuest();showToast('Spielstand '+(i+1)+' geladen')}else showToast('Dieser Speicherplatz ist leer oder beschädigt')};
+   row.append(info,b);buttons.appendChild(row);
+  });
+  if(kind==='load')action('Alten Spielstand suchen',()=>{if(loadGame(0)){closePanel();startFromLoaded()}else showToast('Kein lesbarer Spielstand gefunden')});
+ }else{
+  title.textContent='SPIELSTAND';text.innerHTML='<p>Hauptquest '+Math.min(main.stage+1,6)+'/6 · '+world.name+'</p>';action('Speichern',()=>openPanel('save'));action('Laden',()=>openPanel('load'));
+ }
+ action('Schließen',closePanel);
+}
+function closePanel(){panelOpen=false;const p=document.getElementById('panel');p.classList.add('hidden');p.style.display='none'}
+function enterRoom(b){
+ currentRoom=b.id;roomNPC=rooms[b.id]||{title:b.name,kind:'home',npc:''};
+ insideDoorSpawn={x:b.doorX,y:b.doorY+26};room={w:30,h:17};
+ player.x=220;player.y=175;camera.x=0;camera.y=0;showToast('Betreten: '+b.name);updateQuest();
+}
+function insideDoor(){
+ if(!room)return;room=null;currentRoom=null;roomNPC=null;player.x=insideDoorSpawn.x;player.y=insideDoorSpawn.y;updateCamera();showToast('Zurück auf dem Dorfplatz');updateQuest();
+}
+function nearbyPrompt(){
+ if(room)return player.y>VH-58&&Math.abs(player.x-VW/2)<75?'Hinausgehen':roomNPC?'Mit Bewohner reden':'';
+ const px=player.x+12,py=player.y+31;
+ const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b)return b.name+' betreten';
+ const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item)return item.kind==='mainFlower'?'Blaue Waldblüte pflücken':'Gegenstand aufheben';
+ if(zone==='windruh'&&main.stage===1&&seedSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Echosamen aufheben';
+ if(zone==='wald'&&main.stage===3&&flowerSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Waldblüte pflücken';
+ const ex=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);if(ex)return ex.label;
+ if(zone==='windruh'&&main.stage===2)return 'Zum Brunnen gehen';
+ return '';
+}
+function collectQuestItem(item){
+ item.found=true;collectedItems[item.id]=true;
+ if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
+ else{const q=sideQuests[item.key];if(q){q.items++;const inventoryKey=({crystal:'crystalShard',rune:'runeStone',frost:'frostPetal',watch:'watchSigil'})[item.key]||item.key;inventory[inventoryKey]=(inventory[inventoryKey]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
+ updateQuest();saveGame(activeSlot);
+}
+function interact(){
+ if(dialogOpen){closeDialogue();return}if(panelOpen)return;
+ const px=player.x+12,py=player.y+31;
+ if(room){if(player.y>VH-60&&Math.abs(px-VW/2)<80){insideDoor();return}roomNPCAction();return}
+ const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b){enterRoom(b);return}
+ const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n){talk(n);return}
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item){collectQuestItem(item);return}
+ if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}}
+ if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}}
+ const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
+ if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
+ const fountain=world.decor.find(o=>o.type==='fountain');
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',5*T,30*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
+ showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
+}
+function attack(){
+ if(attackCD>0||dialogOpen||panelOpen)return;attackCD=.32;
+ const candidates=monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<62);
+ const e=candidates.sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y))[0];
+ if(e){
+  e.hp-=selected===2?2:1;
+  if(e.hp<=0){player.xp+=e.type==='guardian'?150:18;player.coins+=e.type==='guardian'?60:5;if(e.type==='guardian'){main.stage=5;main.shrineDone=true;player.potions++;bossState.active=false;showDialogue('DAS ERSTE ECHO','Der Wächter löst sich in Licht auf. Ein warmer Klang kehrt nach Avarra zurück. Ein Heiltrank und 60 Windtaler gehören dir. Sechs weitere Echos warten.')}else showToast('+18 EP · +5 Taler');saveGame(activeSlot)}
+  else showToast('Treffer!');
+  saveGame(activeSlot);
+ }else showToast('Kein Gegner in Reichweite.');
+}
+function ability(){
+ if(skillCD>0||dialogOpen||panelOpen)return;skillCD=4.2;const h=heroes[selected];
+ if(selected===0||selected===4){const dx=player.faceX||0,dy=player.faceY||0;player.x=clamp(player.x+dx*88,20,world.width*T-20);player.y=clamp(player.y+dy*88,20,world.height*T-20);player.inv=1;showToast(h.skill+'!')}
+ else if(selected===1){player.inv=2.1;monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<85).forEach(m=>m.windup=0);showToast('Steinhaut schützt dich!')}
+ else if(selected===2){const e=monsters.find(m=>m.zone===zone&&m.hp>0&&m.type!=='guardian');if(e){e.hp-=3;if(e.hp<=0){player.xp+=18;player.coins+=5}}showToast('Sternenschuss!')}
+ else{player.hp=Math.min(5,player.hp+1);monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<90).forEach(m=>m.hp-=2);showToast('Echowelle!')}
+ updateQuest();saveGame(activeSlot);
+}
+function dodge(){
+ if(rollCD>0||dialogOpen||panelOpen)return;
+ rollCD=.65;player.inv=.5;player.rolling=.24;
+ const dx=player.faceX,dy=player.faceY;
+ const targetX=player.x+(dx||0)*70,targetY=player.y+(dy||0)*70;
+ if(canOccupy(targetX,targetY)){player.x=targetX;player.y=targetY}
+ updateCamera();
+}
+function move(dt){
+ let ix=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+stick.x;
+ let iy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+stick.y;
+ const pads=safeGetPads(),gp=pads.find(v=>v&&v.connected);
+ if(gp){
+  const ax=gp.axes[0]||0,ay=gp.axes[1]||0;if(Math.hypot(ax,ay)>.15){ix=ax;iy=ay}
+  const pressed=(b)=>!!(gp.buttons[b]&&gp.buttons[b].pressed);
+  if(pressed(0)&&!move._a){interact();move._a=true}if(!pressed(0))move._a=false;
+  if(pressed(1)&&!move._b){attack();move._b=true}if(!pressed(1))move._b=false;
+  if(pressed(2)&&!move._x){ability();move._x=true}if(!pressed(2))move._x=false;
+  if(pressed(3)&&!move._y){dodge();move._y=true}if(!pressed(3))move._y=false;
+ }
+ let m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m}
+ if(m<.05){player.walk=0;return}
+ if(Math.abs(ix)>Math.abs(iy)){player.faceX=Math.sign(ix);player.faceY=0}else{player.faceX=0;player.faceY=Math.sign(iy)}
+ player.walk+=dt*9;const speed=heroes[selected].speed*(player.inv>0?1.12:1),dx=ix*speed*dt,dy=iy*speed*dt;
+ if(canOccupy(player.x+dx,player.y))player.x+=dx;
+ if(canOccupy(player.x,player.y+dy))player.y+=dy;
+ player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
+ updateCamera();
+}
+function update(dt,now){
+ if(!dialogOpen&&!panelOpen){move(dt);attackCD=Math.max(0,attackCD-dt);skillCD=Math.max(0,skillCD-dt);rollCD=Math.max(0,rollCD-dt);player.inv=Math.max(0,player.inv-dt);player.rolling=Math.max(0,player.rolling-dt)}
+ updateEnemies(dt,now);updateParticles(dt,now);
+ if(player.hp<lastKnownHp){damageFlash=.15;lastKnownHp=player.hp}damageFlash=Math.max(0,damageFlash-dt);
+ if(zone==='windruh'&&main.stage===2){const f=world.decor.find(o=>o.type==='fountain');if(f&&Math.hypot(f.x+16-player.x,f.y+14-player.y)<48)currentPrompt='Brunnen aktivieren'}
+ updateQuest();
+}
+function keyDown(e){
+ const k=e.key.toLowerCase();keys[k]=true;
+ if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
+ if(e.repeat)return;
+ if(k==='e'||k===' ')interact();if(k==='j')attack();if(k==='k')ability();if(k==='shift')dodge();
+ if(k==='escape'){if(dialogOpen)closeDialogue();else if(panelOpen)closePanel();else openPanel('quest')}
+ if(k==='h'&&player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);showToast('Heiltrank benutzt');updateQuest();saveGame(activeSlot)}
+}
+function safeGetPads(){try{return navigator.getGamepads?Array.from(navigator.getGamepads()||[]):[]}catch(e){return []}}
+function moveStick(e){
+ const r=stickEl.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy),m=Math.min(30,d);
+ stick.x=d>5?dx/d*m/30:0;stick.y=d>5?dy/d*m/30:0;nub.style.transform='translate('+stick.x*30+'px,'+stick.y*30+'px)';
+}
+function resetStick(){stick.x=stick.y=0;nub.style.transform=''}
+function buildHeroCards(){
+ const grid=document.getElementById('heroGrid');grid.innerHTML='';
+ heroes.forEach((h,i)=>{
+  const card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');
+  card.innerHTML='<canvas width="64" height="76"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';
+  const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
+  const P=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};
+  P(9,66,46,5,'#102b25');
+  if(i===0){P(22,37,20,26,'#398f85');P(17,26,5,33,'#e0f3ed');P(43,26,5,33,'#c7e9ea');P(24,17,16,19,'#edc49b');P(20,12,23,8,'#d5a15d');P(18,22,5,18,'#d5a15d');P(43,22,4,18,'#d5a15d');P(27,8,12,5,'#f5dd9b')}
+  else if(i===1){P(13,35,38,29,'#6a604e');P(17,37,30,24,'#b2a688');P(9,37,10,25,'#c9c5ad');P(46,35,12,25,'#71817d');P(48,41,8,17,'#e3e0cd');P(21,17,23,20,'#edc49b');P(18,11,28,12,'#604936');P(25,8,16,6,'#c9c2a1')}
+  else if(i===2){P(20,38,24,25,'#2d6c43');P(24,39,17,20,'#65a453');P(10,26,7,36,'#815833');P(45,32,9,30,'#a77e4a');P(22,17,20,20,'#edc49b');P(18,11,28,13,'#286441');P(25,6,20,8,'#4b8b4e')}
+  else if(i===3){P(16,38,32,26,'#624783');P(12,48,40,15,'#a184c3');P(22,17,21,20,'#edc49b');P(18,10,29,15,'#45314f');P(24,4,18,9,'#77509a');P(49,15,5,45,'#c9b2e5');P(47,7,10,10,'#a6e4e8')}
+  else{P(20,38,24,25,'#293f5c');P(23,40,18,20,'#526d86');P(14,30,6,32,'#c7e1e4');P(45,30,6,32,'#a8c4d4');P(23,17,20,20,'#edc49b');P(18,10,29,16,'#303b4b');P(22,17,22,5,'#443f49')}
+  P(28,26,3,3,'#302c29');P(37,26,3,3,'#302c29');
+  card.onclick=()=>{selected=i;heroChosen=true;buildHeroCards();updateQuest();saveGame(activeSlot)};
+  grid.appendChild(card);
+ });
+}
+function showFinale(){
+ if(finaleShown)return;finaleShown=true;
+ showDialogue('DAS ERSTE ECHO','Der Klang kehrt nach Avarra zurück. Mira und die Menschen von Windruh feiern deine Rückkehr. Die sechs übrigen Echos warten jenseits der bekannten Wege.');
+}
+function startFromLoaded(){
+ document.getElementById('titleScreen').classList.add('hidden');started=true;gameLoopRunning=false;startLoop();showToast('Spielstand geladen');updateQuest();
+}
+function startGame(){
+ document.getElementById('titleScreen').classList.add('hidden');started=true;updateQuest();showDialogue('MIRA','Willkommen in Windruh! Sprich mit mir am Brunnen. Ich erzähle dir, was mit den sieben Echos geschehen ist.');startLoop();saveGame(activeSlot);
+}
+function startLoop(){if(gameLoopRunning)return;gameLoopRunning=true;last=performance.now();requestAnimationFrame(gameLoop)}
+function gameLoop(now){
+ if(!started){gameLoopRunning=false;return}
+ const dt=Math.min(.04,(now-last)/1000||0);last=now;update(dt,now);drawWorld(now);requestAnimationFrame(gameLoop);
+ if(main.stage===6&&!finaleShown)showFinale();
+}
+function addPanelControls(){
+ document.querySelectorAll('[data-panel]').forEach(b=>b.addEventListener('click',()=>openPanel(b.dataset.panel)));
+ document.getElementById('closePanel').onclick=closePanel;
+}
+function init(){
+ world=makeWorld('windruh');player.x=31*T;player.y=27*T;updateCamera();makeMonsters();makeParticles();buildHeroCards();
+ if(hasAnySave())document.getElementById('continueBtn').style.display='inline-block';
+ document.getElementById('startBtn').onclick=startGame;
+ document.getElementById('continueBtn').onclick=()=>{if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}else showToast('Kein Spielstand gefunden')};
+ document.getElementById('nextBtn').onclick=closeDialogue;
+ document.getElementById('useBtn').onclick=interact;document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
+ document.getElementById('stick').addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);moveStick(e)});
+ stickEl.addEventListener('pointermove',e=>{if(e.buttons)moveStick(e)});
+ ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
+ addPanelControls();addEventListener('keydown',keyDown);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+ addEventListener('blur',()=>{for(const k in keys)keys[k]=false;resetStick()});
+ addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Aktion · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
+ addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle'});
+ document.getElementById('menuButtons').style.zIndex='14';
+ updateQuest();drawWorld(performance.now());
+}
+const stickEl=document.getElementById('stick'),nub=document.getElementById('nub');
+init();
+})();
+</script></body></html>
