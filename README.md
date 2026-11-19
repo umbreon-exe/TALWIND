@@ -59,3 +59,10 @@ node scripts/validate.js
 ```
 
 Der Prüflauf parst das eingebettete JavaScript, prüft zentrale UI-Elemente und kontrolliert Manifest, Service Worker und lokale SVG-Dateien.
+
+## Grafik-Credits und Nutzung
+
+- **Super Retro World – Character Pack**: Figuren von Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Die beigefügte Lizenz erlaubt kommerzielle und nicht-kommerzielle Spielprojekte sowie Anpassungen; die Grafiken dürfen nicht als eigenständiges Paket weitergegeben werden.
+- **The Fan-tasy Tileset**: Dekorationen von Ventilatore. In diesem Projekt wird die kostenlose Version verwendet. Diese ist laut Anbieter nur für nicht-kommerzielle Projekte vorgesehen; für eine kommerzielle Veröffentlichung wäre die Premium-Lizenz erforderlich. Eine eigenständige Weitergabe des Asset-Pakets ist nicht erlaubt.
+
+Quellen: [Super Retro World Character Pack](https://farm-animal.itch.io/character-pack) · [The Fan-tasy Tileset](https://ventilatore.itch.io/the-fantasy-tileset)
