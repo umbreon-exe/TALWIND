@@ -176,6 +176,7 @@ const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
 const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
 const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0};
+const collectedItems={};
 const sideQuests={
  reed:{state:0,items:0,need:3},
  shell:{state:0,items:0,need:2},
@@ -266,21 +267,21 @@ function makeWorld(id){
   w.exits.push({x:62*T,y:18*T,w:26,h:95,to:'wald',tx:5*T,ty:30*T,label:'Pfad zum Flüsterwald',open:()=>main.stage>=2});
  }else if(id==='wald'){
   // Forest is its own large, complete map, not part of the village scenery.
-  rect(0,29,88,6,1);path(29,32,29,7,2,1);path(29,32,57,13,1,1);path(29,32,57,49,1,1);
+  rect(0,29,88,6,1);path(29,32,29,7,2,1);path(29,32,57,13,1,1);path(29,32,57,49,1,1);path(29,7,40,7,2,1);
   path(57,13,78,13,1,1);path(57,49,78,49,1,1);
   oval(13,12,7,5,2,4);oval(74,12,5,4,2,4);oval(14,51,6,4,2,4);
   const open=[[12,32,7,6],[29,32,7,7],[57,13,7,6],[57,49,7,6],[78,32,6,7]];
   for(const [cx,cy,rx,ry] of open)for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++)if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<1)set(x,y,5);
   const rnd=rand(81031);
-  for(let i=0;i<680;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'pine':'tree',x,y,true)}
+  for(let i=0;i<680;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||(Math.abs(y-13)<4&&x>=57)||(Math.abs(y-49)<4&&x>=57)||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'pine':'tree',x,y,true)}
   for(let i=0;i<210;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4)add(i%9===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
-  add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('shrine',78,28,true);
+  add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('shrine',78,28,false);
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
   w.exits.push({x:0,y:27*T,w:24,h:104,to:'windruh',tx:59*T,ty:22*T,label:'Zurück nach Windruh',open:()=>true});
   w.exits.push({x:80*T,y:9*T,w:26,h:55,to:'sumpf',tx:5*T,ty:27*T,label:'Zum Nebelmoor',open:()=>true});
   w.exits.push({x:80*T,y:44*T,w:26,h:55,to:'hoehle',tx:5*T,ty:26*T,label:'Zur Flüsterhöhle',open:()=>true});
-  w.exits.push({x:37*T,y:0,w:64,h:22,to:'eispass',tx:38*T,ty:52*T,label:'Zum Frostgrat',open:()=>true});
-  w.exits.push({x:75*T,y:27*T,w:40,h:48,to:'shrine',tx:12*T,ty:18*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
+  w.exits.push({x:37*T,y:0,w:64,h:56,to:'eispass',tx:38*T,ty:2*T,label:'Zum Frostgrat',open:()=>true});
+  w.exits.push({x:75*T,y:27*T,w:40,h:78,to:'shrine',tx:12*T,ty:18*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
  }else if(id==='sumpf'){
@@ -306,8 +307,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
   for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystalShard',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'runeStone',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
-  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:48*T,label:'Zurück zum Flüsterwald',open:()=>true});
-  w.exits.push({x:68*T,y:23*T,w:24,h:110,to:'sumpf',tx:67*T,ty:42*T,label:'Zum Nebelmoor',open:()=>true});
+  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='eispass'){
   // Frostgrat: snow fields, icy water, firs and safe switchback trails.
   fillGround();for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*13+y*5)%29<3)set(x,y,2);
@@ -319,17 +319,18 @@ function makeWorld(id){
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.'),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.')];
   w.items.push({id:'frostflower1',kind:'quest',key:'frostPetal',x:20*T,y:12*T,found:false},{id:'frostflower2',kind:'quest',key:'frostPetal',x:58*T,y:11*T,found:false},{id:'frostflower3',kind:'quest',key:'frostPetal',x:66*T,y:45*T,found:false});
-  w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:3*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:2*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
   w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
   w.npcs=[makeNPC('echo','Echo-Wächter',22,7,'gold','blue','guardian','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen.')];
-  w.exits.push({x:11*T,y:22*T,w:16*T,h:28,to:'wald',tx:76*T,ty:31*T,label:'Zurück in den Flüsterwald',open:()=>true});
+  w.exits.push({x:11*T,y:21*T,w:16*T,h:58,to:'wald',tx:76*T,ty:29*T,label:'Zurück in den Flüsterwald',open:()=>true});
  }
  // Every map receives a coherent natural edge, not an empty tile border.
+ for(const item of w.items)item.found=!!collectedItems[item.id];
  if(id!=='shrine'){
-  for(let x=0;x<W;x++){if(w.tiles[x]!==2&&w.tiles[x]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,0,true);if(w.tiles[(H-1)*W+x]!==2)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,H-1,true)}
-  for(let y=1;y<H-1;y++){if(w.tiles[y*W]!==2&&w.tiles[y*W]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'pine',0,y,true);if(w.tiles[y*W+W-1]!==2&&w.tiles[y*W+W-1]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',W-1,y,true)}
+  for(let x=0;x<W;x++){if(w.tiles[x]!==2&&w.tiles[x]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,0,false);if(w.tiles[(H-1)*W+x]!==2)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,H-1,false)}
+  for(let y=1;y<H-1;y++){if(w.tiles[y*W]!==2&&w.tiles[y*W]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'pine',0,y,false);if(w.tiles[y*W+W-1]!==2&&w.tiles[y*W+W-1]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',W-1,y,false)}
  }
  return w;
 }
@@ -344,7 +345,7 @@ function drawGlow(x,y,r,color,alpha){
 }
 function drawTile(tx,ty,id,now){
  const x=tx*T-camera.x,y=ty*T-camera.y,seed=(tx*73856093^ty*19349663)>>>0;
- if(id===0||id===5||id===9||id===8){
+ if(id===0||id===5||id===9){
   const base=id===5?PALETTE.forest:id===9?PALETTE.bog:id===8?'#d7edf0':PALETTE.grass;
   pixel(x,y,T,T,base);
   pixel(x+(seed%12),y+((seed>>>5)%12),2,2,id===8?'#f4ffff':id===9?'#6d9683':PALETTE.grassLight);
@@ -680,7 +681,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,main,side,inventory,sideQuests,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')||{}).hp||60,main,side,inventory,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -704,16 +705,17 @@ function loadGame(slot){
   Object.assign(player,{x:Number(d.x)||31*T,y:Number(d.y)||27*T,hp:clamp(Number(d.hp)||5,1,5),coins:Math.max(0,Number(d.coins)||35),potions:Math.max(0,Number(d.potions)||0),xp:Math.max(0,Number(d.xp)||0),inv:0,rolling:0});
   if(player.x>world.width*T-30||player.y>world.height*T-30||player.x<25||player.y<25){player.x=zone==='windruh'?31*T:zone==='shrine'?360:Math.floor(world.width*.45)*T;player.y=zone==='windruh'?27*T:zone==='shrine'?220:Math.floor(world.height*.5)*T}
   Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
-  Object.assign(sideQuests,d.sideQuests||{});
+  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});
+  for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
   currentRoom=null;room=null;roomNPC=null;
   if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};player.x=220;player.y=175}
   if(slots[n])activeSlot=n;else{activeSlot=0;slots[0]={savedAt:new Date().toISOString(),data:d};localStorage.setItem(slotsKey,JSON.stringify(slots))}
-  makeMonsters();updateCamera();updateQuest();return true;
+  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp)guardian.hp=clamp(Number(d.bossHp),1,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
  }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
 }
 function hasAnySave(){
- const slots=readSlots();if(slots.some(v=>v&&v.data))return true;
+ const slots=readSlots();const first=slots.findIndex(v=>v&&v.data);if(first>=0){activeSlot=first;return true;}
  try{return !!JSON.parse(localStorage.getItem(saveKey)||'null')}catch(e){return false}
 }
 function showToast(s){
@@ -860,7 +862,7 @@ function nearbyPrompt(){
  return '';
 }
 function collectQuestItem(item){
- item.found=true;
+ item.found=true;collectedItems[item.id]=true;
  if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
  else{const q=sideQuests[item.key];if(q){q.items++;inventory[item.key]=(inventory[item.key]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
  updateQuest();saveGame(activeSlot);
@@ -889,6 +891,7 @@ function attack(){
   e.hp-=selected===2?2:1;
   if(e.hp<=0){player.xp+=e.type==='guardian'?150:18;player.coins+=e.type==='guardian'?60:5;if(e.type==='guardian'){main.stage=5;main.shrineDone=true;player.potions++;bossState.active=false;showDialogue('DAS ERSTE ECHO','Der Wächter löst sich in Licht auf. Ein warmer Klang kehrt nach Avarra zurück. Ein Heiltrank und 60 Windtaler gehören dir. Sechs weitere Echos warten.')}else showToast('+18 EP · +5 Taler');saveGame(activeSlot)}
   else showToast('Treffer!');
+  saveGame(activeSlot);
  }else showToast('Kein Gegner in Reichweite.');
 }
 function ability(){
@@ -999,7 +1002,7 @@ function init(){
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
  addPanelControls();addEventListener('keydown',keyDown);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
  addEventListener('blur',()=>{for(const k in keys)keys[k]=false;resetStick()});
- addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Aktion · X Angriff · Y Fähigkeit · B Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
+ addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Aktion · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
  addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle'});
  document.getElementById('menuButtons').style.zIndex='14';
  updateQuest();drawWorld(performance.now());
