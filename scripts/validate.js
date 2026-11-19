@@ -8,7 +8,12 @@ const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
 
 assert.match(html, /<canvas[^>]+id="world"/, "game canvas is present");
-assert.match(html, /id="titleScreen"/, "title screen is present");
+assert.match(html, /id="mainMenu"/, "separate start menu is present");
+assert.match(html, /id="titleScreen"/, "hero selection menu is present");
+assert.ok(html.includes("const sizes={windruh:[96,72]"), "Windruh is larger than before");
+assert.ok(html.includes("Nordweg · Flüsterwald") && html.includes("Ostweg · Nebelmoor") && html.includes("Südweg · Echo-Schrein") && html.includes("Westweg · Frostgrat"), "four cardinal paths are present");
+assert.ok(html.includes("const inDoor=Math.abs(x+12-VW/2)<34"), "room exit has a dedicated doorway corridor");
+assert.ok(html.includes("if(!room){const px=player.x+12,py=player.y+31;const exit=world.exits.find"), "overworld exits trigger by walking");
 assert.match(html, /id="gameOver"/, "checkpoint screen is present");
 assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
@@ -35,7 +40,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v2"'), "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v3"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
