@@ -1164,7 +1164,9 @@ function buildHeroCards(){
   const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
   g.fillStyle='#102b25';g.fillRect(9,62,46,5);
   const sprite=characterSpriteImages.get(h.spriteId);
-  if(!drawPackCharacter(sprite,16,16,1,0,32,40)){
+  if(sprite&&sprite.complete&&sprite.naturalWidth>=48&&sprite.naturalHeight>=80){
+   g.drawImage(sprite,16,20,16,20,16,16,32,40);
+  }else{
    g.fillStyle=h.coat||'#668e80';g.fillRect(23,34,18,25);
    g.fillStyle=h.hair||'#654632';g.fillRect(23,23,18,12);
    g.fillStyle='#edbd90';g.fillRect(25,26,14,13);
