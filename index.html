@@ -175,13 +175,15 @@ const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,
 const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
 const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
-const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0};
+const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0};
 const collectedItems={};
 const sideQuests={
  reed:{state:0,items:0,need:3},
  shell:{state:0,items:0,need:2},
  crystal:{state:0,items:0,need:3},
- rune:{state:0,items:0,need:2}
+ rune:{state:0,items:0,need:2},
+ frost:{state:0,items:0,need:3},
+ watch:{state:0,items:0,need:2}
 };
 const seedSpots=[{x:16*T+8,y:16*T+8,found:false},{x:46*T+8,y:25*T+8,found:false},{x:57*T+8,y:22*T+8,found:false}];
 const flowerSpots=[{x:24*T+8,y:30*T+8,found:false},{x:58*T+8,y:13*T+8,found:false},{x:58*T+8,y:49*T+8,found:false}];
@@ -305,8 +307,8 @@ function makeWorld(id){
   for(let i=0;i<34;i++){const x=3+Math.floor(rnd()*65),y=3+Math.floor(rnd()*46);if(w.tiles[y*W+x]===3)add('crystal',x,y,false)}
   add('torch',12,23,false);add('torch',42,12,false);add('torch',60,40,false);
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
-  for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystalShard',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
-  for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'runeStone',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
+  for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystal',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
+  for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'rune',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
   w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='eispass'){
   // Frostgrat: snow fields, icy water, firs and safe switchback trails.
@@ -317,8 +319,8 @@ function makeWorld(id){
   for(let i=0;i<270;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<4||Math.abs(y-22)<3||Math.abs(y-39)<3||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'iceRock':'pine',x,y,true)}
   for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add('snowTuft',x,y,false)}
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
-  w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.'),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.')];
-  w.items.push({id:'frostflower1',kind:'quest',key:'frostPetal',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frostPetal',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frostPetal',x:66*T,y:39*T,found:false});
+  w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
+  w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
   w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:2*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
@@ -740,7 +742,9 @@ function rewardQuest(key){
  if(key==='reed'){player.coins+=20;player.potions+=1;inventory.reed=Math.max(0,inventory.reed-q.need);showDialogue('IONA','Die Schilflichter leuchten wieder. Hier sind 20 Windtaler und ein Heiltrank.');showToast('Nebenquest: +20 Taler · +1 Heiltrank')}
  else if(key==='shell'){player.coins+=18;inventory.berries+=3;inventory.shell=Math.max(0,inventory.shell-q.need);showDialogue('PIP','Du hast die Muscheln gefunden! Nimm 18 Taler und drei Flussbeeren.');showToast('Nebenquest: +18 Taler · +3 Beeren')}
  else if(key==='crystal'){player.coins+=30;player.potions+=1;player.xp+=35;inventory.crystalShard=Math.max(0,inventory.crystalShard-q.need);showDialogue('REN','Die Kristallsplitter sind rein. Du bekommst 30 Taler, einen Trank und 35 EP.');showToast('Nebenquest: +30 Taler · +1 Trank · +35 EP')}
- else{player.coins+=25;player.potions+=1;inventory.runeStone=Math.max(0,inventory.runeStone-q.need);showDialogue('UMA','Die Runensteine gehören wieder zusammen. Hier ist eine Belohnung für deinen Einsatz.');showToast('Nebenquest: +25 Taler · +1 Heiltrank')}
+ else if(key==='rune'){player.coins+=25;player.potions+=1;inventory.runeStone=Math.max(0,inventory.runeStone-q.need);showDialogue('UMA','Die Runensteine gehören wieder zusammen. Hier ist eine Belohnung für deinen Einsatz.');showToast('Nebenquest: +25 Taler · +1 Heiltrank')}
+ else if(key==='frost'){player.coins+=35;player.potions+=2;player.xp+=30;inventory.frostPetal=Math.max(0,inventory.frostPetal-q.need);showDialogue('FREYA','Die Frostblüten wärmen den alten Pfad. Du hast Avarra geholfen. Nimm 35 Taler, zwei Heiltränke und 30 EP.');showToast('Nebenquest: +35 Taler · +2 Tränke · +30 EP')}
+ else{player.coins+=40;player.potions+=1;inventory.watchSigil=Math.max(0,inventory.watchSigil-q.need);showDialogue('ALRIK','Die Wachtzeichen sind wieder an ihrem Platz. Du hast den Pass sicherer gemacht.');showToast('Nebenquest: +40 Taler · +1 Heiltrank')}
  saveGame(activeSlot);updateQuest();return true;
 }
 function talk(n){
@@ -779,9 +783,11 @@ function talk(n){
    reed:'Ich sammle die leuchtenden Schilfblüten am Moorsteg. Bring mir bitte drei davon. Als Dank bekommst du Taler und einen Heiltrank.',
    shell:'Im Moor liegen zwei alte Flussmuscheln. Kannst du sie finden? Ich tausche sie gegen Beeren und Windtaler.',
    crystal:'Die Höhle hat drei helle Kristallsplitter verloren. Sammle sie für mich. Ich belohne dich mit Taler, Erfahrung und einem Heiltrank.',
-   rune:'Zwei Runensteine liegen zwischen den Felsen. Bring sie zurück, damit der Weg wieder leuchtet.'
+   rune:'Zwei Runensteine liegen zwischen den Felsen. Bring sie zurück, damit der Weg wieder leuchtet.',
+   frost:'Am Frostgrat sind drei Frostblüten verschwunden. Sammle sie für mich, dann erhältst du Taler, Tränke und Erfahrung.',
+   watch:'Zwei alte Wachtzeichen liegen am Pass. Bring sie zurück, damit ich den Weg wieder sichern kann.'
   };
-  const complete={reed:'Die Schilflichter leuchten wieder. Danke, dass du mir geholfen hast.',shell:'Die Muscheln passen genau zusammen. Du hast es geschafft!',crystal:'Die Kristallsplitter singen wieder. Das Licht ist zurück.',rune:'Die Runen sind wieder vereint. Der Pfad ist sicher.'};
+  const complete={reed:'Die Schilflichter leuchten wieder. Danke, dass du mir geholfen hast.',shell:'Die Muscheln passen genau zusammen. Du hast es geschafft!',crystal:'Die Kristallsplitter singen wieder. Das Licht ist zurück.',rune:'Die Runen sind wieder vereint. Der Pfad ist sicher.',frost:'Die Frostblüten strahlen wieder. Danke, dass du sie gefunden hast.',watch:'Die Wachtzeichen sind wieder aufgestellt. Der Pass ist sicher.'};
   if(q.state===0){q.state=1;showDialogue(n.name.toUpperCase(),intro[n.quest])}
   else if(q.state===1&&q.items>=q.need){rewardQuest(n.quest)}
   else if(q.state===2)showDialogue(n.name.toUpperCase(),complete[n.quest]+' Komm gern wieder vorbei.')
@@ -818,9 +824,9 @@ function openPanel(kind){
  const action=(label,fn)=>{const b=document.createElement('button');b.className='uiButton';b.textContent=label;b.onclick=fn;buttons.appendChild(b)};
  if(kind==='quest'){
   title.textContent='QUESTBUCH';
-  text.innerHTML='<p><b>Hauptgeschichte: Die sieben Echos</b><br>'+(['Finde Mira am Brunnen.','Sammle drei Echosamen in Windruh.','Bringe die Samen zum Brunnen.','Finde drei blaue Waldblüten im Flüsterwald.','Erwecke das Echo im Schrein.','Das erste Echo ist gerettet. Sechs weitere Schreine warten.','Das erste Echo ist erwacht. Der Abspann ist erreicht.'][main.stage])+'</p><p><b>Nebenquests</b><br>Schilflichter: '+sideQuests.reed.items+'/'+sideQuests.reed.need+' · Flussmuscheln: '+sideQuests.shell.items+'/'+sideQuests.shell.need+'<br>Kristallsplitter: '+sideQuests.crystal.items+'/'+sideQuests.crystal.need+' · Runensteine: '+sideQuests.rune.items+'/'+sideQuests.rune.need+'</p><p><b>Bewohner helfen</b><br>'+(side.blueHerb===0?'Eda hat dich noch nicht um Hilfe gebeten.':side.blueHerb===1?'Eda wartet auf drei blaue Waldblüten.':'Eda hat dir zwei Heiltränke geschenkt.')+'<br>'+(side.letter===0?'Runa hat noch keinen Briefauftrag gegeben.':side.letter===1?'Bringe Runas Brief zu Tomke am Fluss.':side.letter===2?'Gib Runas Antwort in der Taverne ab.':'Der Brief wurde zugestellt.')+'</p>';
+  text.innerHTML='<p><b>Hauptgeschichte: Die sieben Echos</b><br>'+(['Finde Mira am Brunnen.','Sammle drei Echosamen in Windruh.','Bringe die Samen zum Brunnen.','Finde drei blaue Waldblüten im Flüsterwald.','Erwecke das Echo im Schrein.','Das erste Echo ist gerettet. Sechs weitere Schreine warten.','Das erste Echo ist erwacht. Der Abspann ist erreicht.'][main.stage])+'</p><p><b>Nebenquests</b><br>Schilflichter: '+sideQuests.reed.items+'/'+sideQuests.reed.need+' · Flussmuscheln: '+sideQuests.shell.items+'/'+sideQuests.shell.need+'<br>Kristallsplitter: '+sideQuests.crystal.items+'/'+sideQuests.crystal.need+' · Runensteine: '+sideQuests.rune.items+'/'+sideQuests.rune.need+'<br>Frostblüten: '+sideQuests.frost.items+'/'+sideQuests.frost.need+' · Wachtzeichen: '+sideQuests.watch.items+'/'+sideQuests.watch.need+'</p><p><b>Bewohner helfen</b><br>'+(side.blueHerb===0?'Eda hat dich noch nicht um Hilfe gebeten.':side.blueHerb===1?'Eda wartet auf drei blaue Waldblüten.':'Eda hat dir zwei Heiltränke geschenkt.')+'<br>'+(side.letter===0?'Runa hat noch keinen Briefauftrag gegeben.':side.letter===1?'Bringe Runas Brief zu Tomke am Fluss.':side.letter===2?'Gib Runas Antwort in der Taverne ab.':'Der Brief wurde zugestellt.')+'</p>';
  }else if(kind==='bag'){
-  title.textContent='RUCKSACK';text.innerHTML='<p>✦ Echosamen: '+inventory.seeds+'<br>❀ Blaue Waldblüten: '+inventory.blueHerb+'<br>✉ Briefe: '+inventory.letters+'<br>🍓 Beeren: '+inventory.berries+'<br>🥧 Mahlzeiten: '+inventory.meals+'<br>🧪 Heiltränke: '+player.potions+'<br>◈ Windtaler: '+player.coins+'</p>';
+  title.textContent='RUCKSACK';text.innerHTML='<p>✦ Echosamen: '+inventory.seeds+'<br>❀ Blaue Waldblüten: '+inventory.blueHerb+'<br>✉ Briefe: '+inventory.letters+'<br>🍓 Beeren: '+inventory.berries+'<br>🥧 Mahlzeiten: '+inventory.meals+'<br>❄ Frostblüten: '+inventory.frostPetal+'<br>◈ Wachtzeichen: '+inventory.watchSigil+'<br>🧪 Heiltränke: '+player.potions+'<br>◈ Windtaler: '+player.coins+'</p>';
   action('Heiltrank benutzen',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);showToast('Zwei Herzen wiederhergestellt');openPanel('bag');saveGame(activeSlot)}else showToast('Du brauchst einen Heiltrank und musst verletzt sein.')});
  }else if(kind==='map'){
   title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra</b></p><p>🟢 Windruh – lebendige Stadt, Marktplatz, Gärten und Häuser<br>🌲 Flüsterwald – Waldwege, Bach und verborgene Lichtungen<br>☘ Nebelmoor – Schilfstege und Moorlichter<br>✧ Flüsterhöhle – Kristalle und alte Runen<br>❄ Frostgrat – Eiswege und Schneefelder<br>✦ Echo-Schrein – ein uralter Ort hinter dem Waldtor</p><p>Die Außenbereiche erreichst du über die Wege im Flüsterwald.</p>';
@@ -864,7 +870,7 @@ function nearbyPrompt(){
 function collectQuestItem(item){
  item.found=true;collectedItems[item.id]=true;
  if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
- else{const q=sideQuests[item.key];if(q){q.items++;inventory[item.key]=(inventory[item.key]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
+ else{const q=sideQuests[item.key];if(q){q.items++;const inventoryKey=({crystal:'crystalShard',rune:'runeStone',frost:'frostPetal',watch:'watchSigil'})[item.key]||item.key;inventory[inventoryKey]=(inventory[inventoryKey]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
  updateQuest();saveGame(activeSlot);
 }
 function interact(){
