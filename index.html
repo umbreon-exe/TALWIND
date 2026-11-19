@@ -143,7 +143,7 @@ body{display:grid;place-items:center;touch-action:none}
 <script>
 (()=>{'use strict';
 const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-const VW=720,VH=405,T=16,MAP_W=64,MAP_H=42;
+const VW=720,VH=405,T=16,MAP_W=112,MAP_H=88;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const heroes=[
 {name:'LYRA',role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
@@ -1731,6 +1731,348 @@ document.getElementById('menuButtons').style.pointerEvents='auto';
 document.getElementById('menuButtons').style.zIndex='14';
 rollButton.setAttribute('aria-label','In die aktuelle Laufrichtung rollen');
 refreshRollButton();
+
+
+/* ===== TALWIND WORLD EXPANSION V6: big forest, quiet village, four monsters ===== */
+const LARGE_MAP_W=112,LARGE_MAP_H=88,LARGE_OFFSET_X=24,LARGE_OFFSET_Y=20;
+const previousMakeWorldLarge=makeWorld;
+
+function expandLargeRegion(w,id){
+ if(!w||id==='shrine')return w;
+ const oldW=w.width,oldH=w.height,oldTiles=w.tiles;
+ const dx=LARGE_OFFSET_X,dy=LARGE_OFFSET_Y,W=LARGE_MAP_W,H=LARGE_MAP_H;
+ const ground=id==='windruh'?0:(id==='hoehle'?6:5);
+ const tiles=new Uint8Array(W*H);tiles.fill(ground);
+ for(let y=0;y<oldH;y++)for(let x=0;x<oldW;x++){
+  const nx=x+dx,ny=y+dy;
+  if(nx>=0&&ny>=0&&nx<W&&ny<H)tiles[ny*W+nx]=oldTiles[y*oldW+x];
+ }
+ w.width=W;w.height=H;w.tiles=tiles;
+ const shiftList=(list,keys)=>{for(const o of list||[])for(const key of keys)if(Number.isFinite(o[key]))o[key]+=key.toLowerCase().includes('y')?dy*T:dx*T};
+ shiftList(w.decor,['x','y']);
+ shiftList(w.buildings,['x','y','doorX','doorY']);
+ shiftList(w.npcs,['x','y','homeX','homeY']);
+ shiftList(w.items,['x','y']);
+ shiftList(w.solid,['x','y']);
+ for(const e of w.exits||[]){
+  if(Number.isFinite(e.x))e.x+=dx*T;
+  if(Number.isFinite(e.y))e.y+=dy*T;
+  // Exit destinations are shifted too unless the destination is the screen-sized shrine.
+  if(e.to!=='shrine'){
+   if(Number.isFinite(e.tx))e.tx+=dx*T;
+   if(Number.isFinite(e.ty))e.ty+=dy*T;
+  }
+ }
+ const set=(x,y,v)=>{if(x>=0&&y>=0&&x<W&&y<H)w.tiles[y*W+x]=v};
+ const rect=(x,y,ww,hh,v)=>{for(let yy=y;yy<y+hh;yy++)for(let xx=x;xx<x+ww;xx++)set(xx,yy,v)};
+ const add=(type,x,y,solid=false)=>w.decor.push({type,x:x*T,y:y*T,solid});
+ const line=(x0,y0,x1,y1,r=1)=>{
+  const steps=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));
+  for(let i=0;i<=steps;i++){
+   const x=Math.round(x0+(x1-x0)*i/Math.max(1,steps));
+   const y=Math.round(y0+(y1-y0)*i/Math.max(1,steps));
+   for(let oy=-r;oy<=r;oy++)for(let ox=-r;ox<=r;ox++)if(ox*ox+oy*oy<=r*r+1)set(x+ox,y+oy,1);
+  }
+ };
+ if(id==='wald'){
+  // A connected trail network stretches across the whole new forest.
+  line(3,40,53,40,2);
+  line(50,15,50,73,1);
+  line(50,30,77,26,1);
+  line(50,56,78,66,1);
+  line(77,26,77,39,1);
+  line(77,66,99,67,1);
+  line(18,40,18,26,1);
+  line(18,26,31,18,1);
+  line(31,18,50,15,1);
+  // Open clearings: entrance, old stone circle, upper stream bend and southern glade.
+  for(const [cx,cy,rx,ry] of [[28,40,7,6],[50,40,7,7],[77,26,8,7],[78,66,8,7],[18,26,5,5],[44,70,7,6]]){
+   for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++){
+    const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);
+    if(d<1)set(x,y,5);
+   }
+  }
+  // Two small ponds with sandy banks.
+  for(const [cx,cy,rx,ry] of [[14,13,7,5],[91,17,8,6]]){
+   for(let y=cy-ry-1;y<=cy+ry+1;y++)for(let x=cx-rx-1;x<=cx+rx+1;x++){
+    const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);
+    if(d<=1)set(x,y,2);else if(d<=1.42)set(x,y,4);
+   }
+  }
+  // Deterministic forest clusters. Keep roads, clearings, ponds, residents and all
+  // four encounter areas open so the player can always reach the creatures.
+  const safeSpots=[[28,40],[37,61],[85,35],[46,74],[93,66],[53,37],[60,47],[66,50],[42,31],[77,26]];
+  const inSafe=(x,y)=>safeSpots.some(([sx,sy])=>Math.abs(x-sx)<6&&Math.abs(y-sy)<6);
+  const nearTrail=(x,y)=>(
+   (Math.abs(y-40)<4&&x<55)||
+   (Math.abs(x-50)<3&&y>14&&y<74)||
+   (Math.abs(y-(30-(x-50)*.15))<3&&x>=50&&x<=78)||
+   (Math.abs(y-(56+(x-50)*.37))<3&&x>=50&&x<=78)||
+   (Math.abs(x-77)<3&&y>=24&&y<=40)||
+   (Math.abs(y-66)<4&&x>=77&&x<=101)||
+   (x>=11&&x<=23&&y>=7&&y<=19)||
+   (x>=83&&x<=100&&y>=9&&y<=25)
+  );
+  const alreadyTree=(x,y)=>w.decor.some(o=>(o.type==='tree'||o.type==='pine'||o.type==='appleTree')&&Math.abs(o.x/T-x)<2&&Math.abs(o.y/T-y)<2);
+  let placed=0;
+  for(let i=0;i<980&&placed<390;i++){
+   const tx=2+((i*73+Math.floor(i/7)*19+i*i*3)%(W-4));
+   const ty=2+((i*47+Math.floor(i/5)*23+i*i*5)%(H-4));
+   if(nearTrail(tx,ty)||inSafe(tx,ty)||alreadyTree(tx,ty))continue;
+   if(w.tiles[ty*W+tx]===2||w.tiles[ty*W+tx]===4)continue;
+   add((i%5===0||i%7===0)?'pine':'tree',tx,ty,true);placed++;
+  }
+  // Flowers, mushrooms, ferns and small ruins animate or sparkle in the clearings.
+  for(let i=0;i<210;i++){
+   const tx=6+((i*29+Math.floor(i/8)*11)%(W-12));
+   const ty=5+((i*43+Math.floor(i/6)*7)%(H-10));
+   if(nearTrail(tx,ty)||inSafe(tx,ty)||w.tiles[ty*W+tx]===2||w.tiles[ty*W+tx]===4)continue;
+   add(i%9===0?'mushroom':i%4===0?'tuft':'flower',tx,ty,false);
+  }
+  // Bright way markers and a tiny camp beside the southern trail.
+  add('crystal',32,18);add('crystal',73,51);add('campfire',42,68);
+  add('bench',48,42);add('sign',25,42);
+  // Make sure the village gate and return trail both line up.
+  w.exits=w.exits.map(e=>{
+   if(e.to==='windruh'){e.x=2*T;e.y=38*T;e.w=28;e.h=84;e.label='Zurück nach Windruh'}
+   if(e.to==='shrine'){e.x=75*T;e.y=24*T;e.w=44;e.h=40}
+   if(e.to==='sumpf'){e.x=78*T;e.y=51*T;e.w=44;e.h=64}
+   return e;
+  });
+ }else if(id==='windruh'){
+  // Keep the town compact inside a much larger peaceful region.
+  // A long eastern road leads to the forest gate; no creature is spawned here.
+  line(82,40,111,40,2);
+  for(let i=0;i<210;i++){
+   const tx=2+((i*37+Math.floor(i/9)*17)%(W-4));
+   const ty=2+((i*61+Math.floor(i/7)*13)%(H-4));
+   const insideTown=tx>=28&&tx<=88&&ty>=23&&ty<=62;
+   const onRoad=Math.abs(ty-40)<=4&&tx>=80;
+   const riverSide=tx>=20&&tx<=31&&ty>=35&&ty<=44;
+   if(insideTown||onRoad||riverSide)continue;
+   if((tx*3+ty*7)%5===0)add('pine',tx,ty,true);
+   else add('tree',tx,ty,true);
+  }
+  for(let i=0;i<80;i++){
+   const tx=6+((i*17)%100),ty=5+((i*31)%78);
+   if(tx>=28&&tx<=88&&ty>=23&&ty<=62)continue;
+   if(Math.abs(ty-40)<5&&tx>80)continue;
+   add(i%4===0?'mushroom':'flower',tx,ty,false);
+  }
+ }else{
+  // The other outdoor regions also have room to explore beyond their entrances.
+  for(let i=0;i<260;i++){
+   const tx=3+((i*41+Math.floor(i/8)*13)%(W-6));
+   const ty=3+((i*59+Math.floor(i/5)*17)%(H-6));
+   if(Math.abs(ty-40)<4||Math.abs(tx-50)<4)continue;
+   if(id==='hoehle'&&w.tiles[ty*W+tx]===2)continue;
+   if(id==='sumpf'&&w.tiles[ty*W+tx]===2)continue;
+   add(i%4===0?'mushroom':'tree',tx,ty,i%4!==0);
+  }
+ }
+ return w;
+}
+makeWorld=function(id){return expandLargeRegion(previousMakeWorldLarge(id),id)};
+
+// Old saved coordinates are shifted into the expanded map once, instead of leaving
+// returning players trapped near the old map origin.
+const previousLoadLargeMap=loadGame;
+loadGame=function(){
+ try{
+  const raw=localStorage.getItem(saveKey),d=raw?JSON.parse(raw):null;
+  if(d&&!d.largeMapV6){
+   if(!d.room&&d.zone!=='shrine'){d.x=(Number(d.x)||0)+LARGE_OFFSET_X*T;d.y=(Number(d.y)||0)+LARGE_OFFSET_Y*T}
+   d.largeMapV6=true;localStorage.setItem(saveKey,JSON.stringify(d));
+  }
+ }catch(e){}
+ const ok=previousLoadLargeMap();
+ if(ok)updateArtCamera();
+ return ok;
+};
+const previousSaveLargeMap=saveGame;
+saveGame=function(){
+ previousSaveLargeMap();
+ try{const d=JSON.parse(localStorage.getItem(saveKey)||'null');if(d){d.largeMapV6=true;localStorage.setItem(saveKey,JSON.stringify(d))}}catch(e){}
+};
+
+// Four normal enemies in the forest only. The village and all its streets are safe.
+// The guardian remains a separate story boss inside the shrine.
+makeMonsters=function(){
+ monsters.length=0;
+ const add=(type,tx,ty,hp,behavior,phase)=>monsters.push({
+  type,zone:'wald',x:tx*T,y:ty*T,hp,maxHp:hp,behavior,
+  phase:phase||0,timer:1.2+monsters.length*.35,windup:0,dead:false,
+  homeX:tx*T,homeY:ty*T
+ });
+ add('wolf',37,61,8,'chase',.2);
+ add('moth',85,35,5,'ranged',1.4);
+ add('bramble',46,74,9,'windup',2.1);
+ add('thornling',93,66,7,'patrol',2.8);
+ monsters.push({type:'guardian',zone:'shrine',x:240,y:112,hp:40,maxHp:40,behavior:'boss',phase:0,timer:1,windup:0,dead:false});
+ bossState={hp:40,maxHp:40,phase:1,windup:0,attackCd:1.5,attackType:'Schallwelle',active:false};
+};
+
+// Put the three quest seeds in Windruh and the forest flowers far apart in the
+// new forest. The player begins beside the village fountain, not at the map edge.
+seedSpots[0].x=40*T+8;seedSpots[0].y=36*T+8;
+seedSpots[1].x=70*T+8;seedSpots[1].y=45*T+8;
+seedSpots[2].x=81*T+8;seedSpots[2].y=42*T+8;
+flowerSpots[0].x=36*T+8;flowerSpots[0].y=32*T+8;
+flowerSpots[1].x=71*T+8;flowerSpots[1].y=46*T+8;
+flowerSpots[2].x=56*T+8;flowerSpots[2].y=69*T+8;
+
+// Hero walk cycle: four clear footfalls, swinging arms, directional facing and
+// visibly different class equipment. The up-facing pose shows the back of the head.
+drawHero=function(x,y,now){
+ const frame=Math.floor(player.walk*1.65)%4;
+ const moving=player.walk>.05;
+ const gait=moving?[0,2,0,-2][frame]:0;
+ const bob=moving?([0,-1,0,-1][frame]):Math.sin(now/470)*.35;
+ const px=Math.round(x),py=Math.round(y+bob),skin='#efc49b',boot='#49382f';
+ const side=player.faceX!==0,back=player.faceY<0;
+ const leftArm= gait, rightArm=-gait;
+ pixel(px+1,py+34,30,5,'#294f35');
+ // Boots and legs are visibly alternating during movement.
+ pixel(px+7+gait,py+26,7,9,boot);pixel(px+18-gait,py+26,7,9,boot);
+ pixel(px+6+gait,py+32,8,3,'#d4b47e');pixel(px+18-gait,py+32,8,3,'#d4b47e');
+ if(selected===0){
+  pixel(px+4,py+12,23,16,'#246f69');pixel(px+7,py+13,17,14,'#43ae9e');
+  pixel(px+3,py+14+leftArm,4,11,'#4bb8a7');pixel(px+24,py+14+rightArm,4,11,'#398d84');
+  pixel(px+2,py+7,3,23,'#e2f2ef');pixel(px+27,py+7,3,23,'#c7eff0');
+  pixel(px+9,py+20,14,3,'#e8d18d');
+ }else if(selected===1){
+  pixel(px+2,py+11,27,18,'#615a4c');pixel(px+4,py+12,23,15,'#a99a77');
+  pixel(px+4,py+14,6,12,'#d4cdb3');pixel(px+19,py+14,6,12,'#d4cdb3');
+  pixel(px+2,py+15+leftArm,5,11,'#b4b9a7');pixel(px+26,py+13+rightArm,6,13,'#899c98');
+  pixel(px+25,py+12,10,21,'#71827e');pixel(px+27,py+16,6,13,'#e2e0ce');
+  pixel(px+11,py+21,10,3,'#e2d1a8');
+ }else if(selected===2){
+  pixel(px+4,py+12,24,16,'#2d6540');pixel(px+7,py+13,17,14,'#659b50');
+  pixel(px+3,py+15+leftArm,4,10,'#3d7b48');pixel(px+25,py+14+rightArm,4,10,'#5c914b');
+  pixel(px+2,py+9,4,22,'#805638');pixel(px+3,py+7,3,4,'#e8d39d');
+  pixel(px+24,py+11,7,19,'#987248');pixel(px+26,py+14,2,15,'#e2cc9b');
+ }else if(selected===3){
+  pixel(px+2,py+11,28,19,'#604681');pixel(px+5,py+13,22,15,'#9876ba');
+  pixel(px+3,py+17+leftArm,5,9,'#b18bd0');pixel(px+25,py+16+rightArm,5,10,'#b18bd0');
+  pixel(px+8,py+21,16,3,'#dfcef4');
+  pixel(px+28,py+5,3,28,'#c5b0e3');pixel(px+26,py+2,7,7,'#a4e8eb');pixel(px+27,py+2,5,3,'#fff2c9');
+ }else{
+  pixel(px+4,py+12,23,17,'#263e59');pixel(px+7,py+14,17,14,'#4d6984');
+  pixel(px+3,py+16+leftArm,4,10,'#33495e');pixel(px+25,py+16+rightArm,4,10,'#33495e');
+  pixel(px+2,py+15,3,17,'#d4e7e7');pixel(px+28,py+15,3,17,'#a8c4d3');
+  pixel(px+5,py+20,21,4,'#44414b');
+ }
+ // Head and directional face/back.
+ if(back){
+  pixel(px+8,py+1,18,15,'#d89e7d');pixel(px+5,py-1,22,9,heroes[selected].hair);
+  pixel(px+4,py+4,6,13,heroes[selected].hair);pixel(px+22,py+4,6,13,heroes[selected].hair);
+  pixel(px+10,py+9,14,5,heroes[selected].hair);
+ }else{
+  pixel(px+9,py+7,13,5,'#c88668');pixel(px+6,py+1,18,16,skin);
+  pixel(px+4,py+5,4,6,'#d89978');pixel(px+22,py+5,4,6,'#d89978');
+  const hair=heroes[selected].hair;
+  pixel(px+5,py,20,6,hair);pixel(px+4,py+3,5,9,hair);pixel(px+22,py+3,5,8,hair);
+  if(side){
+   if(player.faceX>0){pixel(px+19,py+8,3,2,'#332a28');pixel(px+17,py+11,4,2,'#b76e61')}
+   else{pixel(px+8,py+8,3,2,'#332a28');pixel(px+9,py+11,4,2,'#b76e61')}
+  }else{
+   pixel(px+10,py+8,3,2,'#332a28');pixel(px+19,py+8,3,2,'#332a28');
+   pixel(px+14,py+13,5,1,'#b76e61');
+  }
+  if(selected===3){pixel(px+4,py-5,23,7,'#4b365e');pixel(px+9,py-9,14,6,'#77509c')}
+  if(selected===2){pixel(px+3,py-4,24,7,'#2f6c43');pixel(px+8,py-7,19,5,'#47884c')}
+  if(selected===4){pixel(px+4,py-4,23,8,'#303b4b');pixel(px+6,py+11,19,5,'#47434b')}
+  if(selected===1){pixel(px+5,py-3,21,7,'#614b38');pixel(px+10,py-2,13,4,'#b9b394')}
+  if(selected===0){pixel(px+11,py-4,12,4,'#e4c982')}
+ }
+ if(moving&&frame%2===1){
+  pixel(px+2,py+36,3,2,'#ead49b');pixel(px+27,py+36,3,2,'#ead49b');
+ }
+ if(player.rolling>0){
+  ctx.save();ctx.globalAlpha=.4;ctx.strokeStyle='#e1f6ed';ctx.lineWidth=3;
+  ctx.beginPath();ctx.ellipse(px+15,py+19,18,12,frame,0,Math.PI*2);ctx.stroke();ctx.restore();
+ }
+ if(player.inv>0&&Math.floor(now/85)%2===0){ctx.save();ctx.globalAlpha=.23;ctx.fillStyle='#fff';ctx.fillRect(px+1,py,30,37);ctx.restore()}
+};
+
+// Animated, species-specific monsters: wingbeats, running paws, vine sway and
+// blinking eyes. Each creature has its own outline and proportions.
+drawMonster=function(m,now){
+ const x=Math.round(m.x-camera.x),y=Math.round(m.y-camera.y),f=Math.floor(now/120+m.phase*2)%4;
+ const bob=Math.round(Math.sin(now/155+m.phase)*1.3),step=[0,2,0,-2][f],eye=(a,b,c='#fff0be')=>{
+  pixel(a,b,4,4,c);pixel(a+1,b+1,2,2,'#2c2827');
+ };
+ pixel(x+3,y+31,34,5,'#294c34');
+ if(m.type==='wolf'){
+  pixel(x+7,y+15+bob,25,14,'#5b5c59');pixel(x+10,y+9+bob,19,15,'#898b83');
+  pixel(x+7,y+6+bob,8,10,'#656862');pixel(x+24,y+6+bob,8,10,'#656862');
+  pixel(x+9,y+4+bob,4,6,'#c0ae95');pixel(x+26,y+4+bob,4,6,'#c0ae95');
+  pixel(x+28,y+17+bob,12,8,'#b7a58f');pixel(x+35,y+21+bob,5,4,'#473c37');
+  pixel(x+3,y+13+bob,7,4,'#666a62');pixel(x+1,y+15+bob,5,3,'#b39c84');
+  for(const lx of [9,27]){pixel(x+lx,y+25+step,'#000');pixel(x+lx,y+25+step,5,8,'#514e4a');pixel(x+lx-1,y+31+step,7,3,'#c2b49d')}
+  eye(x+13,y+14+bob);eye(x+25,y+14+bob);pixel(x+17,y+21+bob,4,2,'#493b35');
+  pixel(x+4,y+10+bob,5,3,'#b5a590');
+ }else if(m.type==='moth'){
+  const wing=([0,3,7,3][f]);
+  pixel(x+1,y+9+wing,13,17- Math.min(wing,5),'#8d7aa9');
+  pixel(x+24,y+9+wing,14,17-Math.min(wing,5),'#bba8d7');
+  pixel(x+4,y+7+wing,7,10,'#e5d8f2');pixel(x+27,y+7+wing,7,10,'#f3e6fa');
+  pixel(x+13,y+12+bob,13,18,'#78618e');pixel(x+15,y+7+bob,10,12,'#c8b7db');
+  pixel(x+17,y+26+bob,3,6,'#55435f');pixel(x+24,y+26+bob,3,6,'#55435f');
+  eye(x+15,y+15+bob,'#fff4cf');eye(x+24,y+15+bob,'#fff4cf');
+  pixel(x+18,y+3+bob,2,6,'#6d5689');pixel(x+26,y+3+bob,2,6,'#6d5689');
+ }else if(m.type==='bramble'){
+  pixel(x+3,y+15+bob,32,17,'#4e683d');pixel(x+7,y+8+bob,24,19,'#839c51');
+  pixel(x+1,y+18+bob,8,9,'#b4a76c');pixel(x+30,y+16+bob,8,11,'#b4a76c');
+  for(let i=0;i<6;i++){
+   const sway=Math.round(Math.sin(now/180+i*1.7+m.phase)*2);
+   pixel(x+4+i*5,y+4+bob+sway,4,10,'#3e653d');
+   pixel(x+5+i*5,y+3+bob+sway,3,4,i%2?'#a2b865':'#6b9147');
+  }
+  pixel(x+9,y+26+bob,6,7,'#59442f');pixel(x+24,y+26+bob,6,7,'#59442f');
+  eye(x+12,y+17+bob,'#ffe8ad');eye(x+24,y+17+bob,'#ffe8ad');
+  pixel(x+17,y+25+bob,5,2,'#3f3b2e');
+ }else if(m.type==='thornling'){
+  pixel(x+6,y+14+bob,26,16,'#3f7447');pixel(x+9,y+7+bob,20,18,'#83ad58');
+  pixel(x+5,y+10+bob,6,12,'#587c43');pixel(x+27,y+10+bob,7,12,'#587c43');
+  pixel(x+8,y+5+bob,5,9,'#b5a36a');pixel(x+25,y+4+bob,5,10,'#c6ad70');
+  pixel(x+12,y+27+bob,6,7,'#514632');pixel(x+23,y+27+bob,6,7,'#514632');
+  eye(x+13,y+15+bob);eye(x+24,y+15+bob);
+  pixel(x+17,y+24+bob,5,2,'#39422d');
+  if(f%2===0){pixel(x+3,y+20+bob,5,3,'#a8c76b');pixel(x+30,y+19+bob,5,3,'#a8c76b')}
+ }else{
+  // Shrine guardian remains visually distinct from the four roaming creatures.
+  pixel(x+4,y+16+bob,31,18,'#58784c');pixel(x+8,y+7+bob,23,17,'#849d60');
+  pixel(x+5,y+4+bob,30,5,'#d4c18a');pixel(x+8,y+1+bob,24,4,'#e9d7a0');
+  eye(x+12,y+15+bob,'#ffe7ac');eye(x+25,y+15+bob,'#ffe7ac');
+ }
+ if(m.hp>0&&m.hp<m.maxHp){
+  pixel(x+5,y-7,29,4,'#342b29');pixel(x+6,y-6,27,2,'#e3d9bf');
+  pixel(x+6,y-6,Math.max(1,Math.round(27*m.hp/m.maxHp)),2,'#e35d50');
+ }
+};
+
+// Forest ambience: small glowing fireflies drift through the clearings.
+let forestLights=[];
+const previousDrawWorldLarge=drawWorld;
+drawWorld=function(now){
+ previousDrawWorldLarge(now);
+ if(zone==='wald'){
+  for(let i=0;i<10;i++){
+   const px=(i*97+Math.sin(now/950+i*2.1)*16+Math.sin(now/1700+i)*22)%VW;
+   const py=(i*53+Math.cos(now/850+i*1.4)*12+Math.sin(now/1200+i)*18)%VH;
+   const glow=.35+.45*(.5+.5*Math.sin(now/260+i*2));
+   ctx.save();ctx.globalAlpha=glow;ctx.fillStyle=i%3===0?'#fff1a7':'#a9f1c8';
+   ctx.fillRect(px,py,3,3);ctx.fillRect(px-2,py+1,1,1);ctx.restore();
+  }
+ }
+};
+
+// Put the canvas camera back around the player after the expanded world is built.
+player.x=(LARGE_OFFSET_X+24)*T-12;
+player.y=(LARGE_OFFSET_Y+21)*T;
+world=makeWorld(zone);
+updateArtCamera();
 
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
