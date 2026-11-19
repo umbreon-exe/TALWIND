@@ -184,7 +184,7 @@ const sideQuests={
  rune:{state:0,items:0,need:2}
 };
 const seedSpots=[{x:16*T+8,y:16*T+8,found:false},{x:46*T+8,y:25*T+8,found:false},{x:57*T+8,y:22*T+8,found:false}];
-const flowerSpots=[{x:18*T+8,y:35*T+8,found:false},{x:42*T+8,y:20*T+8,found:false},{x:70*T+8,y:48*T+8,found:false}];
+const flowerSpots=[{x:24*T+8,y:30*T+8,found:false},{x:58*T+8,y:13*T+8,found:false},{x:58*T+8,y:49*T+8,found:false}];
 const rooms={
  mira:{title:'Miras gemütliches Haus',kind:'home',npc:'mira'},
  inn:{title:'Zum singenden Krug',kind:'inn',npc:'runa'},
@@ -287,10 +287,10 @@ function makeWorld(id){
  }else if(id==='sumpf'){
   // Nebelmoor: shallow water, reed islands and winding stone causeways.
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*7+y*11)%13<4)set(x,y,2);
-  path(3,28,68,28,2,1);path(18,28,18,10,1,1);path(18,10,44,10,1,1);path(44,10,44,42,1,1);path(44,42,68,42,1,1);
+  path(3,28,68,28,2,1);path(18,28,18,10,1,1);path(18,10,44,10,1,1);path(44,10,44,42,1,1);path(44,42,68,42,1,1);path(18,20,12,18,1,1);path(18,21,22,18,1,1);path(44,10,52,26,1,1);path(52,26,59,31,1,1);
   oval(31,28,7,6,5,4);oval(58,15,6,5,5,4);
   const rnd=rand(1193);
-  for(let i=0;i<220;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(Math.abs(y-28)<4||Math.abs(x-18)<3||Math.abs(x-44)<3||w.tiles[y*W+x]===1)continue;add(i%3===0?'reed':'deadTree',x,y,true)}
+  for(let i=0;i<220;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(Math.abs(y-28)<4||Math.abs(x-18)<3||Math.abs(x-44)<3||(Math.abs(y-(18+(x-12)*.5))<3&&x>=12&&x<=22)||(Math.abs(y-(26+(x-44)*.71))<3&&x>=44&&x<=59)||w.tiles[y*W+x]===1)continue;add(i%3===0?'reed':'deadTree',x,y,true)}
   for(let i=0;i<60;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(w.tiles[y*W+x]===1)continue;add(i%2?'mushroom':'fireflyPlant',x,y,false)}
   add('campfire',48,44,false);add('crystal',15,14,false);add('sign',5,30,false);
   w.npcs=[makeNPC('moor_iona','Iona',20,9,'violet','silver','elder','Der Nebel trägt Stimmen aus alten Zeiten. Bleib auf den hellen Steinen – dort ist der Boden fest.',{quest:'reed'}),makeNPC('moor_pip','Pip',47,39,'gold','brown','child','Ich suche leuchtende Sumpflichter. Manche zeigen versteckte Pfade.',{quest:'shell'})];
@@ -299,9 +299,9 @@ function makeWorld(id){
   w.exits.push({x:0,y:25*T,w:24,h:110,to:'wald',tx:78*T,ty:14*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='hoehle'){
   // Cave: stone paths, crystals and columns.
-  fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);
+  fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);path(22,26,31,15,1,3);path(31,15,39,25,1,3);path(39,25,47,15,1,3);path(22,26,10,39,1,3);path(10,39,19,35,1,3);
   const rnd=rand(7731);
-  for(let i=0;i<200;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*50);if(Math.abs(y-26)<4||Math.abs(x-22)<3||Math.abs(x-55)<3)continue;add(i%3===0?'crystal':'rock',x,y,true)}
+  for(let i=0;i<200;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*50);if(Math.abs(y-26)<4||Math.abs(x-22)<3||Math.abs(x-55)<3||Math.hypot(x-31,y-15)<5||Math.hypot(x-39,y-25)<5||Math.hypot(x-47,y-15)<5||Math.hypot(x-10,y-39)<5||Math.hypot(x-19,y-35)<5)continue;add(i%3===0?'crystal':'rock',x,y,true)}
   for(let i=0;i<34;i++){const x=3+Math.floor(rnd()*65),y=3+Math.floor(rnd()*46);if(w.tiles[y*W+x]===3)add('crystal',x,y,false)}
   add('torch',12,23,false);add('torch',42,12,false);add('torch',60,40,false);
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
@@ -318,7 +318,7 @@ function makeWorld(id){
   for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add('snowTuft',x,y,false)}
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.'),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.')];
-  w.items.push({id:'frostflower1',kind:'quest',key:'frostPetal',x:20*T,y:12*T,found:false},{id:'frostflower2',kind:'quest',key:'frostPetal',x:58*T,y:11*T,found:false},{id:'frostflower3',kind:'quest',key:'frostPetal',x:66*T,y:45*T,found:false});
+  w.items.push({id:'frostflower1',kind:'quest',key:'frostPetal',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frostPetal',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frostPetal',x:66*T,y:39*T,found:false});
   w.exits.push({x:34*T,y:52*T,w:80,h:24,to:'wald',tx:38*T,ty:2*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
