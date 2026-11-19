@@ -2080,6 +2080,220 @@ player.y=(LARGE_OFFSET_Y+21)*T;
 world=makeWorld(zone);
 updateArtCamera();
 
+
+
+/* ===== TALWIND WORLD REPAIR V7 =====
+   One connected overworld: village centre, explorable forest outskirts,
+   clear roads, four fixed wilderness encounters and a safer house renderer. */
+const makeWorldBeforeV7=makeWorld;
+makeWorld=function(id){
+ const w=makeWorldBeforeV7(id);
+ if(!w||id!=='windruh')return w;
+ const W=w.width,H=w.height;
+ const village=(x,y)=>x>=29&&x<=88&&y>=26&&y<=61;
+ const river=(x,y)=>x>=23&&x<=30&&y>=20&&y<=62;
+ // Replace the empty expansion with a forest floor around the actual town.
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  if(village(x,y))continue;
+  const k=y*W+x,old=w.tiles[k];
+  if(river(x,y)&&(old===1||old===2||old===4))continue;
+  w.tiles[k]=5;
+ }
+ // Remove the sparse, randomly scattered outskirts from the previous version.
+ // Keep the village decorations and the bridge, then build the outer forest cleanly.
+ w.decor=w.decor.filter(o=>{
+  const tx=Math.round(o.x/T),ty=Math.round(o.y/T);
+  if(o.type==='bridge')return true;
+  return village(tx,ty);
+ });
+ const set=(x,y,v)=>{if(x>=0&&y>=0&&x<W&&y<H)w.tiles[y*W+x]=v};
+ const line=(x0,y0,x1,y1,r=1,tile=1)=>{
+  const steps=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));
+  for(let i=0;i<=steps;i++){
+   const x=Math.round(x0+(x1-x0)*i/Math.max(1,steps));
+   const y=Math.round(y0+(y1-y0)*i/Math.max(1,steps));
+   for(let oy=-r;oy<=r;oy++)for(let ox=-r;ox<=r;ox++)if(ox*ox+oy*oy<=r*r+1)set(x+ox,y+oy,tile);
+  }
+ };
+ const oval=(cx,cy,rx,ry)=>{
+  for(let y=cy-ry-1;y<=cy+ry+1;y++)for(let x=cx-rx-1;x<=cx+rx+1;x++){
+   const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);
+   if(d<=1)set(x,y,2);else if(d<=1.48)set(x,y,4);
+  }
+ };
+ const clear=(cx,cy,rx,ry)=>{
+  for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++){
+   const d=((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry);
+   if(d<=1)set(x,y,5);
+  }
+ };
+ // Paths continue from the village streets into the woods; each has a broad,
+ // walkable shoulder so the player does not get trapped between trees.
+ line(83,40,110,40,2);
+ line(42,26,42,8,1);
+ line(98,40,98,17,1);
+ line(98,40,98,82,1);
+ line(98,40,108,40,1);
+ // Four open encounter clearings, all outside the village footprint.
+ const clearings=[[42,12,5,5],[98,27,6,6],[104,49,5,6],[98,73,6,6]];
+ for(const c of clearings)clear(...c);
+ // Small pools and banks bring detail all the way to the map edges.
+ oval(13,13,6,4);oval(16,75,5,4);oval(81,12,5,4);oval(107,82,4,3);
+ const nearPath=(x,y)=>{
+  const segments=[[83,40,110,40],[42,26,42,8],[98,40,98,17],[98,40,98,82],[98,40,108,40]];
+  for(const [ax,ay,bx,by] of segments){
+   const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy;
+   const q=l?Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/l)):0;
+   if(Math.hypot(x-(ax+q*dx),y-(ay+q*dy))<4.2)return true;
+  }
+  return false;
+ };
+ const safe=(x,y)=>clearings.some(([cx,cy,rx,ry])=>Math.abs(x-cx)<rx+2&&Math.abs(y-cy)<ry+2);
+ const inPond=(x,y)=>[[13,13,8,6],[16,75,7,6],[81,12,7,6],[107,82,6,5]].some(([cx,cy,rx,ry])=>Math.abs(x-cx)<rx&&Math.abs(y-cy)<ry);
+ const add=(type,x,y,solid=false)=>w.decor.push({type,x:x*T,y:y*T,solid});
+ // A continuous natural tree border frames the map without blocking its paths.
+ for(let x=3;x<W-3;x+=3){
+  if(!nearPath(x,3)&&!inPond(x,3))add(x%2?'pine':'tree',x,3,true);
+  if(!nearPath(x,H-4)&&!inPond(x,H-4))add(x%2?'tree':'pine',x,H-4,true);
+ }
+ for(let y=6;y<H-6;y+=3){
+  if(!nearPath(3,y)&&!inPond(3,y))add('pine',3,y,true);
+  if(!nearPath(W-4,y)&&!inPond(W-4,y))add('tree',W-4,y,true);
+ }
+ // Deterministic foliage density across the complete outer forest, not only
+ // a few isolated clusters. The seeded layout stays identical on every load.
+ let seed=71931;
+ const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+ let trees=0;
+ for(let i=0;i<8000&&trees<510;i++){
+  const x=2+Math.floor(random()*(W-4)),y=2+Math.floor(random()*(H-4));
+  if(village(x,y)||river(x,y)||nearPath(x,y)||safe(x,y)||inPond(x,y))continue;
+  const tile=w.tiles[y*W+x];if(tile===2||tile===4)continue;
+  const crowded=w.decor.some(o=>(o.type==='tree'||o.type==='pine'||o.type==='appleTree')&&Math.abs(o.x/T-x)<2&&Math.abs(o.y/T-y)<2);
+  if(crowded)continue;
+  add(trees%4===0?'pine':'tree',x,y,true);trees++;
+ }
+ for(let i=0;i<320;i++){
+  const x=2+Math.floor(random()*(W-4)),y=2+Math.floor(random()*(H-4));
+  if(village(x,y)||river(x,y)||nearPath(x,y)||safe(x,y)||inPond(x,y))continue;
+  if(w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;
+  add(i%8===0?'mushroom':i%3===0?'tuft':'flower',x,y,false);
+ }
+ // Landmarks make the outer forest readable instead of an empty green border.
+ add('crystal',35,15);add('campfire',91,61);add('bench',94,44);
+ add('sign',84,40);add('crystal',105,68);
+ // Put the gate at the far end of the woodland approach, not in the village.
+ for(const e of w.exits||[])if(e.to==='wald'){
+  e.x=108*T;e.y=36*T;e.w=25;e.h=88;e.tx=6*T;e.ty=40*T;
+ }
+ return w;
+};
+
+// The deeper forest has a complete perimeter too, so it never fades into a
+// featureless green/grey edge when the camera reaches the map boundary.
+const makeWorldBeforeV7Borders=makeWorld;
+makeWorld=function(id){
+ const w=makeWorldBeforeV7Borders(id);
+ if(!w||id!=='wald')return w;
+ const add=(type,x,y)=>w.decor.push({type,x:x*T,y:y*T,solid:true});
+ for(let x=3;x<w.width-3;x+=3){
+  add(x%2?'pine':'tree',x,3);
+  add(x%2?'tree':'pine',x,w.height-4);
+ }
+ for(let y=6;y<w.height-6;y+=3){add('pine',3,y);add('tree',w.width-4,y)}
+ for(const e of w.exits||[])if(e.to==='windruh'){
+  e.x=2*T;e.y=36*T;e.w=28;e.h=92;e.tx=104*T;e.ty=40*T;
+ }
+ return w;
+};
+
+// Clear, size-aware house facades: consistent roof, wall, windows and door
+// across all village building widths/styles (including the clinic and inn).
+drawBuilding=function(b){
+ const x=Math.round(b.x-camera.x),y=Math.round(b.y-camera.y),w=Math.max(64,b.w),h=Math.max(64,b.h);
+ const palettes={
+  teal:['#55b8ad','#287e78','#174e50'],red:['#e97858','#b64d43','#71383a'],
+  ochre:['#f0bd59','#c4863c','#80502f'],violet:['#b18bd0','#79549b','#49365f'],
+  blue:['#8db9d4','#4d7898','#304e69'],slate:['#a8b5ae','#647d79','#3d5551'],
+  green:['#9ac66b','#5e934d','#365d3d'],orange:['#f19a55','#c7683d','#783f32'],
+  cream:['#ead9ae','#bca77e','#776344']
+ };
+ const c=palettes[b.style]||palettes.red;
+ // Ground shadow and stable plaster facade.
+ pixel(x+2,y+h-4,w-4,10,'#416d43');
+ pixel(x+5,y+25,w-10,h-27,'#8a603d');
+ pixel(x+8,y+28,w-16,h-31,'#f0d8a8');
+ pixel(x+11,y+31,4,h-36,'#b47e50');
+ pixel(x+w-15,y+31,4,h-36,'#9a704a');
+ pixel(x+15,y+33,w-30,3,'#fff0c7');
+ // Two evenly spaced windows; coordinates adapt to narrow or wide houses.
+ const winY=y+39,winW=Math.min(17,Math.floor((w-42)/2));
+ const windows=[x+14,x+w-14-winW];
+ for(const wx of windows){
+  pixel(wx-3,winY-3,winW+6,20,'#67452e');
+  pixel(wx,winY,winW,14,'#6faeb7');
+  pixel(wx+2,winY+2,Math.max(3,winW-4),10,'#c8eee0');
+  pixel(wx+Math.floor(winW/2)-1,winY,2,14,'#70482f');
+  pixel(wx,winY+6,winW,2,'#70482f');
+  pixel(wx-4,winY+16,winW+8,4,'#9a583b');
+  pixel(wx,winY+15,3,3,'#e7a2ad');pixel(wx+winW-4,winY+14,3,4,'#f1cf70');
+ }
+ // Centre door, wood grain, latch and porch steps remain aligned to collision data.
+ const dx=x+w/2-9,doorY=y+h-29;
+ pixel(dx-4,doorY-3,26,34,'#65422d');
+ pixel(dx,doorY,18,30,'#875735');
+ pixel(dx+2,doorY+2,6,26,'#a46e42');
+ pixel(dx+10,doorY+2,6,26,'#74472d');
+ pixel(dx+13,doorY+14,2,3,'#f1d179');
+ pixel(dx-7,doorY+29,32,5,'#c6ad7b');
+ // Separate roof plane, eaves, shingle rows and chimney.
+ pixel(x-5,y+24,w+10,10,c[2]);
+ pixel(x-3,y+15,w+6,13,c[1]);
+ pixel(x+2,y+8,w-4,12,c[0]);
+ pixel(x+8,y+2,w-16,10,c[0]);
+ pixel(x+17,y-3,w-34,7,c[0]);
+ for(let row=0;row<4;row++){
+  const yy=y+9+row*5;
+  for(let rx=x+5+(row%2)*7;rx<x+w-8;rx+=14){
+   pixel(rx,yy,8,2,row%2?c[1]:c[2]);
+   pixel(rx+3,yy+2,5,1,c[1]);
+  }
+ }
+ pixel(x+w/2-2,y,5,4,'#fff0b8');
+ pixel(x+w-22,y-12,9,16,'#895337');pixel(x+w-21,y-14,7,4,'#d9a16a');
+ pixel(x+7,y+27,3,h-31,'#765039');pixel(x+w-10,y+27,3,h-31,'#765039');
+ // Sign board on the facade for the inn, shop and craft buildings.
+ pixel(x+w/2-10,y+27,20,7,'#765039');
+ pixel(x+w/2-8,y+28,16,4,c[0]);
+};
+
+// Four hostile creatures now inhabit the wooded outskirts on the same
+// connected overworld as Windruh. Their roaming is fenced to their clearings.
+makeMonsters=function(){
+ monsters.length=0;
+ const add=(type,tx,ty,hp,behavior,phase)=>monsters.push({
+  type,zone:'windruh',x:tx*T,y:ty*T,hp,maxHp:hp,behavior,
+  phase,timer:1.2+monsters.length*.3,windup:0,dead:false,
+  homeX:tx*T,homeY:ty*T
+ });
+ add('wolf',42,12,8,'chase',.2);
+ add('moth',98,27,5,'ranged',1.4);
+ add('bramble',98,73,9,'windup',2.1);
+ add('thornling',104,49,7,'patrol',2.8);
+ monsters.push({type:'guardian',zone:'shrine',x:240,y:112,hp:40,maxHp:40,behavior:'boss',phase:0,timer:1,windup:0,dead:false});
+ bossState={hp:40,maxHp:40,phase:1,windup:0,attackCd:1.5,attackType:'Schallwelle',active:false};
+};
+const updateBeforeV7=update;
+update=function(dt,now){
+ updateBeforeV7(dt,now);
+ for(const m of monsters){
+  if(m.zone!=='windruh'||m.hp<=0||m.behavior==='boss')continue;
+  const radius=5*T;
+  m.x=clamp(m.x,m.homeX-radius,m.homeX+radius);
+  m.y=clamp(m.y,m.homeY-radius,m.homeY+radius);
+ }
+};
+
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
