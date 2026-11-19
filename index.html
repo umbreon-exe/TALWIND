@@ -62,9 +62,48 @@ body{display:grid;place-items:center;touch-action:none}
 #controlHint{position:absolute;left:145px;bottom:14px;z-index:2;color:#fff4d0;background:#274c38d9;border:2px solid #e4c27d;padding:6px 8px;font:10px ui-monospace,monospace;text-shadow:1px 1px #263626;pointer-events:none}
 #gamepadState{position:absolute;right:92px;bottom:18px;color:#fff0c9;font:9px ui-monospace,monospace;text-shadow:1px 1px #27392d;pointer-events:none}
 @media(max-width:650px){#controlHint{left:102px;bottom:8px;max-width:116px;font-size:8px;padding:4px}#gamepadState{right:68px;bottom:9px;font-size:8px}#menuButtons{top:101px}.menuBtn{min-width:99px;font-size:9px;padding:6px}}
+
+/* TALWIND VISUAL OVERHAUL – inspired by the bright village reference */
+:root{--ink:#f5e9cc;--paper:#17263a;--gold:#f0c36b;--wood:#68452e;--red:#d64f47;--green:#2d7049}
+#game{border:5px solid #3a2b23;box-shadow:0 0 0 3px #e7be65,0 10px 35px #081b1a}
+#world{image-rendering:pixelated}
+.plate{color:#fff2d3;background:linear-gradient(180deg,#263c59 0%,#14243a 100%);border:3px solid #d6a64d;box-shadow:inset 0 0 0 2px #5e7892,inset 0 -4px 0 #0c1728,3px 4px 0 #101a25;text-shadow:1px 1px #172438}
+.plate small{color:#b8c7d7}
+#hearts{color:#ff615e;text-shadow:1px 2px #7e252d;font-size:20px}
+#heroLabel{color:#ffe2a0}
+#levelLabel{color:#a8d9c1}
+#questLine{left:10px;top:88px;transform:none;max-width:265px;text-align:left;padding:8px 10px;font-size:11px;background:linear-gradient(180deg,#243c58,#12243b);border-color:#d9a64c;color:#fff1cf;white-space:normal}
+#menuButtons{left:10px;right:auto;top:145px;gap:6px}
+.menuBtn{font-family:ui-monospace,Consolas,monospace;color:#fff0d0;background:linear-gradient(180deg,#354e6a,#192b43);border:2px solid #d4a44d;box-shadow:inset 0 0 0 1px #71859a,2px 3px 0 #101b2b;border-radius:3px;font-size:10px;min-width:125px;padding:7px 9px;text-shadow:1px 1px #101b2b}
+.act{color:#fff0ce;background:linear-gradient(150deg,#3b5d7b,#182b46 80%);border:3px solid #d4a34c;box-shadow:inset 0 0 0 2px #7189a0,0 4px 0 #101b29;font-family:ui-monospace,Consolas,monospace}
+.act.purple{background:linear-gradient(150deg,#73599e,#30264d 80%)}.act.red{background:linear-gradient(150deg,#bd5b54,#602e38 80%)}
+.act b{color:#fff0c9;text-shadow:1px 2px #202b3c}
+.card,.panelCard{color:#f6e7c7;background:linear-gradient(145deg,#233b58,#101f34);border:5px solid #d6a64e;box-shadow:inset 0 0 0 3px #7188a0,0 9px #091725}
+.logo{color:#ffd779;text-shadow:2px 2px #fff0c5,4px 5px #70451f}
+.subtitle{color:#c9dceb}
+.intro{color:#e5dfca}
+.heroCard{color:#f7edcf;background:linear-gradient(180deg,#314b68,#172a43);border:2px solid #bd9652;box-shadow:inset 0 0 0 1px #6e829a}
+.heroCard.selected{background:linear-gradient(180deg,#725a31,#3b2d22);border:3px solid #ffdb73;box-shadow:0 0 0 2px #f1bd55,0 0 12px #f6d67899}
+.heroCard b{color:#ffe4a2}.heroCard small{color:#d2dbe0}
+.smallNote{color:#c2cfdb}
+#dialog{color:#fff0d1;background:linear-gradient(180deg,#243e5d,#12233a);border:4px solid #d3a14c;box-shadow:inset 0 0 0 2px #758aa0,4px 5px #0a1724}
+#dialog strong{color:#ffd77d}#dialog p{color:#fff0d1}
+.uiButton{color:#fff0d1;background:linear-gradient(180deg,#bd6c42,#743c34);border:2px solid #f1c76d;box-shadow:inset 0 0 0 1px #f7dfa3,0 3px #321f1a}
+#toast{color:#fff1cf;background:#1c3551;border:3px solid #e2b453;box-shadow:0 4px #0b1827}
+#panel h2{color:#ffdc8b}
+#panel p{color:#f4e8ce}
+#controlHint{background:#172b43e8;border:2px solid #d6a64e;color:#fff0d0}
+#gamepadState{color:#fff0d0}
+@media(max-width:650px){
+ #questLine{left:5px;top:61px;max-width:45%;font-size:9px}
+ #menuButtons{left:5px;top:112px}
+ .menuBtn{min-width:94px;font-size:8px;padding:5px}
+ .heroCard canvas{width:43px;height:57px}
+}
+
 </style></head>
 <body><main id="game">
-<canvas id="world" width="480" height="270" aria-label="TALWIND-Spielwelt"></canvas>
+<canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
 <div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
 <div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
 <div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button></div>
@@ -77,7 +116,7 @@ body{display:grid;place-items:center;touch-action:none}
 <script>
 (()=>{'use strict';
 const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
-const VW=480,VH=270,T=16,MAP_W=64,MAP_H=42;
+const VW=720,VH=405,T=16,MAP_W=64,MAP_H=42;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const heroes=[
 {name:'LYRA',role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
@@ -1089,6 +1128,340 @@ document.getElementById('continueBtn').onclick=()=>{
  }else showToast('Kein Spielstand gefunden');
 };
 
+
+/* ===== TALWIND ART PASS 2: lush, detailed village + matching fantasy HUD ===== */
+function artPoly(points,fill,stroke){
+ ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);
+ for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);
+ ctx.closePath();ctx.fillStyle=fill;ctx.fill();
+ if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}
+}
+function artFlower(x,y,color,now){
+ const bob=Math.sin(now/330+x*.07)*.6;
+ pixel(x+6,y+8+bob,2,6,'#347847');pixel(x+4,y+12+bob,5,2,'#4a9a4c');
+ pixel(x+5,y+4+bob,3,3,color);pixel(x+2,y+6+bob,3,3,color);
+ pixel(x+8,y+6+bob,3,3,color);pixel(x+5,y+8+bob,3,3,'#ffdf79');
+}
+drawTile=function(tx,ty,id,now){
+ const x=tx*T-camera.x,y=ty*T-camera.y,seed=(tx*92821+ty*68917+tx*ty*17)>>>0;
+ const n=seed%7;
+ if(id===0||id===5){
+  const base=id===5?'#39764a':'#68b75b';
+  pixel(x,y,16,16,base);pixel(x+1,y+1,14,14,id===5?'#478953':'#70bd61');
+  pixel(x+(seed%11),y+((seed>>>4)%11),2,2,id===5?'#75b36b':'#91d875');
+  if(n===0){pixel(x+3,y+5,2,5,'#92cf70');pixel(x+7,y+4,2,6,'#4b9b4e');pixel(x+10,y+9,3,2,'#80c866')}
+  if(n===1){pixel(x+2,y+11,2,2,'#f1d57d');pixel(x+6,y+12,2,2,'#e9a9c2')}
+  if(n===2){pixel(x+11,y+3,3,2,'#f4e6b4');pixel(x+12,y+7,2,3,'#59a65a')}
+  pixel(x+(seed%13),y+14,2,1,id===5?'#2e6942':'#4a984a');
+ }else if(id===1||id===3){
+  const plaza=id===3;
+  pixel(x,y,16,16,plaza?'#d8d1b9':'#d9c99f');
+  pixel(x,y,16,1,plaza?'#f7ebcd':'#f4e5bc');
+  pixel(x,y+15,16,1,plaza?'#aaa58e':'#b39e75');
+  const stones=plaza?[[1,2,6,4],[8,2,7,4],[3,8,5,5],[9,8,6,5]]:[[1,2,5,4],[7,2,7,4],[2,8,6,5],[9,8,6,5]];
+  for(let i=0;i<stones.length;i++){const a=stones[i];pixel(x+a[0],y+a[1],a[2],a[3],plaza?(i%2?'#e9e2cb':'#c9c3ad'):(i%2?'#e9dbb7':'#cbb98e'));pixel(x+a[0],y+a[1]+a[3]-1,a[2],1,plaza?'#b2ac98':'#b3a17c')}
+  pixel(x+((seed>>>2)%12),y+6,2,1,'#fff1cd');
+  if(n===0)pixel(x+12,y+12,2,1,'#a99d7e');
+ }else if(id===2){
+  pixel(x,y,16,16,'#1684c4');pixel(x+1,y+1,14,14,'#258fd0');
+  const wave=Math.floor(now/210+tx*3+ty*2)%11;
+  pixel(x+wave,y+3,5,1,'#9be9f1');pixel(x+((wave+6)%12),y+9,4,1,'#6bd1ed');
+  pixel(x+3,y+6,2,1,'#d2f7f0');pixel(x+10,y+13,3,1,'#62c2e3');
+  if(n===0)pixel(x+5,y+11,4,1,'#b3eefa');
+ }else if(id===4){
+  pixel(x,y,16,16,'#baa77b');pixel(x+1,y+1,14,14,'#c9b487');
+  pixel(x+2,y+4,5,2,'#7da65a');pixel(x+9,y+11,5,2,'#82985b');
+  pixel(x+5,y+7,3,2,'#9b8a6c');pixel(x+10,y+3,3,2,'#e2ce9e');
+ }else if(id===6){
+  pixel(x,y,16,16,'#74796d');pixel(x+1,y+1,14,14,'#969587');
+  pixel(x+2,y+2,5,5,'#aaa895');pixel(x+9,y+2,5,5,'#858577');
+  pixel(x+2,y+9,5,5,'#898a7d');pixel(x+9,y+9,5,5,'#aaa690');
+  pixel(x+7,y+1,1,14,'#6f7469');pixel(x+1,y+7,14,1,'#6f7469');
+ }else if(id===7){
+  pixel(x,y,16,16,'#5e8b46');pixel(x+1,y+1,14,14,'#916740');pixel(x+2,y+2,12,11,'#b98751');
+  pixel(x+3,y+3,10,2,'#d1a46a');pixel(x+3,y+11,10,2,'#70472e');
+ }
+};
+drawTree=function(x,y,pine=false,apple=false){
+ const sx=Math.round(x-camera.x),sy=Math.round(y-camera.y);
+ pixel(sx+5,sy+31,27,7,'#2e633b');pixel(sx+14,sy+24,9,15,'#765034');pixel(sx+12,sy+34,13,3,'#593d2e');
+ if(pine){
+  pixel(sx+11,sy+3,16,13,'#24683f');pixel(sx+6,sy+12,26,12,'#2c7c46');pixel(sx+10,sy+21,18,12,'#1d603a');
+  pixel(sx+15,sy+4,8,5,'#5ab45c');pixel(sx+8,sy+13,8,5,'#4b9b50');pixel(sx+25,sy+16,6,5,'#3e914a');
+ }else{
+  pixel(sx+4,sy+13,31,20,'#225f3b');pixel(sx+7,sy+6,26,22,'#2d7a45');pixel(sx+12,sy+1,18,19,'#3b914e');
+  pixel(sx+3,sy+17,12,13,'#32854a');pixel(sx+24,sy+14,13,14,'#277044');
+  pixel(sx+12,sy+5,8,6,'#7cc96c');pixel(sx+23,sy+8,7,5,'#69bd5e');pixel(sx+7,sy+19,7,5,'#58ab57');
+  pixel(sx+17,sy+23,5,4,'#4a994e');pixel(sx+28,sy+19,5,4,'#4a994e');
+ }
+ if(apple){pixel(sx+9,sy+16,4,4,'#d94c3f');pixel(sx+27,sy+20,4,4,'#e4573f');pixel(sx+19,sy+8,4,4,'#d94c3f');pixel(sx+11,sy+15,2,1,'#f7d17a')}
+};
+drawProp=function(o){
+ const x=Math.round(o.x-camera.x),y=Math.round(o.y-camera.y),now=performance.now();
+ if(o.type==='tree'||o.type==='pine'||o.type==='appleTree'){drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree');return}
+ if(o.type==='flower'||o.type==='mushroom'){artFlower(x+1,y+1,o.type==='mushroom'?'#d87f64':['#f4e8ba','#e6a5c5','#a9b5e9'][Math.abs(Math.floor(x/7))%3],now);return}
+ if(o.type==='tuft'){pixel(x+3,y+11,2,5,'#3b8a48');pixel(x+7,y+7,2,8,'#9bd46d');pixel(x+11,y+10,2,5,'#4a9a4b');return}
+ if(o.type==='bush'){pixel(x+1,y+8,17,9,'#255f3c');pixel(x+3,y+4,13,9,'#34874a');pixel(x+6,y+2,8,7,'#4b9e54');pixel(x+5,y+5,4,3,'#8dce69');pixel(x+13,y+8,3,3,'#70bb5d');return}
+ if(o.type==='flowerBed'||o.type==='crop'){
+  pixel(x,y+11,18,6,'#765036');pixel(x+1,y+9,16,3,'#bb8b50');pixel(x+2,y+8,14,2,'#5c9948');
+  for(let i=0;i<4;i++){pixel(x+2+i*4,y+3+(i%2)*2,3,7,o.type==='crop'?'#36864a':['#f4e7bd','#e8a4c5','#a8b7e9','#efc86b'][i]);pixel(x+2+i*4,y+2+(i%2)*2,3,3,o.type==='crop'?'#67b45d':['#fff3d0','#f5d0e1','#e1ddff','#fff0a9'][i])}return;
+ }
+ if(o.type==='fence'){
+  pixel(x,y+5,18,4,'#8a5934');pixel(x,y+12,18,4,'#9a683d');
+  for(const xx of [1,13]){pixel(x+xx,y+1,4,16,'#70452d');pixel(x+xx,y+1,4,2,'#d2a06a')}
+  pixel(x+1,y+5,16,1,'#d3a36c');return;
+ }
+ if(o.type==='bench'){pixel(x+2,y+7,20,5,'#7a4c2e');pixel(x+3,y+5,18,3,'#d09a57');pixel(x+5,y+12,3,6,'#61412e');pixel(x+17,y+12,3,6,'#61412e');pixel(x+5,y+6,13,1,'#f1c579');return}
+ if(o.type==='lamp'||o.type==='torch'){
+  pixel(x+8,y+9,4,18,'#5d402b');pixel(x+5,y+6,10,6,'#273f51');pixel(x+7,y+3,6,8,'#e8bd64');pixel(x+8,y+4,4,5,'#fff2a8');pixel(x+6,y+2,8,2,'#e9d8a5');
+  ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#ffe28a';ctx.beginPath();ctx.arc(x+10,y+8,15,0,Math.PI*2);ctx.fill();ctx.restore();return;
+ }
+ if(o.type==='sign'){pixel(x+8,y+9,3,12,'#70452d');pixel(x+1,y+1,18,10,'#67452d');pixel(x+3,y+3,14,6,'#e7c27b');pixel(x+5,y+4,10,1,'#fff0c4');return}
+ if(o.type==='barrel'){pixel(x+3,y+3,13,17,'#83502f');pixel(x+5,y+4,9,15,'#b87d43');pixel(x+3,y+6,13,2,'#d0a06a');pixel(x+3,y+14,13,2,'#6c452d');pixel(x+5,y+5,2,12,'#d7a66c');return}
+ if(o.type==='stall'){
+  pixel(x+2,y+12,24,14,'#70472e');pixel(x+4,y+15,20,9,'#bd8747');pixel(x,y+5,28,8,'#f4e5c3');
+  for(let i=0;i<4;i++)pixel(x+i*7,y+5,4,8,i%2?'#d74f45':'#f8edcf');
+  pixel(x+1,y+4,27,2,'#70452d');pixel(x+5,y+18,18,2,'#e6bd70');return;
+ }
+ if(o.type==='well'){
+  pixel(x+1,y+12,28,17,'#777b78');pixel(x+4,y+9,22,17,'#c3c2ae');pixel(x+7,y+13,16,10,'#258fc7');pixel(x+6,y+13,14,2,'#78d8ed');
+  pixel(x+5,y+2,3,12,'#815331');pixel(x+23,y+2,3,12,'#815331');pixel(x+4,y+1,25,3,'#98623a');pixel(x+14,y+4,3,4,'#c7a36b');return;
+ }
+ if(o.type==='fountain'){
+  // Broad stone basin, sparkling blue water and a sculpted central jet.
+  pixel(x-3,y+19,52,25,'#64746e');pixel(x,y+14,47,28,'#a5a99a');pixel(x+3,y+16,41,23,'#d1ceb7');pixel(x+6,y+19,35,16,'#238dc7');
+  pixel(x+8,y+20,31,2,'#8be0ee');pixel(x+12,y+29,23,2,'#5ec8e6');pixel(x+20,y+21,7,12,'#d3d2c5');pixel(x+18,y+17,11,5,'#eee5cd');
+  pixel(x+22,y+10,4,14,'#d4d4c8');pixel(x+18,y+13,12,4,'#eae1cd');pixel(x+23,y+4,3,8,'#9de8ee');
+  pixel(x+21,y+2,7,5,'#fff4c3');pixel(x+22,y+1,5,2,'#d5faff');
+  const pulse=Math.floor(now/180)%5;pixel(x+10+pulse*4,y+24,3,1,'#d4fbf3');pixel(x+30-pulse*3,y+33,3,1,'#b4eef0');
+  return;
+ }
+ if(o.type==='bridge'){
+  pixel(x-2,y+4,54,22,'#66452e');pixel(x,y+1,50,22,'#9b663b');pixel(x+2,y+3,46,17,'#c18b50');
+  for(let i=0;i<6;i++){pixel(x+3+i*7,y+4,2,15,'#85522f');pixel(x+4+i*7,y+4,1,15,'#e0b06d')}
+  pixel(x-1,y+1,52,4,'#e5bd7c');pixel(x-1,y+19,52,4,'#70482e');
+  pixel(x+2,y-3,3,7,'#75492e');pixel(x+43,y-3,3,7,'#75492e');pixel(x+1,y-3,47,3,'#8d5c35');return;
+ }
+ if(o.type==='campfire'){pixel(x+2,y+12,19,5,'#65412a');pixel(x+7,y+7,11,8,'#dc7040');pixel(x+10,y+3,6,10,'#ffd56f');pixel(x+12,y+1,2,6,'#fff1a8');return}
+ if(o.type==='shrine'){pixel(x+2,y+28,52,12,'#6f695c');pixel(x+7,y+6,42,25,'#b9ad91');pixel(x+4,y+5,48,7,'#5c4b3e');pixel(x+12,y+12,7,18,'#775c43');pixel(x+36,y+12,7,18,'#775c43');pixel(x+22,y+13,12,17,'#243a3c');pixel(x+25,y+16,6,7,'#c4e6cf');return}
+ if(o.type==='crystal'){pixel(x+7,y+7,10,16,'#3b94ac');pixel(x+10,y+1,6,18,'#8de2e7');pixel(x+11,y-1,4,8,'#effff0');pixel(x+4,y+11,4,7,'#5fc2d3');return}
+ if(o.type==='altar'){pixel(x+2,y+10,34,21,'#76786e');pixel(x+5,y+7,28,7,'#c2b99e');pixel(x+12,y+4,14,5,'#f1dca2');pixel(x+16,y-2,7,9,'#fff1b9');return}
+};
+drawBuilding=function(b){
+ const x=Math.round(b.x-camera.x),y=Math.round(b.y-camera.y),w=b.w,h=b.h,mid=x+w/2;
+ const themes={
+  teal:['#36aaa6','#25827e','#14565b','#e8d4ac'],red:['#d95748','#a93839','#702d36','#f0d5aa'],
+  ochre:['#edbd55','#c4863e','#80502f','#f0d9ad'],violet:['#aa83c8','#76509a','#48365f','#efdab5'],
+  blue:['#5c9fc2','#36708f','#244c65','#ecd9b5'],slate:['#98aaa7','#617d7d','#3b555b','#e4d5b8'],
+  green:['#88bd58','#548b43','#315b39','#ead7ae'],orange:['#ee984f','#c45f3a','#783d32','#f0d6a8'],
+  cream:['#d8c7a0','#ac8d63','#6a503b','#f0dfbd']
+ };
+ const c=themes[b.style]||themes.red;
+ // soft garden shadow, stone foundation and timber-framed plaster facade
+ ctx.fillStyle='#315a3c';ctx.globalAlpha=.28;ctx.beginPath();ctx.ellipse(x+w/2,y+h+3,w*.58,10,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+ pixel(x+4,y+h-7,w-8,11,'#725239');pixel(x+7,y+h-9,w-14,5,'#d5b984');
+ pixel(x+7,y+27,w-14,h-31,c[3]);pixel(x+10,y+30,w-20,h-34,'#f5e3be');
+ pixel(x+7,y+27,5,h-29,'#775034');pixel(x+w-12,y+27,5,h-29,'#775034');
+ pixel(x+12,y+32,3,h-39,'#ad7848');pixel(x+w-15,y+32,3,h-39,'#ad7848');
+ // roof silhouette and two shaded roof planes
+ artPoly([[x-7,y+25],[mid,y-10],[x+w+7,y+25],[x+w+2,y+45],[mid,y+27],[x-2,y+45]],c[2],'#493329');
+ artPoly([[x-3,y+24],[mid,y-7],[mid,y+25],[x,y+39]],c[0],'#493329');
+ artPoly([[mid,y-7],[x+w+3,y+24],[x+w,y+39],[mid,y+25]],c[1],'#493329');
+ // roof rows, tile seams and highlights
+ for(let r=0;r<5;r++){
+  const yy=y+1+r*5, inset=5+r*2;
+  pixel(x+inset,yy,w/2-inset,2,r%2?'#55c1b5':c[0]);
+  pixel(mid+2,yy,w/2-inset-2,2,r%2?c[0]:'#e17a63');
+  for(let k=0;k<Math.floor(w/24);k++){pixel(x+10+k*22+(r%2?4:0),yy+2,5,2,c[2]);pixel(mid+9+k*22,yy+2,5,2,c[2])}
+ }
+ pixel(x-3,y+24,w+6,4,c[2]);pixel(x-2,y+27,w+4,2,'#e3b76b');
+ // chimney, roof ridge and small dormer
+ pixel(x+w-22,y-8,12,21,'#754b36');pixel(x+w-21,y-9,10,4,'#d9a56e');
+ pixel(mid-2,y-8,4,34,'#e6c17b');pixel(mid-1,y-6,2,27,'#fff0ba');
+ // framed windows with panes, reflection, sills and flower boxes
+ const wy=y+48,winW=18;
+ for(const wx of [x+13,x+w-31]){
+  pixel(wx-3,wy-3,winW+6,winW+7,'#5c3d2c');pixel(wx,wy,winW,winW,'#3b6570');
+  pixel(wx+2,wy+2,winW-4,winW-4,'#72c0cf');pixel(wx+4,wy+3,5,5,'#b9e9df');pixel(wx+11,wy+3,4,5,'#8dd5d8');
+  pixel(wx+8,wy,2,winW,'#6f4a31');pixel(wx,wy+8,winW,2,'#6f4a31');
+  pixel(wx-4,wy+16,winW+8,4,'#8b4f35');pixel(wx-2,wy+14,winW+4,2,'#e5b77c');
+  pixel(wx+1,wy+14,4,3,'#ef9fb3');pixel(wx+8,wy+13,4,4,'#f1d16f');pixel(wx+14,wy+14,3,3,'#fff0cf');
+ }
+ // arched wooden front door, stone step, handle and sign
+ const dx=Math.round(mid-10),dy=y+h-35;
+ pixel(dx-4,dy-3,28,39,'#543628');pixel(dx,dy,20,35,'#a56d3d');pixel(dx+3,dy+3,14,29,'#855332');
+ pixel(dx+4,dy+4,12,4,'#c18a4d');pixel(dx+14,dy+17,2,3,'#f5d477');
+ pixel(dx-7,y+h-3,34,6,'#c3b18e');pixel(dx-5,y+h-5,30,3,'#e7d9b7');
+ pixel(mid-12,y+31,24,7,'#70452e');pixel(mid-9,y+33,18,3,c[0]);pixel(mid-3,y+35,6,1,'#fff0bd');
+};
+drawPerson=function(n,x,y,now){
+ const bx=Math.round(x-camera.x),by=Math.round(y-camera.y+Math.sin(now/250+(n.phase||0))*.7);
+ const skin='#efc49d',hair=paletteColor(n.hair),coat=paletteColor(n.color);
+ const dark='#594331',step=Math.sin(now/95+(n.phase||0))>0?2:0;
+ pixel(bx+3,by+29,21,4,'#315b3c');
+ pixel(bx+7,by+23+step,5,8,dark);pixel(bx+15,by+23+(2-step),5,8,dark);
+ pixel(bx+6,by+29+step,7,3,'#d7bd8c');pixel(bx+14,by+29+(2-step),7,3,'#d7bd8c');
+ pixel(bx+4,by+13,19,14,'#416c55');pixel(bx+6,by+12,15,15,coat);
+ pixel(bx+7,by+14,13,3,'#f1d79b');pixel(bx+10,by+20,8,2,'#795134');pixel(bx+2,by+16,4,9,coat);pixel(bx+21,by+16,4,9,coat);
+ pixel(bx+2,by+23,4,4,skin);pixel(bx+21,by+23,4,4,skin);
+ pixel(bx+10,by+9,7,6,'#d99f7b');pixel(bx+6,by+2,15,13,skin);pixel(bx+4,by+6,3,5,'#d99f7b');pixel(bx+20,by+6,3,5,'#d99f7b');
+ pixel(bx+8,by+7,2,2,'#362d29');pixel(bx+17,by+7,2,2,'#362d29');pixel(bx+6,by+1,15,5,hair);pixel(bx+4,by+4,4,7,hair);pixel(bx+19,by+4,4,7,hair);
+ if(n.kind==='innkeeper'){pixel(bx+3,by-3,19,4,'#b64a42');pixel(bx+7,by-6,12,4,'#fff0d2')}
+ if(n.kind==='merchant'){pixel(bx+3,by-4,20,5,'#478b51');pixel(bx+7,by-7,12,4,'#e4bc70')}
+ if(n.kind==='librarian'){pixel(bx+4,by-3,18,4,'#557fa2');pixel(bx+8,by-6,10,4,'#e9ddbd')}
+ if(n.kind==='elder'){pixel(bx+5,by+2,16,4,'#e7e5dc');pixel(bx+5,by+9,3,9,'#d8d8d0')}
+ if(n.kind==='fisher'){pixel(bx+2,by+1,21,4,'#5d879d');pixel(bx+19,by+1,4,9,'#e3bd78')}
+ if(n.kind==='baker'){pixel(bx+4,by-4,18,5,'#fff0d9');pixel(bx+8,by-7,10,4,'#fff9e9')}
+};
+drawHero=function(x,y,now){
+ const h=heroes[selected],t=heroAnimTime||0,frame=Math.floor(player.walk*1.8)%4,bob=Math.sin(t*8)*.6+(player.walk>.1?Math.sin(t*16)*.8:0);
+ const px=Math.round(x),py=Math.round(y+bob),skin='#f0c39c',dark='#47372e';
+ pixel(px+1,py+31,25,5,'#2f5a3a');
+ // legs, animated alternate steps
+ pixel(px+6,py+25+(frame%2?2:0),6,8,dark);pixel(px+16,py+25+(frame%2?0:2),6,8,dark);
+ pixel(px+5,py+31+(frame%2?2:0),7,3,'#d9bd8b');pixel(px+16,py+31+(frame%2?0:2),7,3,'#d9bd8b');
+ if(selected===0){ // Lyra, ribbons and teal wind jacket
+  pixel(px+3,py+12,21,16,'#1e756f');pixel(px+6,py+13,15,13,'#4db6a5');pixel(px+3,py+15,4,12,'#4db6a5');pixel(px+20,py+15,4,12,'#4db6a5');
+  pixel(px+1,py+7,3,22,'#e4f8ec');pixel(px+23,py+7,3,22,'#b7e8eb');pixel(px+2,py+26,2,8,'#d5eff1');pixel(px+24,py+26,2,8,'#d5eff1');
+  pixel(px+11,py+19,7,2,'#f0d88f');pixel(px+7,py+4,15,12,skin);pixel(px+6,py,17,5,'#d7a05d');pixel(px+5,py+5,4,13,'#d7a05d');pixel(px+21,py+5,3,13,'#d7a05d');pixel(px+12,py-3,8,3,'#f4dc9a');
+ }else if(selected===1){ // Bram, broad stone armour and shield
+  pixel(px+1,py+11,27,18,'#655a49');pixel(px+3,py+12,23,15,'#a79b79');pixel(px+4,py+13,7,12,'#d1c9a9');pixel(px+18,py+13,6,12,'#d1c9a9');
+  pixel(px+23,py+12,10,20,'#6b7b7c');pixel(px+25,py+15,7,13,'#d6d9cb');pixel(px+26,py+18,4,8,'#8e9e9b');
+  pixel(px+7,py+3,17,12,skin);pixel(px+5,py-1,20,8,'#654b39');pixel(px+7,py+1,16,4,'#b8b28e');pixel(px+5,py+7,20,3,'#6b5138');
+  pixel(px+11,py+19,9,3,'#ded2ac');
+ }else if(selected===2){ // Kael, forest hood, bow and quiver
+  pixel(px+4,py+12,21,16,'#275e3c');pixel(px+6,py+13,17,13,'#5b984f');pixel(px+2,py+15,5,11,'#376e45');
+  pixel(px+1,py+8,4,24,'#805532');pixel(px+2,py+6,3,5,'#e6d2a1');pixel(px+22,py+10,7,21,'#a47b49');pixel(px+24,py+12,3,17,'#e2c88e');
+  pixel(px+7,py+4,16,12,skin);pixel(px+4,py,21,9,'#276441');pixel(px+7,py-3,17,5,'#45874b');pixel(px+6,py+7,16,3,'#1d4e34');
+ }else if(selected===3){ // Nima, broad amethyst robe and crystal staff
+  pixel(px+1,py+12,27,18,'#5b407e');pixel(px+4,py+13,21,15,'#9b79bf');pixel(px+2,py+18,5,10,'#bda0db');pixel(px+22,py+18,5,10,'#bda0db');
+  pixel(px+9,py+20,12,3,'#d8c1f3');pixel(px+7,py+4,16,12,skin);pixel(px+4,py,22,8,'#493455');pixel(px+8,py-4,16,7,'#75509c');pixel(px+9,py+6,12,3,'#493455');
+  pixel(px+26,py+4,3,30,'#b9a3dc');pixel(px+24,py+1,7,7,'#9de7eb');pixel(px+25,py,5,4,'#fff4d0');
+ }else{ // Rook, midnight hood, face scarf and paired blades
+  pixel(px+4,py+12,21,16,'#263e59');pixel(px+6,py+13,17,13,'#4b657f');pixel(px+3,py+17,4,9,'#263e59');pixel(px+22,py+17,4,9,'#263e59');
+  pixel(px+1,py+14,3,18,'#d4e7e7');pixel(px+24,py+14,3,18,'#a8c4d3');pixel(px+2,py+11,4,5,'#c0d9df');pixel(px+23,py+11,4,5,'#c0d9df');
+  pixel(px+7,py+4,16,12,skin);pixel(px+4,py,22,10,'#303c4b');pixel(px+6,py+7,18,4,'#423d47');pixel(px+9,py+9,3,2,'#f6f1df');pixel(px+17,py+9,3,2,'#f6f1df');
+ }
+ // shared face details and belt
+ pixel(px+10,py+9,2,2,'#332c2b');pixel(px+18,py+9,2,2,'#332c2b');
+ if(player.inv>0&&Math.floor(t*18)%2===0){ctx.save();ctx.globalAlpha=.25;ctx.fillStyle='#fff';ctx.fillRect(px,py,31,37);ctx.restore()}
+};
+drawRoom=function(){
+ const kind=roomNPC?roomNPC.kind:'home';
+ pixel(0,0,VW,VH,'#4d382b');
+ for(let y=0;y<VH;y+=24)for(let x=0;x<VW;x+=24){pixel(x,y,24,24,((x/24+y/24)%2)?'#bd9766':'#cba675');pixel(x,y+23,24,1,'#9b714c')}
+ pixel(18,15,VW-36,8,'#69452d');pixel(18,15,8,VH-30,'#69452d');pixel(VW-26,15,8,VH-30,'#69452d');
+ pixel(40,40,VW-80,VH-90,'#ead8b3');pixel(44,44,VW-88,4,'#a77c4d');
+ // rear windows, warm wall trim and wall lamps
+ for(const wx of [90,VW-190]){pixel(wx-5,56,68,76,'#6d482f');pixel(wx,61,58,65,'#64a5ad');pixel(wx+5,66,23,54,'#c4eee1');pixel(wx+31,66,22,54,'#9dd7d6');pixel(wx+27,61,4,65,'#704b31');pixel(wx+27,51,4,10,'#e5c47f')}
+ // themed furniture
+ if(kind==='inn'||kind==='bakery'){
+  pixel(95,172,530,65,'#69452d');pixel(105,178,510,15,'#c18a4c');pixel(111,196,498,31,'#946039');
+  for(let x=125;x<620;x+=65){pixel(x,181,43,6,'#f3daa0');pixel(x+8,194,27,20,'#d1aa70')}
+  pixel(115,280,120,62,'#805336');pixel(125,270,100,13,'#c99b5c');pixel(470,280,120,62,'#805336');pixel(480,270,100,13,'#c99b5c');
+ }else if(kind==='shop'){
+  for(const x of [70,565]){pixel(x,145,92,190,'#775035');pixel(x+8,154,76,15,'#d3a05e');for(let y=184;y<320;y+=42){pixel(x+9,y,74,8,'#c18d54');for(let j=0;j<5;j++)pixel(x+13+j*13,y-23,9,23,['#b34f43','#4f7d9b','#668d50','#9b6eae','#b68b48'][j])}}
+  pixel(260,91,190,74,'#b34b40');pixel(270,101,170,53,'#e2c07d');
+ }else if(kind==='library'){
+  for(let x=95;x<630;x+=108){pixel(x,130,76,215,'#795034');for(let y=149;y<325;y+=38){pixel(x+7,y,62,9,'#c18d54');for(let j=0;j<5;j++)pixel(x+10+j*11,y-22,8,22,['#b34f43','#4f7d9b','#668d50','#9b6eae','#b68b48'][j])}}
+ }else if(kind==='smith'){
+  pixel(65,145,180,205,'#75523c');pixel(74,155,162,184,'#a8774d');pixel(500,135,150,185,'#76553e');pixel(205,280,310,62,'#805b40');pixel(220,268,280,12,'#a5aca9');pixel(275,230,165,32,'#6b5140');pixel(300,220,85,18,'#f1a44d');
+ }else if(kind==='tailor'){
+  pixel(65,140,170,218,'#8e6848');pixel(75,150,150,16,'#dbb67b');pixel(490,140,170,210,'#82543e');pixel(500,150,150,16,'#d1a36b');pixel(260,94,200,54,'#85629d');pixel(270,103,180,35,'#d5b9e9');
+ }else if(kind==='garden'){
+  pixel(70,150,580,200,'#c4aa7c');for(let i=0;i<13;i++){pixel(85+i*42,205+(i%2)*45,31,25,'#6b9a4a');pixel(92+i*42,194+(i%2)*45,8,14,'#e99ec4');pixel(104+i*42,194+(i%2)*45,7,14,'#fff0c1')}
+ }else{
+  pixel(70,145,180,205,'#80583a');pixel(80,155,160,18,'#d5a96b');pixel(500,140,165,210,'#80583a');pixel(510,152,145,18,'#d5a96b');
+ }
+ // rug and exit door at the bottom
+ pixel(240,330,240,54,'#8a4c39');pixel(250,336,220,42,'#dab57a');pixel(263,344,194,6,'#b77d48');
+ pixel(VW/2-57,8,114,27,'#62442f');pixel(VW/2-51,12,102,17,'#e8c98b');
+ const resident=world.npcs.find(n=>roomNPC&&n.id===roomNPC.npc);
+ if(resident)drawPerson(resident,VW/2-12,160,performance.now());
+ drawHero(player.x,player.y,performance.now());
+ ctx.fillStyle='#fff0cd';ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,30);
+ ctx.fillStyle='#fff0cc';ctx.fillText('E · Hinausgehen',VW/2,VH-12);ctx.textAlign='left';
+};
+drawShrine=function(){
+ pixel(0,0,VW,VH,'#253a38');
+ for(let y=0;y<VH;y+=24)for(let x=0;x<VW;x+=24){pixel(x,y,24,24,((x/24+y/24)%2)?'#74796f':'#666e67');pixel(x+2,y+2,20,20,'#929184');pixel(x+1,y+22,22,2,'#5c625d')}
+ pixel(50,38,VW-100,VH-74,'#b4a98e');pixel(56,44,VW-112,VH-86,'#d0c2a1');
+ for(let x=76;x<VW-70;x+=42){pixel(x,50,3,VH-105,'#827760');pixel(x+4,50,1,VH-105,'#e1d2ad')}
+ for(let x of [100,VW-145]){pixel(x,76,40,70,'#594535');pixel(x+5,81,30,57,'#d28b44');pixel(x+12,89,16,37,'#ffcf69')}
+ pixel(250,220,220,110,'#6b6351');pixel(270,204,180,25,'#c8b995');pixel(300,186,120,28,'#e2d5b6');
+ pixel(345,116,30,100,'#79cdd5');pixel(328,136,64,16,'#d7f4e8');pixel(357,94,9,52,'#eff8d8');
+ artPoly([[318,221],[402,221],[430,285],[290,285]],'#67766b','#343d3a');
+ const guardian=monsters.find(m=>m.zone==='shrine'&&m.hp>0);if(guardian)drawMonster(guardian,performance.now());
+ drawHero(player.x-camera.x,player.y-camera.y,performance.now());
+ if(main.stage===4){pixel(240,60,240,13,'#28313a');pixel(244,63,232,7,'#8e433d');pixel(244,63,232*(bossState.hp/40),7,'#e96354');ctx.fillStyle='#fff1d0';ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText('ECHO-WÄCHTER '+bossState.hp+'/40',VW/2,51)}
+ if(player.y>VH-95){ctx.fillStyle='#fff0c9';ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText('E · Zurück in den Wald',VW/2,VH-18);ctx.textAlign='left'}
+};
+function applyArtTown(w){
+ if(w.id!=='windruh')return w;
+ const set=(x,y,v)=>{if(x>=0&&y>=0&&x<w.width&&y<w.height)w.tiles[y*w.width+x]=v};
+ // Move the fountain plaza to the visible centre-left, while keeping the river in frame.
+ for(let y=12;y<=31;y++)for(let x=25;x<=41;x++)if(w.tiles[y*w.width+x]===3)set(x,y,0);
+ for(let y=17;y<=23;y++)for(let x=5;x<w.width;x++)set(x,y,1);
+ for(let y=14;y<=28;y++)for(let x=21;x<=31;x++)set(x,y,3);
+ for(let y=10;y<=35;y++)for(let x=23;x<=27;x++)set(x,y,3);
+ // Walkways to the houses and the market quarter.
+ for(const x of [13,22,34,45])for(let y=10;y<=18;y++)set(x,y,1);
+ for(const x of [12,20,35,42])for(let y=24;y<=34;y++)set(x,y,1);
+ // Lower house roofs, so the whole roofline appears in the first camera view.
+ for(const b of w.buildings){if(b.y<180){b.y+=32;b.doorY+=32}}
+ const fountain=w.decor.find(o=>o.type==='fountain');if(fountain){fountain.x=24*T-8;fountain.y=18*T-2;fountain.solid=true}
+ const mira=w.npcs.find(n=>n.id==='mira');if(mira){mira.x=27*T+8;mira.homeX=mira.x;mira.y=24*T+8;mira.homeY=mira.y}
+ // Add a lush orchard, flower borders, hanging lanterns and small market details.
+ const add=(type,tx,ty,solid=false)=>w.decor.push({type,x:tx*T,y:ty*T,solid});
+ add('tree',8,10,true);add('tree',17,11,true);add('tree',37,9,true);add('tree',40,27,true);add('pine',4,28,true);
+ add('appleTree',40,13,true);add('appleTree',43,13,true);add('appleTree',45,15,true);
+ add('flowerBed',19,14);add('flowerBed',30,14);add('flowerBed',19,26);add('flowerBed',30,26);
+ add('flowerBed',38,25);add('crop',40,23);add('crop',43,23);
+ add('fence',39,12);add('fence',41,12);add('fence',43,12);add('fence',45,12);
+ add('fence',39,18);add('fence',41,18);add('fence',43,18);add('fence',45,18);
+ add('stall',16,23);add('stall',34,14);add('bench',30,27);add('bench',17,26);
+ add('lamp',20,16);add('lamp',33,24);add('lamp',39,22);add('sign',15,23);add('barrel',36,25);
+ add('bush',18,13);add('bush',32,13);add('bush',37,26);add('bush',21,29);add('bush',31,29);
+ for(let i=0;i<28;i++){const tx=8+(i*7)%38,ty=9+(i*11)%22;if((tx<18||tx>34||ty<16||ty>24)&&tx!==24&&tx!==25) add(i%5===0?'mushroom':'flower',tx,ty)}
+ return w;
+}
+const artOriginalMakeWorld=makeWorld;
+makeWorld=function(id){return applyArtTown(artOriginalMakeWorld(id))};
+function updateArtCamera(){
+ if(room||zone==='shrine'){camera.x=0;camera.y=0;return}
+ camera.x=clamp(player.x-VW*.68,0,world.width*T-VW);
+ camera.y=clamp(player.y-VH*.62,0,world.height*T-VH);
+}
+const artOriginalMove=move;
+move=function(dt){artOriginalMove(dt);updateArtCamera()};
+const artOriginalLoadGame=loadGame;
+loadGame=function(){const ok=artOriginalLoadGame();if(ok)updateArtCamera();return ok};
+const artOriginalChangeZone=changeZone;
+changeZone=function(id,x,y){artOriginalChangeZone(id,x,y);updateArtCamera()};
+const artOriginalDrawWorld=drawWorld;
+drawWorld=function(now){artOriginalDrawWorld(now)};
+/* Detailed hero-card portraits use the same class silhouettes as the in-game sprites. */
+buildHeroCards=function(){
+ const grid=document.getElementById('heroGrid');grid.innerHTML='';
+ heroes.forEach((h,i)=>{
+  const card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');
+  card.innerHTML='<canvas width="64" height="76"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';
+  const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
+  const P=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};
+  P(9,66,46,5,'#102b25');
+  if(i===0){P(22,37,20,26,'#398f85');P(17,26,5,33,'#e0f3ed');P(43,26,5,33,'#c7e9ea');P(24,17,16,19,'#edc49b');P(20,12,23,8,'#d5a15d');P(18,22,5,18,'#d5a15d');P(43,22,4,18,'#d5a15d');P(27,8,12,5,'#f5dd9b')}
+  else if(i===1){P(13,35,38,29,'#6a604e');P(17,37,30,24,'#b2a688');P(9,37,10,25,'#c9c5ad');P(46,35,12,29,'#71817d');P(48,41,8,17,'#e3e0cd');P(21,17,23,20,'#edc49b');P(18,11,28,12,'#604936');P(25,8,16,6,'#c9c2a1')}
+  else if(i===2){P(20,38,24,25,'#2d6c43');P(24,39,17,20,'#65a453');P(10,26,7,36,'#815833');P(45,32,9,30,'#a77e4a');P(22,17,20,20,'#edc49b');P(18,11,28,13,'#286441');P(25,6,20,8,'#4b8b4e')}
+  else if(i===3){P(16,38,32,26,'#624783');P(12,48,40,15,'#a184c3');P(22,17,21,20,'#edc49b');P(18,10,29,15,'#45314f');P(24,4,18,9,'#77509a');P(49,15,5,45,'#c9b2e5');P(47,7,10,10,'#a6e4e8')}
+  else{P(20,38,24,25,'#293f5c');P(23,40,18,20,'#526d86');P(14,30,6,32,'#c7e1e4');P(45,30,6,32,'#a8c4d4');P(23,17,20,20,'#edc49b');P(18,10,29,16,'#303b4b');P(22,17,22,5,'#443f49')}
+  P(28,26,3,3,'#302c29');P(37,26,3,3,'#302c29');
+  card.onclick=()=>{selected=i;heroChosen=true;buildHeroCards();updateQuest();saveGame()};
+  grid.appendChild(card);
+ });
+};
+
+// rebuild the scene with the revised village layout and wide camera
+player.x=24*T-12;player.y=21*T;world=makeWorld(zone);updateArtCamera();
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
