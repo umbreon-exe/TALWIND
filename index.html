@@ -1049,6 +1049,46 @@ drawWorld=function(now){
  }
 };
 
+
+// FINAL HERO SELECTION FIX: the last duplicate buildHeroCards declaration wins.
+buildHeroCards=function(){
+ const grid=document.getElementById('heroGrid');grid.innerHTML='';
+ heroes.forEach((h,i)=>{
+  const card=document.createElement('button');
+  card.className='heroCard'+(i===selected?' selected':'');
+  card.setAttribute('aria-label',h.name+' auswählen');
+  card.innerHTML='<canvas width="64" height="76"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';
+  const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
+  const P=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};
+  // distinct silhouettes, not just recoloured copies
+  P(17,65,30,5,'#3b5b39');
+  if(i===0){ // Lyra: slim, long twin ribbons
+   P(22,38,20,24,h.cape);P(15,27,7,30,'#d8edf1');P(42,27,7,30,'#d8edf1');
+   P(23,38,18,19,'#398f85');P(24,18,16,19,'#efbf90');P(21,12,22,9,'#d9a45b');P(20,22,5,20,'#d9a45b');P(39,22,5,20,'#d9a45b');P(28,7,10,5,'#f3da91');
+  }else if(i===1){ // Bram: wide heavy armour and shield
+   P(15,35,34,29,'#766346');P(18,37,28,24,'#a38d63');P(11,36,9,25,'#c6c4a9');P(45,34,12,29,'#9ba398');P(47,40,8,18,'#e0dfcf');
+   P(21,17,22,20,'#edbd90');P(18,11,28,12,'#654632');P(25,8,17,7,'#c6c4a9');
+  }else if(i===2){ // Kael: hood and tall bow/quiver
+   P(21,39,22,24,'#376b45');P(24,40,17,19,'#5b8e4b');P(10,25,7,38,'#795438');P(12,22,4,8,'#e6cf9b');P(41,31,9,30,'#9a7547');
+   P(23,18,19,20,'#efbf90');P(19,12,28,13,'#245f3e');P(25,5,21,10,'#477847');
+  }else if(i===3){ // Nima: wide robe, pointed hood and crystal staff
+   P(16,39,32,25,'#6a4f95');P(11,48,42,15,'#9272b8');P(22,17,20,22,'#efbf90');P(19,10,26,15,'#49334f');P(24,4,17,8,'#6a4f95');P(48,15,5,42,'#cdb9ef');P(46,7,10,10,'#fff0c9');
+  }else{ // Rook: narrow dark cloak and two bright daggers
+   P(20,37,24,27,'#344d69');P(23,39,18,22,'#536b83');P(15,30,6,31,'#cadde1');P(43,30,6,31,'#cadde1');P(24,18,17,20,'#edbd90');P(19,10,27,17,'#34404c');P(22,17,22,5,'#433d47');
+  }
+  P(28,25,3,3,'#332b28');P(37,25,3,3,'#332b28');
+  card.onclick=()=>{selected=i;heroChosen=true;buildHeroCards();updateQuest();saveGame()};
+  grid.appendChild(card);
+ });
+};
+document.getElementById('continueBtn').onclick=()=>{
+ const chosenHero=selected,hasNewChoice=heroChosen;
+ if(loadGame()){
+  if(hasNewChoice)selected=chosenHero;
+  buildHeroCards();updateQuest();startGame();
+ }else showToast('Kein Spielstand gefunden');
+};
+
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
