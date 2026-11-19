@@ -27,7 +27,7 @@ body{display:grid;place-items:center;touch-action:none}
 .act b{font-size:22px;line-height:1}.act small{font-size:9px;letter-spacing:.4px}.act.purple{background:linear-gradient(145deg,#f1e4ff,#aa91d1 75%,#6a548e)}.act.red{background:linear-gradient(145deg,#ffe7b4,#d66b4d 75%,#9a3f37);color:#fff5d9}.act:active{transform:translateY(3px);box-shadow:0 1px #493225}
 #menuButtons{position:absolute;left:10px;top:112px;display:grid;gap:6px}
 .menuBtn{min-width:124px;text-align:left;border:3px solid #61442e;border-radius:6px;background:linear-gradient(#fff4d1,#e5bd77);box-shadow:0 3px #493225;color:#4b3628;padding:7px 9px;font-weight:900;cursor:pointer;font-size:11px}
-#stick{position:absolute;left:12px;bottom:12px;width:104px;height:104px;border:3px solid #66482f;border-radius:50%;background:#fff0c766;display:none;touch-action:none}
+#stick{touch-action:none;user-select:none;-webkit-user-select:none;position:absolute;left:12px;bottom:12px;width:104px;height:104px;border:3px solid #66482f;border-radius:50%;background:#fff0c766;display:none;touch-action:none}
 #nub{position:absolute;left:30px;top:30px;width:38px;height:38px;border:3px solid #684a30;border-radius:50%;background:linear-gradient(#fff2cf,#dca95d);box-shadow:0 2px #543928}
 #dialog{position:absolute;left:50%;bottom:13px;transform:translateX(-50%);width:min(70%,680px);display:none;pointer-events:auto;background:linear-gradient(#fff6e0,#efd8a8);border:4px solid #65462f;box-shadow:inset 0 0 0 2px #d8ab62,4px 5px #35291f;border-radius:6px;padding:12px 15px}
 #dialog strong{color:#a7453b;font-size:12px;letter-spacing:1px}#dialog p{margin:6px 0 10px;line-height:1.5;font-size:clamp(12px,1.1vw,15px)}
@@ -142,7 +142,7 @@ body{display:grid;place-items:center;touch-action:none}
 #gameOver{z-index:50}#gameOver .card{width:min(92%,560px)}#gameOver .intro{max-width:460px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style></head>
-<body><main id="game">
+<body><main id="game" tabindex="0" aria-label="TALWIND-Spiel. Mit WASD oder Pfeiltasten bewegen.">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
 <div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
 <div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
@@ -171,11 +171,11 @@ const VW=720,VH=405,T=16;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const rand=(seed)=>{let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}};
 const heroes=[
-{name:'LYRA',role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
-{name:'BRAM',role:'Felswächter',speed:78,hair:'#654632',coat:'#a38d63',cape:'#766346',detail:'#c6c4a9',skill:'Steinhaut',desc:'Ein Schutzschild hält Treffer ab und stößt Gegner weg.'},
-{name:'KAEL',role:'Waldhüter',speed:91,hair:'#79533b',coat:'#5b8e4b',cape:'#376b45',detail:'#e6cf9b',skill:'Sternenschuss',desc:'Ein leuchtender Schuss trifft ein Ziel auf größere Entfernung.'},
-{name:'NIMA',role:'Echomagierin',speed:87,hair:'#49334f',coat:'#9272b8',cape:'#6a4f95',detail:'#cdb9ef',skill:'Echowelle',desc:'Eine Welle trifft Gegner in der Nähe und schenkt ein Herz.',female:true},
-{name:'ROOK',role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
+{name:'LYRA',spriteId:28,role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
+{name:'BRAM',spriteId:8,role:'Felswächter',speed:78,hair:'#654632',coat:'#a38d63',cape:'#766346',detail:'#c6c4a9',skill:'Steinhaut',desc:'Ein Schutzschild hält Treffer ab und stößt Gegner weg.'},
+{name:'KAEL',spriteId:1,role:'Waldhüter',speed:91,hair:'#79533b',coat:'#5b8e4b',cape:'#376b45',detail:'#e6cf9b',skill:'Sternenschuss',desc:'Ein leuchtender Schuss trifft ein Ziel auf größere Entfernung.'},
+{name:'NIMA',spriteId:31,role:'Echomagierin',speed:87,hair:'#49334f',coat:'#9272b8',cape:'#6a4f95',detail:'#cdb9ef',skill:'Echowelle',desc:'Eine Welle trifft Gegner in der Nähe und schenkt ein Herz.',female:true},
+{name:'ROOK',spriteId:24,role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
 ];
 const PALETTE={
  grass:'#68ad5c',grassLight:'#83c76b',grassDark:'#3d7d49',forest:'#427c4a',forestDark:'#285b3d',
@@ -191,11 +191,16 @@ const NPC_SPRITE_IDS={
  elder:21,mossy:16,wald_meri:10,wald_taro:23,moor_iona:11,moor_pip:6,cave_ren:19,cave_uma:20,
  freya:18,alrik:13,echo:3
 };
-const npcSpriteImages=new Map();
-for(const spriteId of new Set(Object.values(NPC_SPRITE_IDS))){
+// Use the pack author's default 16x20 sprites: 3 animation frames x 4 directions.
+const HERO_SPRITE_IDS=[28,8,1,31,24];
+const characterSpriteImages=new Map();
+const allCharacterSpriteIds=new Set([...Object.values(NPC_SPRITE_IDS),...HERO_SPRITE_IDS]);
+for(const spriteId of allCharacterSpriteIds){
  const sprite=new Image();
- sprite.src='./assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split/character_'+spriteId+'/character_'+spriteId+'_frame32x32.png';
- npcSpriteImages.set(spriteId,sprite);
+ sprite.decoding='async';
+ sprite.onload=()=>{if(HERO_SPRITE_IDS.includes(spriteId))buildHeroCards()};
+ sprite.src='./assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split/character_'+spriteId+'/character_'+spriteId+'_frame16x20.png';
+ characterSpriteImages.set(spriteId,sprite);
 }
 const roomAssetBase='./assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Props/';
 const roomAssets={};
@@ -206,6 +211,20 @@ for(const [name,file] of Object.entries({
  image.src=roomAssetBase+file;
  roomAssets[name]=image;
 }
+const buildingAssetBase='./assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Buildings/';
+const BUILDING_SPRITES_BY_ID={
+ mira:'House_Hay_3.png',inn:'House_Hay_2.png',shop:'House_Hay_1.png',library:'House_Hay_3.png',
+ home2:'House_Hay_4_Purple.png',tailor:'House_Hay_1.png',smith:'House_Hay_3.png',
+ bakery:'House_Hay_2.png',garden:'House_Hay_1.png',clinic:'House_Hay_4_Purple.png'
+};
+const buildingImages=new Map();
+for(const file of new Set(Object.values(BUILDING_SPRITES_BY_ID))){
+ const image=new Image();
+ image.decoding='async';
+ image.src=buildingAssetBase+file;
+ buildingImages.set(file,image);
+}
+
 const ROOM_DRESSING={
  home:[['fireplace',54,130,44,24],['table',344,164,42,42],['plant',48,184,32,16]],
  inn:[['bench',48,166,22,42],['table',342,164,44,44]],
@@ -456,6 +475,17 @@ function drawProp(o,now){
  else if(o.type==='fireflyPlant'){drawGlow(o.x+8,o.y+5,28,'#c7ef9b',.22);pixel(x+6,y+9,3,7,'#478b58');pixel(x+4,y+5,7,5,'#bfdc83')}
 }
 function drawBuilding(b){
+ const spriteFile=BUILDING_SPRITES_BY_ID[b.id];
+ const houseImage=spriteFile?buildingImages.get(spriteFile):null;
+ if(houseImage&&houseImage.complete&&houseImage.naturalWidth>0){
+  const maxWidth=b.w+48,maxHeight=b.h+48;
+  const scale=Math.min(1,maxWidth/houseImage.naturalWidth,maxHeight/houseImage.naturalHeight);
+  const drawWidth=Math.round(houseImage.naturalWidth*scale),drawHeight=Math.round(houseImage.naturalHeight*scale);
+  const groundX=b.x+b.w/2,groundY=b.y+b.h-1;
+  drawSoftShadow(groundX,groundY,Math.max(25,b.w*.58),7,.32);
+  ctx.drawImage(houseImage,Math.round(groundX-drawWidth/2-camera.x),Math.round(groundY-drawHeight-camera.y),drawWidth,drawHeight);
+  return;
+ }
  const x=Math.round(b.x-camera.x),y=Math.round(b.y-camera.y),w=b.w,h=b.h;
  const palettes={teal:['#55b8ad','#287e78','#174e50'],red:['#e97858','#b64d43','#71383a'],ochre:['#f0bd59','#c4863c','#80502f'],violet:['#b18bd0','#79549b','#49365f'],blue:['#8db9d4','#4d7898','#304e69'],slate:['#a8b5ae','#647d79','#3d5551'],green:['#9ac66b','#5e934d','#365d3d'],orange:['#f19a55','#c7683d','#783f32'],cream:['#ead9ae','#bca77e','#776344']};
  const c=palettes[b.style]||palettes.red;
@@ -477,21 +507,29 @@ function drawBuilding(b){
  pixel(x+w/2-2,y,5,4,'#fff0b8');pixel(x+w-22,y-12,9,16,'#895337');pixel(x+w-21,y-14,7,4,'#d9a16a');
  pixel(x+w/2-10,y+27,20,7,PALETTE.woodDark);pixel(x+w/2-8,y+28,16,4,c[0]);
 }
+function spriteDirection(faceX,faceY){
+ if(Math.abs(faceX)>Math.abs(faceY))return faceX<0?1:2;
+ return faceY<0?3:0;
+}
+function drawPackCharacter(sprite,x,y,frame,direction,width=32,height=40){
+ if(!sprite||!sprite.complete||sprite.naturalWidth<48||sprite.naturalHeight<80)return false;
+ const column=Math.max(0,Math.min(2,frame|0));
+ const row=Math.max(0,Math.min(3,direction|0));
+ ctx.drawImage(sprite,column*16,row*20,16,20,Math.round(x),Math.round(y),width,height);
+ return true;
+}
 function drawPerson(n,x,y,now){
- const bx=Math.round(x-camera.x),by=Math.round(y-camera.y+Math.sin(now/260+(n.phase||0))*.6);
- const spriteId=NPC_SPRITE_IDS[n.id],sprite=npcSpriteImages.get(spriteId);
- if(sprite&&sprite.complete&&sprite.naturalWidth>=96&&sprite.naturalHeight>=128){
-  drawSoftShadow(x+16,y+30,12,4,.3);
-  const dx=player.x-x,dy=player.y-y;
-  let direction=0;
-  if(Math.abs(dx)>Math.abs(dy))direction=dx<0?1:2;
-  else direction=dy<0?3:0;
-  const frames=[0,1,2,1],frame=frames[Math.floor(now/240+(n.phase||0))%4];
-  ctx.drawImage(sprite,frame*32,direction*32,32,32,bx-2,by-1,32,32);
+ const bx=Math.round(x-camera.x),by=Math.round(y-camera.y);
+ const sprite=characterSpriteImages.get(NPC_SPRITE_IDS[n.id]);
+ const dx=player.x-x,dy=player.y-y;
+ const direction=spriteDirection(dx,dy);
+ const frame=Math.floor(now/420+(n.phase||0))%3;
+ drawSoftShadow(x+16,y+32,12,4,.32);
+ // The source frame is 16x20. Scale it evenly and align the feet to the shadow.
+ if(drawPackCharacter(sprite,bx,by-9,frame,direction,32,40)){
   if(n.quest){pixel(bx+24,by-8,7,7,'#f4cf79');pixel(bx+26,by-7,3,5,'#78542e')}
   return;
  }
- drawSoftShadow(x+11,y+29,10,4,.28);
  const skin=PALETTE.skin,hair=n.hair||'#674333',tunic=n.color||'#578d69',walking=Math.sin(now/95+(n.phase||0))>0;
  pixel(bx+6,by+22+(walking?2:0),5,7,'#514238');pixel(bx+13,by+22+(walking?0:2),5,7,'#514238');
  pixel(bx+5,by+27+(walking?2:0),7,3,'#352d29');pixel(bx+12,by+27+(walking?0:2),7,3,'#352d29');
@@ -517,6 +555,20 @@ function drawRoomAsset(name,x,y,w,h){
 }
 
 function drawHero(x,y,now){
+ const hero=heroes[selected]||heroes[0],sprite=characterSpriteImages.get(hero.spriteId);
+ const px=Math.round(x-camera.x),py=Math.round(y-camera.y);
+ const direction=spriteDirection(player.faceX,player.faceY);
+ const frame=player.walk>.05?Math.floor(now/125)%3:1;
+ drawSoftShadow(x+16,y+36,14,5,.34);
+ if(!drawPackCharacter(sprite,px,py-5,frame,direction,32,40)){
+  drawHeroFallback(x,y,now);
+  return;
+ }
+ if(player.inv>0&&Math.floor(now/85)%2===0){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#fff';ctx.fillRect(px+1,py,30,37);ctx.restore()}
+ if(player.rolling>0){ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle='#e1f6ed';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px+15,py+19,18,12,frame,0,Math.PI*2);ctx.stroke();ctx.restore()}
+ if(damageFlash>0){ctx.save();ctx.globalAlpha=.65;ctx.fillStyle='#fff';ctx.fillRect(px+1,py+1,29,34);ctx.restore()}
+}
+function drawHeroFallback(x,y,now){
  const frame=Math.floor(player.walk*1.7)%4,step=[0,2,0,-2][frame],bob=player.walk>.05?([0,-1,0,-1][frame]):Math.sin(now/470)*.35;
  const px=Math.round(x-camera.x),py=Math.round(y-camera.y+bob),skin=PALETTE.skin,boot='#49382f',hair=heroes[selected].hair;
  drawSoftShadow(x+14,y+36,14,5,.3);
@@ -1110,14 +1162,13 @@ function buildHeroCards(){
   const card=document.createElement('button');card.className='heroCard'+(i===selected?' selected':'');
   card.innerHTML='<canvas width="64" height="76"></canvas><b>'+h.name+'</b><small>'+h.role+'<br>'+h.skill+'</small>';
   const g=card.querySelector('canvas').getContext('2d');g.imageSmoothingEnabled=false;
-  const P=(x,y,w,hh,c)=>{g.fillStyle=c;g.fillRect(x,y,w,hh)};
-  P(9,66,46,5,'#102b25');
-  if(i===0){P(22,37,20,26,'#398f85');P(17,26,5,33,'#e0f3ed');P(43,26,5,33,'#c7e9ea');P(24,17,16,19,'#edc49b');P(20,12,23,8,'#d5a15d');P(18,22,5,18,'#d5a15d');P(43,22,4,18,'#d5a15d');P(27,8,12,5,'#f5dd9b')}
-  else if(i===1){P(13,35,38,29,'#6a604e');P(17,37,30,24,'#b2a688');P(9,37,10,25,'#c9c5ad');P(46,35,12,25,'#71817d');P(48,41,8,17,'#e3e0cd');P(21,17,23,20,'#edc49b');P(18,11,28,12,'#604936');P(25,8,16,6,'#c9c2a1')}
-  else if(i===2){P(20,38,24,25,'#2d6c43');P(24,39,17,20,'#65a453');P(10,26,7,36,'#815833');P(45,32,9,30,'#a77e4a');P(22,17,20,20,'#edc49b');P(18,11,28,13,'#286441');P(25,6,20,8,'#4b8b4e')}
-  else if(i===3){P(16,38,32,26,'#624783');P(12,48,40,15,'#a184c3');P(22,17,21,20,'#edc49b');P(18,10,29,15,'#45314f');P(24,4,18,9,'#77509a');P(49,15,5,45,'#c9b2e5');P(47,7,10,10,'#a6e4e8')}
-  else{P(20,38,24,25,'#293f5c');P(23,40,18,20,'#526d86');P(14,30,6,32,'#c7e1e4');P(45,30,6,32,'#a8c4d4');P(23,17,20,20,'#edc49b');P(18,10,29,16,'#303b4b');P(22,17,22,5,'#443f49')}
-  P(28,26,3,3,'#302c29');P(37,26,3,3,'#302c29');
+  g.fillStyle='#102b25';g.fillRect(9,62,46,5);
+  const sprite=characterSpriteImages.get(h.spriteId);
+  if(!drawPackCharacter(sprite,16,16,1,0,32,40)){
+   g.fillStyle=h.coat||'#668e80';g.fillRect(23,34,18,25);
+   g.fillStyle=h.hair||'#654632';g.fillRect(23,23,18,12);
+   g.fillStyle='#edbd90';g.fillRect(25,26,14,13);
+  }
   card.onclick=()=>{selected=i;heroChosen=true;buildHeroCards();updateQuest();saveGame(activeSlot)};
   grid.appendChild(card);
  });
@@ -1130,7 +1181,13 @@ function startFromLoaded(){
  document.getElementById('titleScreen').classList.add('hidden');started=true;gameLoopRunning=false;startLoop();showToast('Spielstand geladen');updateQuest();
 }
 function startGame(){
- document.getElementById('titleScreen').classList.add('hidden');started=true;updateQuest();showDialogue('MIRA','Willkommen in Windruh! Sprich mit mir am Brunnen. Ich erzähle dir, was mit den sieben Echos geschehen ist.');startLoop();saveGame(activeSlot);
+ document.getElementById('titleScreen').classList.add('hidden');
+ started=true;
+ document.getElementById('game').focus({preventScroll:true});
+ updateQuest();
+ startLoop();
+ showToast('Willkommen in Windruh! Sprich mit Mira am Brunnen.');
+ saveGame(activeSlot);
 }
 function startLoop(){if(gameLoopRunning)return;gameLoopRunning=true;last=performance.now();requestAnimationFrame(gameLoop)}
 function gameLoop(now){
@@ -1150,10 +1207,10 @@ function init(){
  document.getElementById('continueBtn').onclick=()=>{if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}else showToast('Kein Spielstand gefunden')};
  document.getElementById('nextBtn').onclick=closeDialogue;
  document.getElementById('useBtn').onclick=interact;document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
- document.getElementById('stick').addEventListener('pointerdown',e=>{stickEl.setPointerCapture(e.pointerId);moveStick(e)});
- stickEl.addEventListener('pointermove',e=>{if(e.buttons)moveStick(e)});
+ document.getElementById('stick').addEventListener('pointerdown',e=>{e.preventDefault();try{stickEl.setPointerCapture(e.pointerId)}catch(err){}moveStick(e)});
+ stickEl.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')moveStick(e)});
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
- addPanelControls();addEventListener('keydown',keyDown);addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+ addPanelControls();document.addEventListener('keydown',keyDown);document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
  addEventListener('blur',()=>{for(const k in keys)keys[k]=false;resetStick()});
  addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Aktion · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
  addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle'});
