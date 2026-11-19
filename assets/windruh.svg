@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="t d">
+<title id="t">Windruh in Avarra</title><desc id="d">Ein helles Pixel-Art-Dorf mit roten Dächern, Fluss, Brücke und grünen Hügeln.</desc>
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#82c8df"/><stop offset="1" stop-color="#d9e9bd"/></linearGradient>
+ <linearGradient id="water" x2="0" y2="1"><stop stop-color="#51b4d1"/><stop offset="1" stop-color="#267da7"/></linearGradient>
+ <pattern id="tiles" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M0 31.5H32M31.5 0V32" stroke="#ffffff" opacity=".12"/></pattern>
+</defs>
+<rect width="960" height="540" fill="url(#sky)"/>
+<circle cx="780" cy="92" r="42" fill="#ffe5a0"/>
+<path d="M0 250Q150 170 300 240T610 220T960 240V540H0Z" fill="#77ae69"/>
+<path d="M0 330Q180 280 360 333T700 320T960 338V540H0Z" fill="#55945b"/>
+<path d="M0 400Q240 360 470 402T960 388V540H0Z" fill="#3f7b4d"/>
+<path d="M0 380Q190 340 370 395Q530 448 690 390T960 407V540H0Z" fill="url(#water)"/>
+<path d="M0 407Q180 367 365 419T700 414T960 423" fill="none" stroke="#9be3e5" stroke-width="8" opacity=".75"/>
+<path d="M0 463Q180 428 350 468T700 465T960 470" fill="none" stroke="#2b7694" stroke-width="5" opacity=".6"/>
+<!-- Brücke -->
+<path d="M320 365Q480 298 645 365L645 414Q480 350 320 414Z" fill="#62452f"/>
+<path d="M328 368Q480 314 638 368L638 384Q480 330 328 384Z" fill="#c89458"/>
+<path d="M350 369V405M398 353V391M446 342V380M494 341V380M542 350V391M590 361V403" stroke="#70492f" stroke-width="9"/>
+<!-- Häuser -->
+<g stroke="#513a2a" stroke-width="8" stroke-linejoin="round">
+ <g transform="translate(110 210)"><path d="M0 80V0L95 -58L190 0V80Z" fill="#e9d6ad"/><path d="M-15 5L95 -68L205 5" fill="none" stroke="#a94d43" stroke-width="28"/><rect x="76" y="34" width="42" height="46" fill="#80563a"/><rect x="22" y="27" width="34" height="29" fill="#8ac8ce"/><rect x="133" y="27" width="34" height="29" fill="#8ac8ce"/></g>
+ <g transform="translate(375 177)"><path d="M0 92V4L100 -58L200 4V92Z" fill="#e8d1a2"/><path d="M-15 8L100 -68L215 8" fill="none" stroke="#bb5a43" stroke-width="29"/><rect x="77" y="42" width="46" height="50" fill="#765039"/><rect x="25" y="30" width="38" height="32" fill="#8dc9d0"/><rect x="137" y="30" width="38" height="32" fill="#8dc9d0"/></g>
+ <g transform="translate(675 224)"><path d="M0 72V0L80 -48L160 0V72Z" fill="#e5d2ab"/><path d="M-13 4L80 -57L173 4" fill="none" stroke="#6b8795" stroke-width="25"/><rect x="63" y="31" width="36" height="41" fill="#80563b"/><rect x="17" y="22" width="30" height="26" fill="#8ac7cd"/><rect x="113" y="22" width="30" height="26" fill="#8ac7cd"/></g>
+</g>
+<!-- Bäume -->
+<g><g fill="#2f7448"><circle cx="70" cy="255" r="50"/><circle cx="840" cy="245" r="55"/><circle cx="900" cy="286" r="45"/><circle cx="275" cy="218" r="34"/></g><g fill="#68ad62"><circle cx="48" cy="235" r="24"/><circle cx="825" cy="222" r="27"/><circle cx="887" cy="265" r="23"/><circle cx="265" cy="204" r="18"/></g><g fill="#725039"><rect x="62" y="274" width="16" height="55"/><rect x="833" y="269" width="17" height="64"/><rect x="893" y="292" width="15" height="48"/></g></g>
+<!-- Pflasterplatz -->
+<path d="M300 300Q470 270 670 315L645 360Q470 330 300 365Z" fill="#cbb587" stroke="#76583c" stroke-width="5"/>
+<path d="M300 300Q470 270 670 315L645 360Q470 330 300 365Z" fill="url(#tiles)"/>
+<!-- Brunnen -->
+<ellipse cx="520" cy="310" rx="46" ry="19" fill="#827f72"/><ellipse cx="520" cy="304" rx="37" ry="13" fill="#6ac8d8"/><path d="M516 301Q505 278 520 264Q535 281 524 301Z" fill="#e4ffff"/>
+<!-- Wind -->
+<g fill="none" stroke="#f4f1d7" stroke-width="7" stroke-linecap="round" opacity=".8"><path d="M38 125Q120 95 185 128T315 125"/><path d="M590 125Q665 96 730 122T900 116"/></g>
+<rect width="960" height="540" fill="url(#tiles)" opacity=".65"/>
+<rect x="7" y="7" width="946" height="526" fill="none" stroke="#f0c36b" stroke-width="14"/>
+</svg>
