@@ -523,18 +523,58 @@ function drawCollectible(item,now){
  else{const c=item.key==='reed'?'#a0d9ac':item.key==='shell'?'#e6c68e':item.key==='crystalShard'?'#82e0ed':item.key==='runeStone'?'#c2a6ef':'#e4f8fb';drawGlow(item.x+8,item.y+8,24,c,.25);pixel(x+4,y+4+bob,9,9,c);pixel(x+6,y+1+bob,5,4,'#f2ffff')}
 }
 function drawRoom(now){
- pixel(0,0,VW,VH,'#9a704b');for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#c79d6d':'#b98d5f');pixel(x,y+15,16,1,'#916744')}
- pixel(10,8,460,6,PALETTE.woodDark);pixel(10,8,5,250,PALETTE.woodDark);pixel(465,8,5,250,PALETTE.woodDark);
- pixel(27,32,426,190,'#ead7ad');pixel(29,32,422,4,'#9a7049');
- pixel(53,43,54,45,'#78513a');pixel(57,47,46,36,'#78acb0');pixel(61,51,18,28,'#c3e7df');pixel(82,51,17,28,'#9dd2d7');pixel(78,47,3,36,'#795238');
- pixel(370,43,54,45,'#78513a');pixel(374,47,46,36,'#78acb0');pixel(378,51,18,28,'#c3e7df');pixel(399,51,17,28,'#9dd2d7');
- if(roomNPC&&['inn','bakery'].includes(roomNPC.kind)){pixel(65,104,350,43,'#6d482f');pixel(71,100,338,12,'#c38b4e');pixel(74,116,332,25,'#95613b');for(let x=84;x<400;x+=48){pixel(x,108,30,5,'#f3d79a');pixel(x+6,116,18,14,'#d4ad72')}}
- else if(roomNPC&&roomNPC.kind==='shop'){pixel(90,120,280,80,'#815235');pixel(100,126,260,12,'#d3a05e');for(let x=115;x<360;x+=55)pixel(x,141,33,32,'#bd8d50')}
- else{pixel(65,122,125,82,'#765137');pixel(70,126,115,8,'#c69b61');pixel(324,122,90,82,'#765137');pixel(329,126,80,8,'#c69b61')}
- pixel(176,218,128,34,'#8a4c39');pixel(182,222,116,26,'#dab57a');pixel(190,228,100,5,'#b77d48');
+ const kind=roomNPC?.kind||'home';
+ const skins={
+  home:['#ead8b4','#bd9367','#cba77a','#765039','#b65e55'],
+  inn:['#e8cda0','#9e704c','#ad8056','#5f3c2c','#8f4938'],
+  shop:['#e9d7ad','#b88c60','#c99f70','#704b32','#628c78'],
+  tailor:['#f0d9c5','#bd997d','#d0ad91','#805b4b','#a96c88'],
+  library:['#d9c8a3','#987650','#a9855e','#4e3a2b','#6c637f'],
+  smith:['#cbbba4','#76685a','#887767','#403a36','#76604d'],
+  bakery:['#f0d5a7','#b88a5c','#cba071','#795039','#b77a43'],
+  garden:['#dce0b8','#a88a62','#b99c70','#596a46','#78945d']
+ };
+ const p=skins[kind]||skins.home;
+ pixel(0,0,VW,VH,'#61432f');pixel(9,8,462,254,p[3]);pixel(14,13,452,244,p[0]);
+ for(let y=164;y<252;y+=12){pixel(14,y,452,12,((y/12)%2)?p[1]:p[2]);for(let x=14+(y%24);x<466;x+=48)pixel(x,y,1,12,'#8a6547');pixel(14,y+11,452,1,'#8b6547')}
+ for(let x=30;x<455;x+=106){pixel(x,14,7,25,p[3]);pixel(x+2,17,3,20,'#b78b5e')}
+ pixel(14,151,452,5,p[3]);pixel(14,156,452,2,'#d6b887');
+ for(const wx of [43,395]){pixel(wx-4,38,59,56,p[3]);pixel(wx,42,51,46,'#6f9e9c');pixel(wx+4,46,43,38,'#b8e0ce');pixel(wx+24,42,3,46,p[3]);pixel(wx,63,51,3,p[3]);pixel(wx-7,91,65,6,'#b98554');pixel(wx-2,96,55,3,'#785039');pixel(wx+5,50,12,7,'#fff0bd')}
+ pixel(145,168,190,67,p[3]);pixel(150,173,180,57,p[4]);pixel(158,180,164,43,'#d9b77c');pixel(165,185,150,33,p[4]);pixel(173,191,134,21,'#e3c58c');
+ if(kind==='inn'){
+  pixel(120,105,250,39,p[3]);pixel(125,101,240,10,'#d6a366');pixel(130,111,230,27,'#98623e');
+  for(let x=145;x<350;x+=55){pixel(x,116,18,15,'#d8b46f');pixel(x+4,112,10,5,'#f0dba0')}
+  pixel(32,117,58,34,'#5c3d2d');pixel(37,122,48,25,'#b35d42');pixel(42,126,38,17,'#e8a45e');
+ }else if(kind==='shop'){
+  for(const sy of [103,137]){pixel(95,sy,290,7,p[3]);for(let x=103;x<375;x+=37){pixel(x,sy-16,22,15,'#9a754c');pixel(x+3,sy-13,16,10,['#8ab2a0','#d6a05d','#a77fae','#d7c58c'][(x/37|0)%4])}}
+  pixel(155,174,170,31,p[3]);pixel(160,170,160,8,'#d4a166');pixel(166,182,148,18,'#95633f');
+ }else if(kind==='library'){
+  for(const sx of [34,362]){pixel(sx,102,82,83,p[3]);for(let sy=108;sy<178;sy+=22){pixel(sx+5,sy,72,4,'#bd925e');for(let x=sx+9;x<sx+72;x+=12)pixel(x,sy-13,8,12,['#a85f51','#6c829b','#78966e','#d0ae69'][(x+sy)%4])}}
+  pixel(170,111,140,42,p[3]);pixel(176,106,128,9,'#bd925e');pixel(183,119,114,27,'#8b6948');
+ }else if(kind==='smith'){
+  pixel(45,120,105,53,'#4b4139');pixel(52,125,91,43,'#9b6b48');pixel(61,132,72,30,'#d78b4c');drawGlow(96,142,45,'#f4a45b',.25);
+  pixel(315,107,90,70,'#51483f');pixel(321,112,78,9,'#9b8871');pixel(188,171,118,35,p[3]);pixel(194,165,106,9,'#a7a09a');
+ }else if(kind==='bakery'){
+  pixel(44,111,118,57,'#87513a');pixel(50,116,106,12,'#d49a55');pixel(55,132,96,30,'#b87543');
+  for(const x of [65,100,135]){pixel(x,122,16,10,'#d9a15c');pixel(x+3,118,10,6,'#f0d08d')}
+  pixel(290,105,112,54,p[3]);pixel(296,111,100,10,'#d7a76c');
+ }else if(kind==='tailor'){
+  pixel(43,108,95,67,p[3]);pixel(49,114,83,8,'#d1a36f');for(let x=55;x<122;x+=17){pixel(x,126,12,39,['#b96d91','#6b91a1','#d5b16e','#819b75'][(x/17|0)%4])}
+  pixel(320,105,110,64,p[3]);pixel(326,111,98,8,'#d1a36f');pixel(190,112,100,45,'#78523d');pixel(196,106,88,8,'#d3a66d');
+ }else if(kind==='garden'){
+  pixel(40,113,95,53,'#76513b');pixel(46,119,83,8,'#b98d58');for(let x=55;x<118;x+=20){pixel(x,132,12,22,'#6b925c');pixel(x+2,125,8,9,'#9fc47b')}
+  pixel(344,111,90,55,'#76513b');pixel(350,117,78,8,'#b98d58');pixel(193,120,96,46,'#79523a');
+ }else{
+  pixel(42,113,120,65,p[3]);pixel(48,119,108,8,'#c69a62');pixel(55,131,94,39,'#d7bd91');pixel(57,125,34,18,'#f0e4c8');
+  pixel(325,112,96,63,p[3]);pixel(331,118,84,8,'#c69a62');pixel(339,132,68,34,'#9c7650');pixel(205,113,70,40,'#76513a');
+ }
+ pixel(225,27,28,5,p[3]);pixel(236,32,6,15,'#d2a45f');pixel(231,46,16,4,'#d2a45f');drawGlow(239,47,48,'#f6d78b',.16);
+ for(const x of [24,432]){pixel(x,188,20,28,'#76513a');pixel(x+3,181,14,13,'#6d925e');pixel(x+5,176,10,9,'#9fbe76')}
  const npcId=roomNPC?roomNPC.npc:null,resident=world.npcs.find(n=>n.id===npcId);
- if(resident)drawPerson(resident,220,103,now);drawHero(player.x,player.y,now);
- ctx.fillStyle='#fff0cd';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,28);ctx.fillText('E · Hinausgehen',VW/2,VH-8);ctx.textAlign='left';
+ if(resident)drawPerson(resident,220,94,now);
+ drawHero(player.x,player.y,now);
+ ctx.fillStyle='#fff0cd';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(roomNPC?roomNPC.title:'Zimmer',VW/2,25);
+ ctx.font='bold 9px monospace';ctx.fillStyle='#fff1c9';ctx.fillText('E · Hinausgehen',VW/2,VH-8);ctx.textAlign='left';
 }
 function drawShrine(now){
  for(let y=0;y<VH;y+=16)for(let x=0;x<VW;x+=16){pixel(x,y,16,16,((x/16+y/16)%2)?'#77796f':'#858477');pixel(x+2,y+2,12,12,'#999587')}
