@@ -14,12 +14,16 @@ assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
 assert.match(html, /id="questLine"/, "quest HUD is present");
 
-assert.match(html, /frame16x20\\.png/, "default 16x20 character sheets are used");
-assert.match(html, /const HERO_SPRITE_IDS=\\[28,8,1,31,24\\]/, "five distinct pack heroes are configured");
-assert.match(html, /Art\\/Buildings\\//, "the exterior building asset folder is used");
-assert.match(html, /document\\.addEventListener\\('keydown',keyDown\\)/, "keyboard input is connected at document level");
-assert.match(html, /pointerType==='touch'/, "touch joystick movement is handled");
-const startGameBlock = html.match(/function startGame\\(\\)\\s*\\{[\\s\\S]*?\\n\\}/)?.[0] || "";
+assert.ok(html.includes("frame16x20.png"), "default 16x20 character sheets are used");
+assert.ok(html.includes("const HERO_SPRITE_IDS=[28,8,1,31,24]"), "five distinct pack heroes are configured");
+assert.ok(html.includes("Art/Buildings/"), "the exterior building asset folder is used");
+assert.ok(html.includes("document.addEventListener('keydown',keyDown)"), "keyboard input is connected at document level");
+assert.ok(html.includes("pointerType==='touch'"), "touch joystick movement is handled");
+const startGameStart = html.indexOf("function startGame(){");
+const startGameEnd = html.indexOf("\\nfunction startLoop(", startGameStart);
+const startGameBlock = startGameStart >= 0 && startGameEnd > startGameStart
+  ? html.slice(startGameStart, startGameEnd)
+  : "";
 assert.ok(startGameBlock, "startGame function is present");
 assert.doesNotMatch(startGameBlock, /showDialogue/, "the opening modal no longer blocks movement");
 const spriteRoot = "assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split";
@@ -31,7 +35,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.match(read("sw.js"), /talwind-shell-v2/, "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v2"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
