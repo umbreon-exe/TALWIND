@@ -150,7 +150,7 @@ body{display:grid;place-items:center;touch-action:none}
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
 <div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
-<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p></div></div>
+<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
 <div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
 
 <div class="overlay hidden" id="gameOver" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
@@ -185,6 +185,38 @@ const PALETTE={
  ice:'#9dd5df',iceLight:'#def8f2',iceDark:'#4d8397',bog:'#426d65',bogWater:'#356d78',
  crystal:'#7ed8e2',gold:'#f4cf79',red:'#d85c50'
 };
+
+const NPC_SPRITE_IDS={
+ mira:12,tomke:2,eda:22,finn:18,runa:5,pavo:7,lina:26,orin:14,sela:4,tavi:15,wulf:17,pippa:25,
+ elder:21,mossy:16,wald_meri:10,wald_taro:23,moor_iona:11,moor_pip:6,cave_ren:19,cave_uma:20,
+ freya:18,alrik:13,echo:3
+};
+const npcSpriteImages=new Map();
+for(const spriteId of new Set(Object.values(NPC_SPRITE_IDS))){
+ const sprite=new Image();
+ sprite.src='./assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split/character_'+spriteId+'/character_'+spriteId+'_frame32x32.png';
+ npcSpriteImages.set(spriteId,sprite);
+}
+const roomAssetBase='./assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Props/';
+const roomAssets={};
+for(const [name,file] of Object.entries({
+ fireplace:'Fireplace_1.png',table:'Table_Medium_1.png',bench:'Bench_1.png',plant:'Plant_2.png',banner:'Banner_Stick_1_Purple.png'
+})){
+ const image=new Image();
+ image.src=roomAssetBase+file;
+ roomAssets[name]=image;
+}
+const ROOM_DRESSING={
+ home:[['fireplace',54,130,44,24],['table',344,164,42,42],['plant',48,184,32,16]],
+ inn:[['bench',48,166,22,42],['table',342,164,44,44]],
+ shop:[['table',344,163,44,44],['plant',48,184,32,16]],
+ tailor:[['table',342,163,44,44],['bench',48,166,22,42]],
+ library:[['table',342,163,44,44],['banner',48,104,24,42]],
+ smith:[['fireplace',48,127,52,28],['table',342,163,44,44]],
+ bakery:[['fireplace',48,127,52,28],['table',342,163,44,44]],
+ garden:[['plant',48,178,34,20],['plant',390,178,34,20],['table',342,163,44,44]]
+};
+
 const keys={},stick={x:0,y:0},camera={x:0,y:0};
 let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,roomNPC=null,currentRoom=null;
 let dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0,currentPrompt='';
@@ -446,7 +478,19 @@ function drawBuilding(b){
  pixel(x+w/2-10,y+27,20,7,PALETTE.woodDark);pixel(x+w/2-8,y+28,16,4,c[0]);
 }
 function drawPerson(n,x,y,now){
- const bx=Math.round(x-camera.x),by=Math.round(y-camera.y+Math.sin(now/260+(n.phase||0))*1);
+ const bx=Math.round(x-camera.x),by=Math.round(y-camera.y+Math.sin(now/260+(n.phase||0))*.6);
+ const spriteId=NPC_SPRITE_IDS[n.id],sprite=npcSpriteImages.get(spriteId);
+ if(sprite&&sprite.complete&&sprite.naturalWidth>=96&&sprite.naturalHeight>=128){
+  drawSoftShadow(x+16,y+30,12,4,.3);
+  const dx=player.x-x,dy=player.y-y;
+  let direction=0;
+  if(Math.abs(dx)>Math.abs(dy))direction=dx<0?1:2;
+  else direction=dy<0?3:0;
+  const frames=[0,1,2,1],frame=frames[Math.floor(now/240+(n.phase||0))%4];
+  ctx.drawImage(sprite,frame*32,direction*32,32,32,bx-2,by-1,32,32);
+  if(n.quest){pixel(bx+24,by-8,7,7,'#f4cf79');pixel(bx+26,by-7,3,5,'#78542e')}
+  return;
+ }
  drawSoftShadow(x+11,y+29,10,4,.28);
  const skin=PALETTE.skin,hair=n.hair||'#674333',tunic=n.color||'#578d69',walking=Math.sin(now/95+(n.phase||0))>0;
  pixel(bx+6,by+22+(walking?2:0),5,7,'#514238');pixel(bx+13,by+22+(walking?0:2),5,7,'#514238');
@@ -467,6 +511,11 @@ function drawPerson(n,x,y,now){
  if(n.kind==='baker'){pixel(bx+4,by-5,17,6,'#fff0d9');pixel(bx+8,by-7,9,3,'#e5d3b3')}
  if(n.quest){pixel(bx+19,by-8,7,7,'#f4cf79');pixel(bx+21,by-7,3,5,'#78542e')}
 }
+function drawRoomAsset(name,x,y,w,h){
+ const image=roomAssets[name];
+ if(image&&image.complete&&image.naturalWidth>0)ctx.drawImage(image,Math.round(x),Math.round(y),w,h);
+}
+
 function drawHero(x,y,now){
  const frame=Math.floor(player.walk*1.7)%4,step=[0,2,0,-2][frame],bob=player.walk>.05?([0,-1,0,-1][frame]):Math.sin(now/470)*.35;
  const px=Math.round(x-camera.x),py=Math.round(y-camera.y+bob),skin=PALETTE.skin,boot='#49382f',hair=heroes[selected].hair;
@@ -570,6 +619,7 @@ function drawRoom(now){
  }
  pixel(225,27,28,5,p[3]);pixel(236,32,6,15,'#d2a45f');pixel(231,46,16,4,'#d2a45f');drawGlow(239,47,48,'#f6d78b',.16);
  for(const x of [24,432]){pixel(x,188,20,28,'#76513a');pixel(x+3,181,14,13,'#6d925e');pixel(x+5,176,10,9,'#9fbe76')}
+ for(const [asset,ax,ay,aw,ah] of (ROOM_DRESSING[kind]||[]))drawRoomAsset(asset,ax,ay,aw,ah);
  const npcId=roomNPC?roomNPC.npc:null,resident=world.npcs.find(n=>n.id===npcId);
  if(resident)drawPerson(resident,220,94,now);
  drawHero(player.x,player.y,now);
