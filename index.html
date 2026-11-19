@@ -2130,10 +2130,11 @@ makeWorld=function(id){
  // Paths continue from the village streets into the woods; each has a broad,
  // walkable shoulder so the player does not get trapped between trees.
  line(83,40,110,40,2);
- line(42,26,42,8,1);
+ line(42,40,42,8,1);
  line(98,40,98,17,1);
  line(98,40,98,82,1);
  line(98,40,108,40,1);
+ line(98,40,104,49,1);
  // Four open encounter clearings, all outside the village footprint.
  const clearings=[[42,12,5,5],[98,27,6,6],[104,49,5,6],[98,73,6,6]];
  for(const c of clearings)clear(...c);
@@ -2294,6 +2295,8 @@ update=function(dt,now){
  }
 };
 
+// Instantiate the corrected connected overworld before the first frame.
+world=makeWorld(zone);updateArtCamera();
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
