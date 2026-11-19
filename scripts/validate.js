@@ -14,7 +14,7 @@ assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
 assert.match(html, /id="questLine"/, "quest HUD is present");
 
-const inlineScripts = [...html.matchAll(/<script(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)]
+const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
   .filter(script => script.trim().length > 0);
 assert.ok(inlineScripts.length > 0, "at least one inline script is present");
