@@ -1165,7 +1165,7 @@ function buildHeroCards(){
   g.fillStyle='#102b25';g.fillRect(9,62,46,5);
   const sprite=characterSpriteImages.get(h.spriteId);
   if(sprite&&sprite.complete&&sprite.naturalWidth>=48&&sprite.naturalHeight>=80){
-   g.drawImage(sprite,16,20,16,20,16,16,32,40);
+   g.drawImage(sprite,16,0,16,20,16,16,32,40);
   }else{
    g.fillStyle=h.coat||'#668e80';g.fillRect(23,34,18,25);
    g.fillStyle=h.hair||'#654632';g.fillRect(23,23,18,12);
