@@ -20,7 +20,7 @@ assert.ok(html.includes("Art/Buildings/"), "the exterior building asset folder i
 assert.ok(html.includes("document.addEventListener('keydown',keyDown)"), "keyboard input is connected at document level");
 assert.ok(html.includes("pointerType==='touch'"), "touch joystick movement is handled");
 const startGameStart = html.indexOf("function startGame(){");
-const startGameEnd = html.indexOf("\\nfunction startLoop(", startGameStart);
+const startGameEnd = html.indexOf("function startLoop(", startGameStart);
 const startGameBlock = startGameStart >= 0 && startGameEnd > startGameStart
   ? html.slice(startGameStart, startGameEnd)
   : "";
