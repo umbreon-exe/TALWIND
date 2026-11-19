@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#24543c">
+<meta name="theme-color" content="#17263a">
+<meta name="description" content="TALWIND – Die sieben Echos. Ein handgezeichnetes Pixel-Abenteuer in Avarra.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
 <title>TALWIND – Die sieben Echos</title>
 <style>
 :root{--ink:#35291f;--paper:#fff1cf;--gold:#e8b765;--wood:#67472e;--red:#aa4439;--green:#315f43}
@@ -133,6 +139,8 @@ body{display:grid;place-items:center;touch-action:none}
 #titleScreen .card{max-height:96vh;overflow-y:auto}
 @media(max-height:700px){#titleArt{max-height:150px;width:auto;max-width:100%}.intro{margin:6px auto 9px}.heroGrid{margin:7px 0}}
 #menuButtons .menuBtn{min-height:34px}
+#gameOver{z-index:50}#gameOver .card{width:min(92%,560px)}#gameOver .intro{max-width:460px}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style></head>
 <body><main id="game">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
@@ -142,8 +150,18 @@ body{display:grid;place-items:center;touch-action:none}
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
 <div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
-<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.webp" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p></div></div>
+<div class="overlay" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p></div></div>
 <div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
+
+<div class="overlay hidden" id="gameOver" role="dialog" aria-modal="true" aria-labelledby="gameOverTitle">
+ <div class="card">
+  <h2 class="logo" id="gameOverTitle">DAS ECHO ERWARTET DICH</h2>
+  <div class="subtitle">EIN NEUER VERSUCH</div>
+  <p class="intro">Deine Kraft ist erschöpft. Lade deinen letzten Speicherpunkt und setze die Reise fort.</p>
+  <button class="uiButton" id="retryBtn">LETZTEN SPEICHERPUNKT LADEN</button>
+ </div>
+</div>
+
 </main>
 <script>
 (()=>{'use strict';
@@ -201,6 +219,7 @@ const rooms={
 };
 let world=null,insideDoorSpawn={x:31*T,y:29*T};
 let monsters=[],bossState={hp:60,maxHp:60,phase:1,attackType:'Schallwelle',windup:0,cooldown:1.2,active:false,ring:0};
+let gameOver=false;
 let lastKnownHp=5,damageFlash=0,finaleShown=false;
 
 function makeNPC(id,name,tx,ty,color,hair,kind,line,extra){
@@ -683,7 +702,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')||{}).hp||60,main,side,inventory,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -713,7 +732,7 @@ function loadGame(slot){
   currentRoom=null;room=null;roomNPC=null;
   if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};player.x=220;player.y=175}
   if(slots[n])activeSlot=n;else{activeSlot=0;slots[0]={savedAt:new Date().toISOString(),data:d};localStorage.setItem(slotsKey,JSON.stringify(slots))}
-  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp)guardian.hp=clamp(Number(d.bossHp),1,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
+  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp!==undefined&&d.bossHp!==null)guardian.hp=clamp(Number(d.bossHp),0,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
  }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
 }
 function hasAnySave(){
@@ -937,14 +956,51 @@ function move(dt){
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
  updateCamera();
 }
+function triggerGameOver(){
+ if(gameOver)return;
+ gameOver=true;
+ const screen=document.getElementById('gameOver');
+ if(screen)screen.classList.remove('hidden');
+}
+function retryFromCheckpoint(){
+ const restored=loadGame(activeSlot);
+ if(!restored){
+  player.hp=3;
+  player.inv=2;
+  player.rolling=0;
+  player.x=zone==='windruh'?31*T:zone==='shrine'?220:Math.floor(world.width*.45)*T;
+  player.y=zone==='windruh'?27*T:zone==='shrine'?300:Math.floor(world.height*.5)*T;
+  makeMonsters();
+ }
+ gameOver=false;
+ document.getElementById('gameOver').classList.add('hidden');
+ lastKnownHp=player.hp;
+ updateCamera();
+ updateQuest();
+ showToast(restored?'Speicherpunkt geladen':'Du bist wieder aufgestanden');
+}
 function update(dt,now){
- if(!dialogOpen&&!panelOpen){move(dt);attackCD=Math.max(0,attackCD-dt);skillCD=Math.max(0,skillCD-dt);rollCD=Math.max(0,rollCD-dt);player.inv=Math.max(0,player.inv-dt);player.rolling=Math.max(0,player.rolling-dt)}
- updateEnemies(dt,now);updateParticles(dt,now);
- if(player.hp<lastKnownHp){damageFlash=.15;lastKnownHp=player.hp}damageFlash=Math.max(0,damageFlash-dt);
- if(zone==='windruh'&&main.stage===2){const f=world.decor.find(o=>o.type==='fountain');if(f&&Math.hypot(f.x+16-player.x,f.y+14-player.y)<48)currentPrompt='Brunnen aktivieren'}
+ if(!gameOver&&!dialogOpen&&!panelOpen){
+  move(dt);
+  attackCD=Math.max(0,attackCD-dt);
+  skillCD=Math.max(0,skillCD-dt);
+  rollCD=Math.max(0,rollCD-dt);
+  player.inv=Math.max(0,player.inv-dt);
+  player.rolling=Math.max(0,player.rolling-dt);
+  updateEnemies(dt,now);
+  updateParticles(dt,now);
+  if(player.hp<=0)triggerGameOver();
+ }
+ if(player.hp<lastKnownHp){damageFlash=.15;lastKnownHp=player.hp}
+ damageFlash=Math.max(0,damageFlash-dt);
+ if(zone==='windruh'&&main.stage===2){
+  const f=world.decor.find(o=>o.type==='fountain');
+  if(f&&Math.hypot(f.x+16-player.x,f.y+14-player.y)<48)currentPrompt='Brunnen aktivieren';
+ }
  updateQuest();
 }
 function keyDown(e){
+ if(gameOver)return;
  const k=e.key.toLowerCase();keys[k]=true;
  if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
  if(e.repeat)return;
@@ -1000,6 +1056,7 @@ function init(){
  world=makeWorld('windruh');player.x=31*T;player.y=27*T;updateCamera();makeMonsters();makeParticles();buildHeroCards();
  if(hasAnySave())document.getElementById('continueBtn').style.display='inline-block';
  document.getElementById('startBtn').onclick=startGame;
+ document.getElementById('retryBtn').onclick=retryFromCheckpoint;
  document.getElementById('continueBtn').onclick=()=>{if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}else showToast('Kein Spielstand gefunden')};
  document.getElementById('nextBtn').onclick=closeDialogue;
  document.getElementById('useBtn').onclick=interact;document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
@@ -1016,4 +1073,12 @@ function init(){
 const stickEl=document.getElementById('stick'),nub=document.getElementById('nub');
 init();
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden)window.dispatchEvent(new Event('blur'));
+});
 </script></body></html>
