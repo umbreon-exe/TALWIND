@@ -389,7 +389,7 @@ function makeWorld(id){
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
   w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
-  w.exits.push({x:76*T,y:34*T,w:28,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
   w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
@@ -412,10 +412,10 @@ function makeWorld(id){
   for(let xx=8;xx<88;xx+=3){set(xx,4,4);set(xx,67,4)}
   for(let yy=10;yy<64;yy+=3){set(4,yy,4);set(91,yy,4)}
   w.exits.push(
-   {x:45*T,y:0,w:64,h:42,to:'wald',tx:44*T,ty:60*T,label:'Nordweg · Flüsterwald',open:()=>true},
+   {x:45*T,y:0,w:64,h:42,to:'wald',tx:44*T,ty:55*T,label:'Nordweg · Flüsterwald',open:()=>true},
    {x:94*T,y:32*T,w:28,h:72,to:'sumpf',tx:5*T,ty:27*T,label:'Ostweg · Nebelmoor',open:()=>true},
    {x:45*T,y:70*T,w:64,h:36,to:'shrine',tx:22*T,ty:14*T,label:'Südweg · Echo-Schrein',open:()=>main.forestFlowers>=3},
-   {x:0,y:32*T,w:24,h:72,to:'eispass',tx:74*T,ty:39*T,label:'Westweg · Frostgrat',open:()=>true}
+   {x:0,y:32*T,w:24,h:72,to:'eispass',tx:68*T,ty:39*T,label:'Westweg · Frostgrat',open:()=>true}
   );
  }
  // Every map receives a coherent natural edge, not an empty tile border.
@@ -1071,7 +1071,7 @@ function interact(){
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
- if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',44*T,60*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',44*T,55*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
