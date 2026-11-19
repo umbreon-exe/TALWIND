@@ -256,7 +256,7 @@ const sideQuests={
  watch:{state:0,items:0,need:2}
 };
 const seedSpots=[{x:32*T+8,y:30*T+8,found:false},{x:62*T+8,y:39*T+8,found:false},{x:73*T+8,y:36*T+8,found:false}];
-const flowerSpots=[{x:24*T+8,y:30*T+8,found:false},{x:58*T+8,y:13*T+8,found:false},{x:58*T+8,y:49*T+8,found:false}];
+const flowerSpots=[{x:33*T+8,y:41*T+8,found:false},{x:80*T+8,y:18*T+8,found:false},{x:80*T+8,y:67*T+8,found:false}];
 const rooms={
  mira:{title:'Miras gemütliches Haus',kind:'home',npc:'mira'},
  inn:{title:'Zum singenden Krug',kind:'inn',npc:'runa'},
@@ -278,7 +278,7 @@ function makeNPC(id,name,tx,ty,color,hair,kind,line,extra){
  return Object.assign({id,name,x:tx*T+8,y:ty*T+8,color,hair,kind,line,homeX:tx*T+8,homeY:ty*T+8,phase:rand((tx+ty+id.length)*913)()*6},extra||{});
 }
 function makeWorld(id){
- const sizes={windruh:[96,72],wald:[88,64],sumpf:[72,56],hoehle:[72,54],eispass:[80,56],shrine:[45,25]};
+ const sizes={windruh:[96,72],wald:[121,88],sumpf:[99,77],hoehle:[99,74],eispass:[110,77],shrine:[45,25]};
  const size=sizes[id]||sizes.windruh,W=size[0],H=size[1];
  const names={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',eispass:'Frostgrat',shrine:'Echo-Schrein'};
  const ground={windruh:0,wald:5,sumpf:9,hoehle:6,eispass:8,shrine:3}[id];
@@ -351,7 +351,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
   w.exits.push({x:38*T,y:0,w:70,h:42,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
   path(44,61,44,32,2,1);path(44,32,29,32,2,1);
-  w.exits.push({x:40*T,y:61*T,w:70,h:30,to:'hoehle',tx:5*T,ty:26*T,label:'Zum Höhlenpfad',open:()=>true});
+  w.exits.push({x:40*T,y:61*T,w:70,h:30,to:'hoehle',tx:7*T,ty:36*T,label:'Zum Höhlenpfad',open:()=>true});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
  }else if(id==='sumpf'){
@@ -389,7 +389,7 @@ function makeWorld(id){
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
   w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
-  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:78*T,ty:46*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:107*T,ty:63*T,label:'Zurück zum Flüsterwald',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
   w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
@@ -412,11 +412,24 @@ function makeWorld(id){
   for(let xx=8;xx<88;xx+=3){set(xx,4,4);set(xx,67,4)}
   for(let yy=10;yy<64;yy+=3){set(4,yy,4);set(91,yy,4)}
   w.exits.push(
-   {x:45*T,y:0,w:64,h:42,to:'wald',tx:44*T,ty:55*T,label:'Nordweg · Flüsterwald',open:()=>true},
-   {x:94*T,y:32*T,w:28,h:72,to:'sumpf',tx:5*T,ty:27*T,label:'Ostweg · Nebelmoor',open:()=>true},
+   {x:45*T,y:0,w:64,h:42,to:'wald',tx:60*T,ty:76*T,label:'Nordweg · Flüsterwald',open:()=>true},
+   {x:94*T,y:32*T,w:28,h:72,to:'sumpf',tx:7*T,ty:37*T,label:'Ostweg · Nebelmoor',open:()=>true},
    {x:45*T,y:70*T,w:64,h:36,to:'shrine',tx:22*T,ty:14*T,label:'Südweg · Echo-Schrein',open:()=>main.forestFlowers>=3},
-   {x:0,y:32*T,w:24,h:72,to:'eispass',tx:68*T,ty:39*T,label:'Westweg · Frostgrat',open:()=>true}
+   {x:0,y:32*T,w:24,h:72,to:'eispass',tx:94*T,ty:54*T,label:'Westweg · Frostgrat',open:()=>true}
   );
+ }else if(id!=='shrine'){
+  // Scale each outer region as a complete map: terrain, props, NPCs, items and local exits.
+  const scale=1.375,original={wald:[88,64],sumpf:[72,56],hoehle:[72,54],eispass:[80,56]}[id];
+  const source=w.tiles,scaled=new Uint8Array(W*H);scaled.fill(ground);
+  for(let yy=0;yy<original[1];yy++)for(let xx=0;xx<original[0];xx++){
+   const value=source[yy*W+xx],x0=Math.floor(xx*scale),x1=Math.max(x0+1,Math.floor((xx+1)*scale)),y0=Math.floor(yy*scale),y1=Math.max(y0+1,Math.floor((yy+1)*scale));
+   for(let y=y0;y<y1&&y<H;y++)for(let x=x0;x<x1&&x<W;x++)scaled[y*W+x]=value;
+  }
+  w.tiles=scaled;
+  for(const o of w.decor){o.x*=scale;o.y*=scale}
+  for(const n of w.npcs){n.x*=scale;n.y*=scale;n.homeX*=scale;n.homeY*=scale}
+  for(const item of w.items){item.x*=scale;item.y*=scale}
+  for(const e of w.exits){e.x*=scale;e.y*=scale;e.w*=scale;e.h*=scale}
  }
  // Every map receives a coherent natural edge, not an empty tile border.
  for(const item of w.items)item.found=!!collectedItems[item.id];
@@ -773,7 +786,7 @@ function drawParticles(now){
 }
 function makeMonsters(){
  monsters=[];
- const add=(type,z,tx,ty,hp,behavior,phase)=>monsters.push({type,zone:z,x:tx*T,y:ty*T,hp,maxHp:hp,behavior,phase:phase||0,timer:1+monsters.length*.3,windup:0,dead:false,homeX:tx*T,homeY:ty*T,hostile:true});
+ const add=(type,z,tx,ty,hp,behavior,phase)=>{const scale=z==='windruh'?1:1.375;monsters.push({type,zone:z,x:tx*T*scale,y:ty*T*scale,hp,maxHp:hp,behavior,phase:phase||0,timer:1+monsters.length*.3,windup:0,dead:false,homeX:tx*T*scale,homeY:ty*T*scale,hostile:true})};
  // Forest encounters.
  add('wolf','wald',12,32,8,'chase',.2);add('moth','wald',58,13,5,'ranged',1.4);add('bramble','wald',58,49,9,'ambush',2.1);add('thornling','wald',29,53,7,'patrol',2.8);
  // Swamp, cave and ice types are separate entities, never decorations.
@@ -1071,7 +1084,7 @@ function interact(){
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
- if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',44*T,55*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
