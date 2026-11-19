@@ -389,7 +389,7 @@ function makeWorld(id){
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
   w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
-  w.exits.push({x:0,y:23*T,w:24,h:110,to:'wald',tx:107*T,ty:63*T,label:'Zurück zum Flüsterwald',open:()=>true});
+  w.exits.push({x:75*T,y:34*T,w:64,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
   path(22,18,22,33,2,3);
@@ -847,7 +847,7 @@ function canOccupy(x,y){
  return !pts.some(p=>pointBlocked(p[0],p[1]));
 }
 function pointBlocked(px,py){
- if(room||zone==='shrine')return false;
+ if(room)return false;
  const tx=Math.floor(px/T),ty=Math.floor(py/T);
  if(tx<1||ty<1||tx>=world.width-1||ty>=world.height-1)return true;
  const tile=world.tiles[ty*world.width+tx];
@@ -1156,8 +1156,8 @@ function retryFromCheckpoint(){
   player.hp=3;
   player.inv=2;
   player.rolling=0;
-  player.x=zone==='windruh'?48*T:zone==='shrine'?220:Math.floor(world.width*.45)*T;
-  player.y=zone==='windruh'?36*T:zone==='shrine'?300:Math.floor(world.height*.5)*T;
+  player.x=zone==='windruh'?48*T:zone==='shrine'?480:Math.floor(world.width*.45)*T;
+  player.y=zone==='windruh'?36*T:zone==='shrine'?304:Math.floor(world.height*.5)*T;
   makeMonsters();
  }
  gameOver=false;
