@@ -101,6 +101,33 @@ body{display:grid;place-items:center;touch-action:none}
  .heroCard canvas{width:43px;height:57px}
 }
 
+
+/* Interaction fix and clarity pass */
+#questLine{z-index:4;pointer-events:none}
+#menuButtons{z-index:14;pointer-events:auto}
+#menuButtons .menuBtn{position:relative;z-index:15;pointer-events:auto;touch-action:manipulation;min-height:38px}
+#panel:not(.hidden){display:grid!important;pointer-events:auto;z-index:30}
+#panel .panelCard{pointer-events:auto;max-width:min(94vw,680px)}
+#panel button{pointer-events:auto;touch-action:manipulation}
+.menuBtn:focus-visible,.act:focus-visible,.uiButton:focus-visible{outline:3px solid #fff0a8;outline-offset:2px}
+.menuBtn:active{transform:translateY(2px);filter:brightness(1.15)}
+.act.cooldown{filter:saturate(.55);opacity:.82}
+.act.cooldown small{color:#ffe18a}
+#rollBtn{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#rollBtn:disabled{cursor:default}
+#panel .mapRoute{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+#panel .mapZone{padding:11px 10px;border:2px solid #b99053;background:linear-gradient(145deg,#304d68,#182b43);color:#f7edcf;min-height:75px;text-align:left}
+#panel .mapZone.current{border:3px solid #ffda78;box-shadow:0 0 0 2px #f6c75f66;background:linear-gradient(145deg,#4c604e,#263d36)}
+#panel .mapZone b{display:block;color:#ffdf93;margin-bottom:5px}
+#panel .mapZone small{color:#d5dfdc;line-height:1.4}
+#panel .mapLegend{font-size:11px;color:#d7e0e5}
+@media(max-width:650px){
+ #menuButtons{top:112px;gap:5px}
+ #menuButtons .menuBtn{min-height:34px}
+ #panel .mapRoute{gap:5px}
+ #panel .mapZone{padding:8px;font-size:11px;min-height:68px}
+}
+
 </style></head>
 <body><main id="game">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
@@ -1462,6 +1489,249 @@ buildHeroCards=function(){
 
 // rebuild the scene with the revised village layout and wide camera
 player.x=24*T-12;player.y=21*T;world=makeWorld(zone);updateArtCamera();
+
+/* ===== GAMEPLAY REPAIR PASS: menus, directional roll, wilderness spawns ===== */
+
+// 1) Left-side menu: #panel previously inherited display:none from its ID rule.
+// Keep the overlay visible whenever it is opened and rebind the menu buttons cleanly.
+const panelRoot=document.getElementById('panel');
+const panelCloseButton=document.getElementById('closePanel');
+const previousPanelOpen=openPanel;
+openPanel=function(kind){
+ previousPanelOpen(kind);
+ panelRoot.classList.remove('hidden');
+ panelRoot.style.display='grid';
+ panelRoot.setAttribute('aria-hidden','false');
+ if(kind==='map'){
+  const here={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',shrine:'Echo-Schrein'}[zone]||'Avarra';
+  const places=[
+   ['windruh','🏘 Windruh','Stadt, Brunnenplatz, Geschäfte und Bewohner. Hier gibt es keine Monster.'],
+   ['wald','🌲 Flüsterwald','Waldlichtungen, wilde Kreaturen und der Weg zum Echo-Schrein.'],
+   ['sumpf','🌫 Nebelmoor','Nasse Pfade, Moorlichter und weitere Gegner.'],
+   ['hoehle','💎 Flüsterhöhle','Dunkle Gänge, Kristalle und Höhlenwesen.'],
+   ['shrine','✧ Echo-Schrein','Alter Tempel und der Wächter des ersten Echos.']
+  ];
+  document.getElementById('panelText').innerHTML=
+   '<p><b>Avarra · Übersicht</b><br>Dein aktueller Ort: <b>'+here+'</b></p>'+
+   '<div class="mapRoute">'+places.map(p=>'<div class="mapZone '+(p[0]===zone?'current':'')+'"><b>'+p[1]+(p[0]===zone?' · DU BIST HIER':'')+'</b><small>'+p[2]+'</small></div>').join('')+'</div>'+
+   '<p class="mapLegend">Gold umrandet = aktueller Standort. Die Gebiete erreichst du über die Wege in der Spielwelt.</p>';
+ }
+};
+const previousPanelClose=closePanel;
+closePanel=function(){
+ previousPanelClose();
+ panelRoot.style.display='none';
+ panelRoot.setAttribute('aria-hidden','true');
+};
+document.querySelectorAll('#menuButtons [data-panel]').forEach(oldButton=>{
+ const button=oldButton.cloneNode(true);
+ oldButton.replaceWith(button);
+ button.addEventListener('click',ev=>{
+  ev.preventDefault();ev.stopPropagation();
+  openPanel(button.dataset.panel);
+ });
+});
+if(panelCloseButton){
+ panelCloseButton.onclick=ev=>{ev.preventDefault();closePanel()};
+ panelCloseButton.setAttribute('aria-label','Menü schließen');
+}
+panelRoot.setAttribute('aria-hidden','true');
+
+// 2) Directional dodge roll. It reads the live movement input, so it also works
+// while WASD, arrows, touch stick or a controller are held down.
+let rollEffects=[];
+function getLiveMoveDirection(){
+ let x=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+(stick.x||0);
+ let y=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0)+(stick.y||0);
+ try{
+  const pads=navigator.getGamepads?navigator.getGamepads():[];
+  const gp=pads&&Array.from(pads).find(p=>p&&p.connected);
+  if(gp){
+   const ax=gp.axes[0]||0,ay=gp.axes[1]||0;
+   if(Math.hypot(ax,ay)>.2){x=ax;y=ay}
+  }
+ }catch(e){}
+ let mag=Math.hypot(x,y);
+ if(mag>.12){return{x:x/mag,y:y/mag}}
+ let fx=player.faceX||0,fy=player.faceY||0;
+ if(!fx&&!fy)fy=1;
+ mag=Math.hypot(fx,fy)||1;
+ return{x:fx/mag,y:fy/mag};
+}
+dodge=function(){
+ if(rollCD>0||dialogOpen||panelOpen)return;
+ const dir=getLiveMoveDirection();
+ const startX=player.x,startY=player.y;
+ player.faceX=Math.abs(dir.x)>Math.abs(dir.y)?Math.sign(dir.x):0;
+ player.faceY=Math.abs(dir.y)>=Math.abs(dir.x)?Math.sign(dir.y):0;
+ const distance=88;
+ const steps=14;
+ for(let i=1;i<=steps;i++){
+  const nx=startX+dir.x*distance*i/steps;
+  const ny=startY+dir.y*distance*i/steps;
+  if(canOccupy(nx,ny)){player.x=nx;player.y=ny}
+  else{
+   // Slide along a wall rather than cancelling the whole roll.
+   if(canOccupy(nx,player.y))player.x=nx;
+   if(canOccupy(player.x,ny))player.y=ny;
+  }
+ }
+ if(zone==='shrine'){
+  player.x=clamp(player.x,18,VW-44);
+  player.y=clamp(player.y,20,VH-48);
+ }
+ player.inv=Math.max(player.inv,.62);
+ player.rolling=.28;
+ rollCD=.82;
+ rollEffects.push({x:startX+12,y:startY+19,dx:dir.x,dy:dir.y,born:performance.now(),life:.28});
+ updateArtCamera();
+ refreshRollButton();
+};
+function refreshRollButton(){
+ const b=document.getElementById('rollBtn');if(!b)return;
+ const small=b.querySelector('small');const ticks=Math.ceil(rollCD*10);
+ b.classList.toggle('cooldown',rollCD>.04);
+ b.disabled=rollCD>.04;
+ if(small)small.textContent=rollCD>.04?('ROLLE '+(ticks/10).toFixed(1)):'ROLLE';
+}
+const previousUpdateForRoll=update;
+update=function(dt,now){
+ previousUpdateForRoll(dt,now);
+ refreshRollButton();
+ if(player.rolling>0)player.rolling=Math.max(0,player.rolling-dt);
+};
+const previousDrawWorldForRoll=drawWorld;
+drawWorld=function(now){
+ previousDrawWorldForRoll(now);
+ rollEffects=rollEffects.filter(e=>(now-e.born)<e.life*1000);
+ for(const e of rollEffects){
+  const p=Math.max(0,1-(now-e.born)/(e.life*1000));
+  const x=e.x-camera.x,y=e.y-camera.y;
+  ctx.save();ctx.globalAlpha=p*.72;
+  ctx.strokeStyle='#d9f7ef';ctx.lineWidth=3;ctx.beginPath();
+  ctx.moveTo(x-e.dx*10-e.dy*7,y-e.dy*10+e.dx*7);
+  ctx.lineTo(x+e.dx*70-e.dy*4,y+e.dy*70+e.dx*4);ctx.stroke();
+  ctx.strokeStyle='#fff0b7';ctx.lineWidth=2;ctx.beginPath();
+  ctx.arc(x+e.dx*14,y+e.dy*14,10+(1-p)*10,-.8,1.7);ctx.stroke();
+  for(let i=0;i<4;i++){
+   const q=i*1.7+(1-p)*4;
+   pixel(x+Math.cos(q)*18,y+Math.sin(q)*12,3,3,i%2?'#bfeee7':'#fff0b8');
+  }
+  ctx.restore();
+ }
+};
+const rollButton=document.getElementById('rollBtn');
+rollButton.onclick=ev=>{ev.preventDefault();dodge()};
+rollButton.addEventListener('pointerdown',()=>rollButton.classList.add('pressed'));
+['pointerup','pointercancel','pointerleave'].forEach(name=>rollButton.addEventListener(name,()=>rollButton.classList.remove('pressed')));
+refreshRollButton();
+
+// 3) No creatures in Windruh. Hostile creatures live in the forest, swamp,
+// caves and the shrine only.
+makeMonsters=function(){
+ monsters.length=0;
+ const add=(type,z,tx,ty,hp,behavior)=>monsters.push({
+  type,zone:z,x:tx*T,y:ty*T,hp,maxHp:hp,behavior,
+  phase:monsters.length*.83,timer:.7+(monsters.length%4)*.32,windup:0,dead:false
+ });
+ // Flüsterwald: creatures at forest edges and clearings, never in Windruh.
+ add('wolf','wald',13,10,6,'chase');
+ add('moth','wald',46,12,4,'ranged');
+ add('bramble','wald',16,30,7,'windup');
+ add('archer','wald',49,29,5,'ranged');
+ add('wisp','wald',40,25,4,'patrol');
+ add('thornling','wald',54,24,5,'chase');
+ // Nebelmoor and Flüsterhöhle receive their own distinct encounters.
+ add('bogling','sumpf',18,12,6,'chase');
+ add('wisp','sumpf',45,27,4,'ranged');
+ add('caveBat','hoehle',18,13,4,'chase');
+ add('stoneWarden','hoehle',46,27,8,'windup');
+ // The shrine guardian is the only enemy in the shrine.
+ monsters.push({type:'guardian',zone:'shrine',x:240,y:112,hp:40,maxHp:40,behavior:'boss',phase:0,timer:1,windup:0,dead:false});
+ bossState={hp:40,maxHp:40,phase:1,windup:0,attackCd:1.5,attackType:'Schallwelle',active:false};
+};
+
+// 4) More readable pixel monsters: clear silhouettes, outlines and signature
+// colors, with distinct faces and equipment instead of one shared blob.
+drawMonster=function(m,now){
+ const x=Math.round(m.x-camera.x),y=Math.round(m.y-camera.y),f=Math.floor(now/150)%4;
+ const blink=f===0;
+ const shadow=(w)=>pixel(x+3,y+28,w,4,'#244b36');
+ const eye=(ex,ey,c='#f8f0c6')=>{pixel(ex,ey,4,4,c);pixel(ex+1,ey+1,2,2,'#332c2b')};
+ if(m.type==='wolf'){
+  shadow(31);pixel(x+5,y+13,25,12,'#5e5d5a');pixel(x+8,y+8,19,13,'#898a82');
+  pixel(x+7,y+4,7,9,'#6c6e68');pixel(x+21,y+4,7,9,'#6c6e68');pixel(x+9,y+3,4,6,'#b2a28d');pixel(x+23,y+3,4,6,'#b2a28d');
+  pixel(x+24,y+14,11,8,'#b8a58e');pixel(x+30,y+18,5,4,'#4e403a');
+  for(const lx of [8,26]){pixel(x+lx,y+22,5,8,'#4e4c49');pixel(x+lx-1,y+28,7,3,'#baad98')}
+  eye(x+11,y+12);eye(x+23,y+12);pixel(x+15,y+18,3,2,'#44332f');
+ }else if(m.type==='moth'){
+  shadow(25);pixel(x+2,y+7,11,15,'#8d7aa9');pixel(x+23,y+7,11,15,'#bda9d8');
+  pixel(x+6,y+5,7,10,'#dbcbe9');pixel(x+24,y+5,7,10,'#eee0f6');
+  pixel(x+13,y+9,12,17,'#77628e');pixel(x+15,y+5,9,10,'#c5b3d8');eye(x+15,y+13,'#fff3ce');eye(x+23,y+13,'#fff3ce');
+  pixel(x+17,y+27,3,5,'#51404f');pixel(x+24,y+27,3,5,'#51404f');
+ }else if(m.type==='archer'){
+  shadow(25);pixel(x+7,y+18,18,13,'#385f42');pixel(x+9,y+19,14,11,'#6c9857');
+  pixel(x+10,y+7,13,13,'#e5b58c');pixel(x+8,y+4,17,7,'#315f3e');pixel(x+6,y+7,5,10,'#315f3e');
+  pixel(x+3,y+15,4,18,'#835a37');pixel(x+4,y+13,3,3,'#e3ca8f');
+  pixel(x+24,y+17,8,12,'#92683f');pixel(x+26,y+17,2,12,'#ead09a');
+  eye(x+12,y+12);eye(x+19,y+12);pixel(x+11,y+30,5,5,'#49372d');pixel(x+19,y+30,5,5,'#49372d');
+ }else if(m.type==='bramble'){
+  shadow(33);pixel(x+2,y+13,32,16,'#536c3c');pixel(x+5,y+7,26,18,'#7e9650');
+  pixel(x+1,y+14,7,9,'#a8a45e');pixel(x+28,y+12,7,11,'#b6a96a');
+  for(let i=0;i<5;i++)pixel(x+4+i*6,y+4+(i%2)*3,5,8,'#3d653d');
+  eye(x+11,y+15,'#f5e0a7');eye(x+23,y+15,'#f5e0a7');
+  pixel(x+16,y+23,5,2,'#3c3b2e');pixel(x+9,y+28,5,4,'#493b2c');pixel(x+24,y+28,5,4,'#493b2c');
+ }else if(m.type==='wisp'){
+  shadow(21);pixel(x+9,y+8,15,17,'#368f9a');pixel(x+12,y+4,10,19,'#80dce0');pixel(x+15,y+1,5,8,'#d9ffff');
+  pixel(x+5,y+12,6,8,'#65b9c4');pixel(x+23,y+13,7,8,'#5aaeb9');
+  eye(x+12,y+12,'#fff8d0');eye(x+20,y+12,'#fff8d0');
+  pixel(x+16,y+26,2,5,'#a8e6df');
+ }else if(m.type==='bogling'){
+  shadow(29);pixel(x+3,y+12,28,17,'#355d3f');pixel(x+6,y+7,22,19,'#759a4c');
+  pixel(x+8,y+4,6,9,'#457c49');pixel(x+22,y+4,6,9,'#457c49');pixel(x+14,y+1,8,8,'#9aaf5b');
+  eye(x+10,y+14,'#ffedb5');eye(x+22,y+14,'#ffedb5');pixel(x+16,y+22,5,2,'#3e4b34');
+  pixel(x+5,y+27,6,4,'#5d4432');pixel(x+24,y+27,6,4,'#5d4432');
+ }else if(m.type==='caveBat'){
+  shadow(26);pixel(x+1,y+10,12,10,'#4e3c69');pixel(x+23,y+10,12,10,'#4e3c69');
+  pixel(x+3,y+6,8,12,'#785a93');pixel(x+24,y+6,8,12,'#785a93');
+  pixel(x+11,y+9,14,18,'#49365f');pixel(x+14,y+5,9,11,'#8163a2');
+  pixel(x+11,y+24,5,7,'#49365f');pixel(x+21,y+24,5,7,'#49365f');
+  eye(x+13,y+14,'#f6dfad');eye(x+21,y+14,'#f6dfad');
+ }else if(m.type==='stoneWarden'){
+  shadow(34);pixel(x+2,y+11,34,19,'#5b625d');pixel(x+5,y+5,28,20,'#8e9489');
+  pixel(x+8,y+2,8,8,'#adb3a5');pixel(x+23,y+2,8,8,'#a3a99e');
+  pixel(x+10,y+13,5,5,'#b8ecdc');pixel(x+23,y+13,5,5,'#b8ecdc');
+  pixel(x+7,y+27,7,7,'#555d58');pixel(x+25,y+27,7,7,'#555d58');
+  pixel(x+1,y+14,7,15,'#747c72');pixel(x+31,y+14,7,15,'#747c72');
+ }else{
+  shadow(25);pixel(x+4,y+12,25,16,'#3f7848');pixel(x+7,y+7,19,17,'#78ad58');
+  pixel(x+8,y+8,5,7,'#a4c96d');pixel(x+20,y+8,5,7,'#9bc46a');
+  eye(x+10,y+13);eye(x+21,y+13);pixel(x+15,y+23,5,2,'#41523a');
+  if(m.type==='thornling'){pixel(x+4,y+3,6,9,'#536b3d');pixel(x+23,y+2,7,10,'#536b3d');pixel(x+1,y+13,6,5,'#b2a16a');pixel(x+28,y+13,6,5,'#b2a16a')}
+ }
+ if(m.hp>0&&m.hp<m.maxHp){
+  pixel(x+4,y-6,27,4,'#342b29');pixel(x+5,y-5,25,2,'#e3d9bf');
+  pixel(x+5,y-5,Math.max(1,Math.round(25*m.hp/m.maxHp)),2,'#e35d50');
+ }
+};
+
+// 5) More visual feedback and bounded monster roaming.
+const updateBeforeWilderness=update;
+update=function(dt,now){
+ updateBeforeWilderness(dt,now);
+ for(const m of monsters){
+  if(m.zone!==zone||m.hp<=0||m.behavior==='boss')continue;
+  m.x=clamp(m.x,2*T,(world.width-3)*T);
+  m.y=clamp(m.y,2*T,(world.height-3)*T);
+ }
+};
+
+// Bind the touch/action button and keep all menu actions above the canvas.
+document.getElementById('menuButtons').style.pointerEvents='auto';
+document.getElementById('menuButtons').style.zIndex='14';
+rollButton.setAttribute('aria-label','In die aktuelle Laufrichtung rollen');
+refreshRollButton();
+
 buildHeroCards();makeMonsters();if(localStorage.getItem(saveKey))document.getElementById('continueBtn').style.display='inline-block';
 updateQuest();drawWorld(performance.now());
 })();
