@@ -252,6 +252,11 @@ const regionAt=(x,y)=>{
  for(const id of REGION_IDS){const r=REGION_LAYOUT[id];if(tx>=r.x&&tx<r.x+r.w&&ty>=r.y&&ty<r.y+r.h)return id}
  return null;
 };
+function discoverRegion(id){
+ if(!id||discoveredRegions[id])return false;
+ discoveredRegions[id]=true;player.coins+=12;player.xp+=20;
+ showToast(regionName(id)+' entdeckt · +12 Windtaler · +20 EP');saveGame(activeSlot,true);updateQuest();return true;
+}
 const rand=(seed)=>{let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}};
 const heroes=[
 {name:'LYRA',spriteId:28,role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
@@ -634,6 +639,7 @@ function makeWorld(initialZone){
  connect('wald','windruh',60,86,48,1,'Zurück nach Windruh');
  connect('sumpf','wald',97,30,2,30,'Steinpfad · Flüsterwald');
  connect('wald','sumpf',2,30,97,30,'Zum Nebelmoor');
+ carve(REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+35,REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+70,1);
  connect('windruh','hoehle',48,70,44,2,'Wurzelpfad · Flüsterhöhle');
  connect('hoehle','windruh',44,2,48,70,'Zurück nach Windruh');
  connect('wald','shrine',119,31,2,17,'Zum Echo-Schrein',()=>main.forestFlowers>=3);
@@ -1201,7 +1207,7 @@ function changeZone(id,x,y){
  const snapshot=document.createElement('canvas');snapshot.width=VW;snapshot.height=VH;
  try{snapshot.getContext('2d').drawImage(canvas,0,0)}catch(e){}
  const from=zone,r=REGION_LAYOUT[id]||REGION_LAYOUT.windruh;
- zone=id;discoveredRegions[id]=true;room=null;currentRoom=null;roomNPC=null;combatFx=[];
+ zone=id;discoverRegion(id);room=null;currentRoom=null;roomNPC=null;combatFx=[];
  player.x=r.x*T+x;player.y=r.y*T+y;player.inv=.22;
  updateCamera();worldTransition={snapshot,start:performance.now(),duration:280,from,to:id};
  if(from!==id)showToast('Entdeckt: '+regionName(id));
@@ -1593,7 +1599,7 @@ function move(dt){
   }
   move._lockedNotice=false;
   const detected=regionAt(px,py);
-  if(detected&&detected!==zone){zone=detected;discoveredRegions[detected]=true;showToast('Entdeckt: '+regionName(detected));saveGame(activeSlot,true);updateQuest()}
+  if(detected&&detected!==zone){zone=detected;discoverRegion(detected);updateQuest()}
  }
  if(room&&player.faceY>0&&player.y>=VH-58&&Math.abs(player.x+12-VW/2)<34){insideDoor();return}
  updateCamera();
