@@ -201,6 +201,12 @@ body{display:grid;place-items:center;touch-action:none}
  .invSlot .invIcon{font-size:20px}
  .invSlot .invName{font-size:7px}
 }
+
+/* Avarra world-map and remake styling */
+.worldMapCanvas{display:block;width:100%;height:auto;max-height:62vh;object-fit:contain;image-rendering:pixelated;border:2px solid #d6ad63;border-radius:8px;background:#10243a;touch-action:pan-y;cursor:crosshair}
+.mapLegend{font:10px/1.6 ui-monospace,monospace;color:#d8e2e8;text-align:center}
+#panel .panelCard{max-width:min(94vw,860px)}
+@media(max-width:650px){.worldMapCanvas{max-height:54vh}.mapLegend{font-size:8px}}
 </style></head>
 <body><main id="game" tabindex="0" aria-label="TALWIND-Spiel. Mit WASD oder Pfeiltasten bewegen.">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
@@ -1382,6 +1388,33 @@ function transferChestItem(key,from){const chest=chestStorage[activeChestId];if(
 function renderChestPanel(id){const chest=chestStorage[id];if(!chest)return;activeChestId=id;const text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons'),names={forestCache:'WALDTRUHE',moorCache:'MOORTRUHE',caveCache:'HÖHLENTRUHE'};document.getElementById('panelTitle').textContent=names[id]||'TRUHE';text.innerHTML='<p class="chestNote">Gegenstände antippen, um sie zwischen Truhe und Rucksack zu verschieben.</p><div class="chestLayout"><section class="chestBox"><h3>TRUHE</h3><div class="inventoryGrid">'+renderChestGrid(chest,'chest',12)+'</div></section><section class="chestBox"><h3>RUCKSACK</h3><div class="inventoryGrid">'+renderChestGrid(inventory,'bag',BAG_SLOTS)+'</div></section></div>';text.querySelectorAll('[data-transfer]').forEach(b=>b.onclick=()=>transferChestItem(b.dataset.transfer,b.dataset.from));buttons.innerHTML='';const close=document.createElement('button');close.className='uiButton';close.textContent='SCHLIESSEN';close.onclick=closePanel;buttons.appendChild(close)}
 function openChestPanel(id){if(!chestStorage[id])return;openedChests[id]=true;panelOpen=true;const p=document.getElementById('panel');p.classList.remove('hidden');p.classList.add('inventoryPanel');p.style.display='grid';renderChestPanel(id);saveGame(activeSlot)}
 
+function drawWorldMap(){
+ const el=document.getElementById('worldMapCanvas');if(!el||!world)return;
+ const c=el.getContext('2d'),W=el.width,H=el.height,pad=14,scale=Math.min((W-pad*2)/world.width,(H-pad*2)/world.height),mapW=world.width*scale,mapH=world.height*scale,ox=(W-mapW)/2,oy=(H-mapH)/2;
+ const colors=['#6da957','#d9c69a','#2688b8','#8b887c','#d5b978','#4e8c51','#59636b','#9a896d','#b9e1e8','#4d8374'];
+ c.clearRect(0,0,W,H);c.fillStyle='#10243a';c.fillRect(0,0,W,H);
+ for(let y=0;y<world.height;y++)for(let x=0;x<world.width;x++){
+  c.fillStyle=colors[world.tiles[y*world.width+x]]||'#6da957';
+  c.fillRect(ox+x*scale,oy+y*scale,Math.ceil(scale+.15),Math.ceil(scale+.15));
+ }
+ c.save();c.lineWidth=1.5;
+ for(const id of REGION_IDS){
+  const r=REGION_LAYOUT[id],known=!!discoveredRegions[id];
+  c.strokeStyle=id===zone?'#ffe08a':'#d8bd78';c.lineWidth=id===zone?3:1.5;
+  c.strokeRect(ox+r.x*scale,oy+r.y*scale,r.w*scale,r.h*scale);
+  const label=known?r.name:'Unbekannt';c.font='bold 13px ui-monospace,monospace';const tw=c.measureText(label).width;
+  const labelX=ox+(r.x+r.w/2)*scale,labelY=oy+(r.y+r.h/2)*scale;
+  c.fillStyle='rgba(8,23,38,.78)';c.fillRect(labelX-tw/2-5,labelY-10,tw+10,19);
+  c.fillStyle='#fff0c8';c.textAlign='center';c.fillText(label,labelX,labelY+4);
+ }
+ c.textAlign='left';
+ for(const exit of world.exits){const x=ox+(exit.x+exit.w/2)/T*scale,y=oy+(exit.y+exit.h/2)/T*scale;c.fillStyle=exit.open()?'#f1d276':'#b66b59';c.fillRect(x-2,y-2,4,4)}
+ for(const o of world.decor){if(o.type==='chest'){c.fillStyle='#e9b85c';c.fillRect(ox+o.x/T*scale-2,oy+o.y/T*scale-2,4,4)}}
+ for(const n of world.npcs){if(n.id==='mira'||n.quest){c.fillStyle='#d1e9ff';c.fillRect(ox+n.x/T*scale-1.5,oy+n.y/T*scale-1.5,3,3)}}
+ if(worldWaypoint){const x=ox+worldWaypoint.x/T*scale,y=oy+worldWaypoint.y/T*scale;c.fillStyle='#d8a4ff';c.beginPath();c.moveTo(x,y-7);c.lineTo(x+6,y);c.lineTo(x,y+7);c.lineTo(x-6,y);c.closePath();c.fill()}
+ const px=ox+player.x/T*scale,py=oy+player.y/T*scale;c.fillStyle='#ffdb70';c.strokeStyle='#26384c';c.lineWidth=3;c.beginPath();c.arc(px,py,6,0,Math.PI*2);c.fill();c.stroke();
+ c.restore();
+}
 function openPanel(kind){
  panelOpen=true;const panel=document.getElementById('panel');panel.classList.remove('hidden');panel.style.display='grid';
  const title=document.getElementById('panelTitle'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');buttons.innerHTML='';
@@ -1392,8 +1425,8 @@ function openPanel(kind){
  }else if(kind==='bag'){renderInventoryPanel();return;
  }else if(kind==='craft'){renderCraftPanel();return;
  }else if(kind==='map'){
-  title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra · Windruh und die vier Himmelswege</b></p><p>⬆ Norden: Flüsterwald<br>➡ Osten: Nebelmoor<br>⬇ Süden: Echo-Schrein (öffnet sich nach den drei Waldblüten)<br>⬅ Westen: Frostgrat</p><p>Windruh liegt als eigene Stadt auf einer Insel, vollständig von einem Fluss umgeben. Jeder der vier Wege führt über eine Brücke direkt in ein eigenes, großes Gebiet. Die Flüsterhöhle bleibt als Nebenpfad im Wald erreichbar.</p>';
- }else if(kind==='save'||kind==='load'){
+  title.textContent='AVARRA · WELTKARTE';text.innerHTML='<p>Eine gemeinsame Karte. Tippe auf eine Stelle, um einen Wegpunkt zu setzen. Gold = du · Violett = Wegpunkt.</p><canvas id="worldMapCanvas" class="worldMapCanvas" width="900" height="690" aria-label="Zusammenhängende Karte von Avarra"></canvas><p class="mapLegend">Windruh · Flüsterwald · Nebelmoor · Flüsterhöhle · Frostgrat · Echo-Schrein</p>';
+  drawWorldMap();const mapCanvas=document.getElementById('worldMapCanvas');mapCanvas.addEventListener('pointerdown',e=>{const r=mapCanvas.getBoundingClientRect(),pad=14,scale=Math.min((mapCanvas.width-pad*2)/world.width,(mapCanvas.height-pad*2)/world.height),mw=world.width*scale,mh=world.height*scale,ox=(mapCanvas.width-mw)/2,oy=(mapCanvas.height-mh)/2,x=(e.clientX-r.left)*mapCanvas.width/r.width,y=(e.clientY-r.top)*mapCanvas.height/r.height;if(x<ox||y<oy||x>ox+mw||y>oy+mh)return;worldWaypoint={x:(x-ox)/scale*T,y:(y-oy)/scale*T};saveGame(activeSlot,true);drawWorldMap();showToast('Wegpunkt gesetzt · Pfeil zeigt die Richtung')});}else if(kind==='save'||kind==='load'){
   title.textContent=kind==='save'?'SPIELSTAND SPEICHERN':'SPIELSTAND LADEN';
   const slots=readSlots();text.innerHTML='<p>Wähle einen von drei Speicherplätzen. Alte Spielstände werden automatisch in Platz 1 übernommen.</p>';
   slots.forEach((slot,i)=>{
@@ -1532,13 +1565,20 @@ function move(dt){
  if(canOccupy(player.x+dx,player.y))player.x+=dx;
  if(canOccupy(player.x,player.y+dy))player.y+=dy;
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
- if(!room){const px=player.x+12,py=player.y+31;const exit=world.exits.find(e=>px>=e.x-12&&px<=e.x+e.w+12&&py>=e.y-18&&py<=e.y+e.h+18);if(exit&&exit.open()){changeZone(exit.to,exit.tx,exit.ty);return}}
- // In Häusern führt die Tür am unteren Bildschirmrand direkt nach draußen.
- // Der Spieler muss nur nach unten in die Tür laufen; keine Aktionstaste nötig.
- if(room&&player.faceY>0&&player.y>=VH-58&&Math.abs(player.x+12-VW/2)<34){
-  insideDoor();
-  return;
+ if(!room){
+  const px=player.x+12,py=player.y+31;
+  const exit=world.exits.find(e=>px>=e.x-12&&px<=e.x+e.w+12&&py>=e.y-18&&py<=e.y+e.h+18);
+  if(exit){
+   if(exit.open()){changeZone(exit.to,exit.tx,exit.ty);return}
+   player.x-=dx;player.y-=dy;updateCamera();
+   if(!move._lockedNotice){showDialogue('DER WEG IST NOCH VERSCHLOSSEN',exit.to==='wald'?'Mira wartet am Brunnen. Sammle zuerst die drei Echosamen.':'Drei Waldblüten müssen das Tor zum Echo-Schrein öffnen.');move._lockedNotice=true}
+   return;
+  }
+  move._lockedNotice=false;
+  const detected=regionAt(px,py);
+  if(detected&&detected!==zone){zone=detected;discoveredRegions[detected]=true;showToast('Entdeckt: '+regionName(detected));saveGame(activeSlot,true);updateQuest()}
  }
+ if(room&&player.faceY>0&&player.y>=VH-58&&Math.abs(player.x+12-VW/2)<34){insideDoor();return}
  updateCamera();
 }
 function triggerGameOver(){
@@ -1565,6 +1605,7 @@ function retryFromCheckpoint(){
  showToast(restored?'Speicherpunkt geladen':'Du bist wieder aufgestanden');
 }
 function update(dt,now){
+ if(started&&!gameOver){autosaveClock+=dt;if(autosaveClock>=15){autosaveClock=0;saveGame(activeSlot,true)}}
  if(!gameOver&&!dialogOpen&&!panelOpen){
   worldMinutes=(worldMinutes+dt*4)%1440;
   if(!fishing.active)move(dt);
@@ -1628,16 +1669,16 @@ function showFinale(){
  showDialogue('DAS ERSTE ECHO','Der Klang kehrt nach Avarra zurück. Mira und die Menschen von Windruh feiern deine Rückkehr. Die sechs übrigen Echos warten jenseits der bekannten Wege.');
 }
 function startFromLoaded(){
- document.getElementById('titleScreen').classList.add('hidden');started=true;gameLoopRunning=false;startLoop();showToast('Spielstand geladen');updateQuest();
+ document.getElementById('mainMenu').classList.add('hidden');
+ document.getElementById('titleScreen').classList.add('hidden');
+ started=true;gameLoopRunning=false;startLoop();showToast('Spielstand automatisch fortgesetzt');updateQuest();
 }
 function startGame(){
+ document.getElementById('mainMenu').classList.add('hidden');
  document.getElementById('titleScreen').classList.add('hidden');
- started=true;
- document.getElementById('game').focus({preventScroll:true});
- updateQuest();
- startLoop();
- showToast('Willkommen in Windruh! Sprich mit Mira am Brunnen.');
- saveGame(activeSlot);
+ started=true;document.getElementById('game').focus({preventScroll:true});
+ updateQuest();startLoop();showToast('Willkommen in Windruh! Sprich mit Mira am Brunnen.');
+ saveGame(activeSlot,true);
 }
 function startLoop(){if(gameLoopRunning)return;gameLoopRunning=true;last=performance.now();requestAnimationFrame(gameLoop)}
 function gameLoop(now){
@@ -1650,8 +1691,13 @@ function addPanelControls(){
  document.getElementById('closePanel').onclick=closePanel;
 }
 function init(){
- world=makeWorld('windruh');player.x=48*T;player.y=36*T;updateCamera();makeMonsters();makeParticles();buildHeroCards();
- if(hasAnySave())document.getElementById('continueBtn').style.display='inline-block';
+ world=makeWorld('windruh');player.x=(REGION_LAYOUT.windruh.x+48)*T;player.y=(REGION_LAYOUT.windruh.y+36)*T;
+ updateCamera();makeMonsters();makeParticles();buildHeroCards();
+ const hasSave=hasAnySave();
+ if(hasSave){
+  document.getElementById('continueBtn').style.display='inline-block';
+  if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}
+ }
  document.getElementById('openHeroMenuBtn').onclick=()=>{document.getElementById('mainMenu').classList.add('hidden');document.getElementById('titleScreen').classList.remove('hidden')};
  document.getElementById('startBtn').onclick=startGame;
  document.getElementById('retryBtn').onclick=retryFromCheckpoint;
@@ -1663,6 +1709,9 @@ function init(){
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
  addPanelControls();document.addEventListener('keydown',keyDown);document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
  addEventListener('blur',()=>{for(const k in keys)keys[k]=false;resetStick()});
+ addEventListener('pagehide',()=>{if(started)saveGame(activeSlot,true)});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden&&started)saveGame(activeSlot,true)});
+ try{navigator.storage?.persist?.().catch(()=>{})}catch(e){}
  addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Interagieren · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · Klick / E Interagieren · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
  addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · Klick / E Interagieren · J Angriff · K Fähigkeit · Shift Rolle'});
  canvas.addEventListener('pointerdown',handleWorldPointer);
