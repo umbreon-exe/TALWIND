@@ -20,6 +20,9 @@ assert.match(html, /id="heroGrid"/, "hero selection is present");
 assert.match(html, /id="questLine"/, "quest HUD is present");
 assert.match(html, /id="skillCooldown"/, "ability cooldown is visible");
 assert.match(html, /id="attackCooldown"/, "attack cooldown is visible");
+assert.ok(html.includes("function questGuideTarget(") && html.includes("function drawQuestGuide("), "main quest direction arrow is implemented");
+assert.ok(html.includes("function updateNPCs(dt)") && html.includes("updateNPCs(dt)"), "NPCs have ambient roaming movement");
+assert.ok(html.includes("const pulse=Math.sin(now/210)"), "fountain has recognizable animated basin details");
 assert.ok(html.includes("function spawnCombatFx("), "combat visual effects are implemented");
 assert.ok(html.includes("function drawCombatEffects("), "combat effects are rendered");
 assert.ok(html.includes("function combatTarget("), "combat targeting uses facing direction and range");
@@ -49,7 +52,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v4"'), "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v6"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
