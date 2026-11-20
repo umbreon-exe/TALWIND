@@ -1361,11 +1361,11 @@ function harvestTree(tree){
  if(gear.tool!=='woodAxe'){showToast('Zum Fällen brauchst du eine ausgerüstete Holzfälleraxt.');return}
  const hits=Math.min(3,(Number(treeProgress[tree.id])||0)+1);treeProgress[tree.id]=hits;tree.chopHits=hits;tree.chopFlash=.42;
  spawnCombatFx('hit',tree.x+22,tree.y+42,0,0,'#e6c18b',.3);
- if(hits<3){showToast('Holz fällen · '+hits+'/3');saveGame(activeSlot);return}
+ if(hits<3){saveGame(activeSlot);showToast('Holz fällen · '+hits+'/3');return}
  tree.felled=true;tree.solid=false;collectedItems['treeFelled:'+tree.id]=true;
  const key=tree.woodKey||'wood',amount=tree.woodYield||3;inventory[key]=(Number(inventory[key])||0)+amount;
- const names={wood:'Holz',birchWood:'Birkenholz',frostWood:'Frostholz'};showToast(amount+' × '+(names[key]||'Holz')+' erhalten');
- spawnCombatFx('ring',tree.x+22,tree.y+44,0,0,'#cda16a',.42);saveGame(activeSlot);updateQuest();
+ const names={wood:'Holz',birchWood:'Birkenholz',frostWood:'Frostholz'};
+ spawnCombatFx('ring',tree.x+22,tree.y+44,0,0,'#cda16a',.42);saveGame(activeSlot);updateQuest();showToast(amount+' × '+(names[key]||'Holz')+' erhalten');
 }
 function handleWorldPointer(e){
  if(!started||gameOver||dialogOpen||panelOpen)return;
