@@ -13,7 +13,7 @@ assert.match(html, /id="titleScreen"/, "hero selection menu is present");
 assert.ok(html.includes("const sizes={windruh:[96,72]"), "Windruh is larger than before");
 assert.ok(html.includes("label:'Nordbrücke · Flüsterwald'") && !html.includes("label:'Ostweg · Nebelmoor'") && !html.includes("label:'Südweg · Echo-Schrein'"), "Windruh has one exit to the forest only");
 assert.ok(html.includes("const inDoor=Math.abs(x+12-VW/2)<34"), "room exit has a dedicated doorway corridor");
-assert.ok(html.includes("if(!room){const px=player.x+12,py=player.y+31;const exit=world.exits.find"), "overworld exits trigger by walking");
+assert.ok(html.includes("const exit=world.exits.find") && html.includes("function regionAt("), "global region crossings trigger while walking");
 assert.match(html, /id="gameOver"/, "checkpoint screen is present");
 assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
@@ -80,7 +80,7 @@ console.log("TALWIND validation passed.");
 
 
 assert.ok(html.includes('id="worldClock"') && html.includes("function drawDayNight("), "day/night cycle and clock HUD exist");
-assert.ok(html.includes("function renderInventoryPanel(") && html.includes("const BAG_SLOTS=24"), "24-slot inventory exists");
+assert.ok(html.includes("function renderInventoryPanel(") && html.includes("const BAG_SLOTS=36"), "36-slot inventory exists");
 assert.ok(html.includes("function openChestPanel(") && html.includes("function transferChestItem("), "storage chests can transfer items");
 assert.ok(html.includes("function startFishing(") && html.includes("function drawFishingRod("), "fishing minigame and rod animation exist");
 assert.ok(html.includes("const RECIPES=") && html.includes("ironArmor") && html.includes("frostMantle"), "armor crafting recipes exist");
@@ -96,3 +96,15 @@ assert.ok(html.includes("function collectTreeTwigs(tree)") && html.includes("fun
 assert.ok(html.includes("woodNode") && html.includes("treeTwigs:"), "harvested resources persist in save data");
 assert.ok(html.includes("KLICK / E · ") && html.includes("Zu weit entfernt"), "interaction feedback and distance checks are present");
 assert.ok(html.includes("birchWood") && html.includes("frostWood") && !html.includes("woodAxe"), "wood types are present without a chopping tool requirement");
+
+
+assert.ok(html.includes("function makeRegionWorld(") && html.includes("function makeWorld(initialZone)"), "biome regions are merged into a single world");
+assert.ok(html.includes("WORLD_WIDTH=309,WORLD_HEIGHT=237"), "Avarra uses one large global tile map");
+assert.ok(html.includes("function drawWorldMap()") && html.includes("id=\\"worldMapCanvas\\""), "the interactive world map is rendered");
+assert.ok(html.includes("worldWaypoint={x:") && html.includes("waypoint:worldWaypoint"), "map waypoints are saved");
+assert.ok(html.includes("autosaveClock>=15") && html.includes("addEventListener('pagehide'"), "periodic and page-exit autosaving is connected");
+assert.ok(html.includes("if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}"), "the most recent save is resumed on startup");
+assert.ok(html.includes("worldVersion:2") && html.includes("discoveredRegions,waypoint:worldWaypoint"), "save data stores global coordinates and world discovery");
+assert.ok(html.includes("function seedRegionResources(") && html.includes("oreSilver") && html.includes("frostBerry"), "biome-specific resource pools are generated");
+assert.ok(html.includes("id:'healingSalve'") && html.includes("id:'fieldRation'") && html.includes("function useBagItem(key)"), "crafted food and healing items are usable");
+assert.ok(html.includes("function changeZone(id,x,y)") && !html.slice(html.indexOf("function changeZone("),html.indexOf("function makeSaveState(")).includes("world=makeWorld(id)"), "biome transitions keep the same world instance");
