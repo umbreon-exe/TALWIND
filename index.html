@@ -532,11 +532,11 @@ function drawBuilding(b){
  const spriteFile=BUILDING_SPRITES_BY_ID[b.id];
  const houseImage=spriteFile?buildingImages.get(spriteFile):null;
  if(houseImage&&houseImage.complete&&houseImage.naturalWidth>0){
-  const maxWidth=b.w+48,maxHeight=b.h+48;
+  const maxWidth=b.w+18,maxHeight=b.h+28;
   const scale=Math.min(1,maxWidth/houseImage.naturalWidth,maxHeight/houseImage.naturalHeight);
   const drawWidth=Math.round(houseImage.naturalWidth*scale),drawHeight=Math.round(houseImage.naturalHeight*scale);
   const groundX=b.x+b.w/2,groundY=b.y+b.h-1;
-  drawSoftShadow(groundX,groundY,Math.max(25,b.w*.58),7,.32);
+  drawSoftShadow(groundX,groundY,Math.max(28,b.w*.62),9,.38);
   ctx.drawImage(houseImage,Math.round(groundX-drawWidth/2-camera.x),Math.round(groundY-drawHeight-camera.y),drawWidth,drawHeight);
   return;
  }
