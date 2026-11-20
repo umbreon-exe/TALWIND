@@ -30,22 +30,23 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 - Hauptquest, Nebenquests, Bewohnerdialoge, Häuser und Laden
 - Gegner, Bosskampf, Herzen, Erfahrung, Windtaler und Gegenstände
 - Tag-/Nachtzyklus mit sichtbarer Uhr und Abend-/Nachtstimmung
-- Valheim-inspiriertes 24-Slot-Inventar mit Ausrüstungsplätzen und Lagertruhen
-- Handwerkssystem mit Angelrute, Spitzhacke, Kleidung und Rüstung
+- 36-Slot-Inventar mit Ausrüstungsplätzen, Lagertruhen und anklickbaren Gegenständen
+- Handwerkssystem mit Angelrute, Spitzhacke, Kleidung, Rüstung, Heilsalbe, Wegzehrung und Kristalllaterne
 - Angeln mit Biss-Zeitfenster und gezeichneter Angel-Animation
-- Sammelbare Zweige, Pflanzenfasern, Kupfer-, Eisen- und Frost-Erz
-- Drei lokale Speicherplätze über den Browser-Speicher
+- Viele Rohstoffe je Biom: Holz, Kräuter, Pilze, Harz, Getreide, Lehm, Torf, Salz, Muscheln, Kupfer, Eisen, Silber, Gold, Geoden und Frostmaterialien
+- Drei Browser-Speicherplätze plus automatisches Fortsetzen, Autosave alle 15 Sekunden und Speichern beim Verlassen der Seite
+- Zusammenhängende Avarra-Karte (309×237 Tiles) mit begehbaren Wegen zwischen sechs Biomen, anklickbarer Weltkarte und speicherbaren Wegpunkten
 - Touch-Steuerung, Gamepad-Unterstützung und Vollbild-fähiges Layout
 - Installierbares PWA-Grundgerüst und Offline-Caching der Kern-Dateien
 - GitHub Actions prüft bei Push und Pull Request die Syntax des eingebetteten JavaScripts und die benötigten Spieldateien
 
 ## Spielstände
 
-Spielstände werden aktuell lokal im Browser über `localStorage` gespeichert. Sie werden nicht automatisch zwischen Geräten oder Browsern synchronisiert. Browserdaten zu löschen kann lokale Spielstände entfernen; nutze die Speicherplätze im Spiel und behalte deinen Browserdatenspeicher bei.
+Spielstände werden lokal im Browser über `localStorage` gespeichert. TALWIND setzt beim Start den zuletzt gespeicherten Slot automatisch fort, speichert während des Spiels alle 15 Sekunden und zusätzlich beim Verlassen der Seite. Die Daten werden nicht zwischen Geräten oder Browsern synchronisiert. Das Löschen von Website-/Browserdaten kann Spielstände entfernen; lösche daher nicht den Website-Speicher, wenn du deinen Fortschritt behalten möchtest.
 
 ## Grafik und Assets
 
-Die Titelillustration und das App-Symbol in `assets/` sind eigenständige SVG-Dateien für dieses Repository. Die Spielwelt verwendet einen eingebauten Pixel-Art-Renderer mit verschiedenen Baumarten, Büschen, Pflanzen, abwechslungsreicheren Bodenmustern sowie eigenen Minen- und Eisdekorationen. Die neuen Ergänzungen werden direkt gezeichnet; es werden keine zusätzlichen Dateien extern nachgeladen.
+Die Titelillustration und das App-Symbol in `assets/` sind eigenständige SVG-Dateien für dieses Repository. Die Spielwelt verwendet einen eingebauten Pixel-Art-Renderer mit saisonalen Baumarten, Büschen, Pflanzen, Minen- und Eisdekorationen. Die Biome liegen nun als eine große Karte mit einem gemeinsamen Weltkoordinatensystem vor. Neue Rohstoff-Fundstellen werden pro Biom erzeugt. Zusätzliche kostenlose Asset-Pakete sind in `ASSET_SOURCES.md` dokumentiert; die neu recherchierten ZIP-/PNG-Pakete wurden noch nicht importiert.
 
 ## Veröffentlichung auf Render
 
