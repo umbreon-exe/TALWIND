@@ -463,16 +463,18 @@ function drawGlow(x,y,r,color,alpha){
 function drawTile(tx,ty,id,now){
  const x=tx*T-camera.x,y=ty*T-camera.y,seed=(tx*73856093^ty*19349663)>>>0;
  if(id===0||id===5||id===9){
-  const base=id===5?PALETTE.forest:id===9?PALETTE.bog:id===8?'#d7edf0':PALETTE.grass;
+  const base=id===5?PALETTE.forest:id===9?PALETTE.bog:PALETTE.grass;
   pixel(x,y,T,T,base);
-  pixel(x+(seed%12),y+((seed>>>5)%12),2,2,id===8?'#f4ffff':id===9?'#6d9683':PALETTE.grassLight);
-  pixel(x+((seed>>>11)%13),y+13,2,1,id===8?'#b9e5ed':id===9?'#426d62':PALETTE.grassDark);
-  if((seed%9)===0)pixel(x+4,y+4,2,5,id===8?'#f4ffff':'#a8df7d');
-  if((seed%7)===0&&id!==8)pixel(x+((seed>>>7)%10)+2,y+((seed>>>13)%9)+3,2,2,id===9?'#d2c77b':id===5?'#c5d987':['#f3d18b','#e6a9c2','#d7d2f0'][seed%3]);
-  if((seed%11)===0&&id!==8)pixel(x+((seed>>>4)%11)+2,y+((seed>>>9)%10)+2,1,4,id===9?'#8ab88a':'#b0d879');
+  pixel(x+((seed>>>2)%13),y+((seed>>>5)%12),3,2,id===9?'#628c72':id===5?'#63975b':'#8ac96b');
+  pixel(x+((seed>>>11)%13),y+13,2,1,id===9?'#426d62':PALETTE.grassDark);
+  if((seed%5)===0){pixel(x+3+(seed%8),y+7,2,3,'#a1d578');pixel(x+5+(seed%7),y+5,2,2,'#d3df8b')}
+  if((seed%7)===0)pixel(x+((seed>>>7)%10)+2,y+((seed>>>13)%9)+3,2,2,id===9?'#d2c77b':id===5?'#c5d987':['#f3d18b','#e6a9c2','#d7d2f0'][seed%3]);
+  if((seed%11)===0)pixel(x+((seed>>>4)%11)+2,y+((seed>>>9)%10)+2,1,4,id===9?'#8ab88a':'#b0d879');
  }else if(id===1){
-  pixel(x,y,T,T,PALETTE.path);pixel(x,y,T,2,PALETTE.pathLight);pixel(x,y+14,T,2,PALETTE.pathDark);
-  pixel(x+((seed>>>5)%10),y+5,3,2,'#eee1bd');pixel(x+((seed>>>10)%11),y+11,2,2,PALETTE.pathDark);
+  pixel(x,y,T,T,PALETTE.path);pixel(x,y,T,2,'#eadbb6');pixel(x,y+14,T,2,PALETTE.pathDark);
+  pixel(x+((seed>>>5)%10),y+5,3,2,'#f4e8ca');pixel(x+((seed>>>10)%11),y+11,2,2,PALETTE.pathDark);
+  if((seed%3)===0)pixel(x+((seed>>>8)%10)+2,y+((seed>>>13)%9)+2,2,1,'#b7a27a');
+  if((seed%8)===0){pixel(x+2,y+2,2,2,'#c6d49a');pixel(x+5,y+3,2,2,'#8ab66d')}
  }else if(id===2){
   pixel(x,y,T,T,PALETTE.water);const wave=Math.floor(now/230+tx*2+ty)%8;
   pixel(x+wave,y+4,6,1,PALETTE.waterLight);pixel(x+10-wave/2,y+11,4,1,'#4fb6dc');
