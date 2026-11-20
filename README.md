@@ -17,7 +17,7 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 | Aktion | Tastatur | Touch / Gamepad |
 |---|---|---|
 | Bewegen | WASD oder Pfeiltasten | Virtueller Stick / linker Stick |
-| Interagieren | E oder Leertaste | Aktion / A |
+| Interagieren | E oder Leertaste | Objekt antippen / A |
 | Angreifen | J | Angriff / B |
 | Fähigkeit | K | Fähigkeit / X |
 | Ausweichen / Rolle | Shift | Rolle / Y |
@@ -26,7 +26,7 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 ## Enthalten
 
 - Fünf auswählbare Helden mit unterschiedlichen Fähigkeiten
-- Windruh, Flüsterwald, Nebelmoor, Flüsterhöhle, Frostgrat und Echo-Schrein
+- Eine zusammenhängende Avarra-Welt mit Windruh, Flüsterwald, Nebelmoor, Flüsterhöhle, Frostgrat und Echo-Schrein
 - Hauptquest, Nebenquests, Bewohnerdialoge, Häuser und Laden
 - Erkundungs-Belohnungen beim erstmaligen Entdecken eines Bioms
 - Gegner, Bosskampf, Herzen, Erfahrung, Windtaler und Gegenstände
@@ -36,6 +36,8 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 - Angeln mit Biss-Zeitfenster und gezeichneter Angel-Animation
 - Viele Rohstoffe je Biom: Holz, Kräuter, Pilze, Harz, Getreide, Lehm, Torf, Salz, Muscheln, Kupfer, Eisen, Silber, Gold, Geoden und Frostmaterialien
 - Drei Browser-Speicherplätze plus automatisches Fortsetzen, Autosave alle 15 Sekunden und Speichern beim Verlassen der Seite
+- Erkundungs-Belohnungen beim erstmaligen Entdecken eines Bioms: Windtaler und Erfahrung
+- Anklickbare Weltkarte mit Spielerposition, Truhen, wichtigen Bewohnern und speicherbarem Wegpunkt
 - Zusammenhängende Avarra-Karte (309×237 Tiles) mit begehbaren Wegen zwischen sechs Biomen, anklickbarer Weltkarte und speicherbaren Wegpunkten
 - Touch-Steuerung, Gamepad-Unterstützung und Vollbild-fähiges Layout
 - Installierbares PWA-Grundgerüst und Offline-Caching der Kern-Dateien
@@ -43,7 +45,7 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 
 ## Spielstände
 
-Spielstände werden lokal im Browser über `localStorage` gespeichert. TALWIND setzt beim Start den zuletzt gespeicherten Slot automatisch fort, speichert während des Spiels alle 15 Sekunden und zusätzlich beim Verlassen der Seite. Die Daten werden nicht zwischen Geräten oder Browsern synchronisiert. Das Löschen von Website-/Browserdaten kann Spielstände entfernen; lösche daher nicht den Website-Speicher, wenn du deinen Fortschritt behalten möchtest.
+Spielstände werden lokal im Browser über `localStorage` gespeichert. TALWIND setzt beim Start den zuletzt gespeicherten Slot automatisch fort, speichert während des Spiels alle 15 Sekunden und zusätzlich beim Verlassen der Seite. Die Daten werden nicht zwischen Geräten oder Browsern synchronisiert. Über die Karte gesetzte Wegpunkte und bereits entdeckte Biome werden mitgespeichert. Das Löschen von Website-/Browserdaten kann Spielstände entfernen; lösche daher nicht den Website-Speicher, wenn du deinen Fortschritt behalten möchtest.
 
 ## Grafik und Assets
 
