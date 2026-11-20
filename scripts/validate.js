@@ -11,7 +11,7 @@ assert.match(html, /<canvas[^>]+id="world"/, "game canvas is present");
 assert.match(html, /id="mainMenu"/, "separate start menu is present");
 assert.match(html, /id="titleScreen"/, "hero selection menu is present");
 assert.ok(html.includes("const sizes={windruh:[96,72]"), "Windruh is larger than before");
-assert.ok(html.includes("Nordweg · Flüsterwald") && html.includes("Ostweg · Nebelmoor") && html.includes("Südweg · Echo-Schrein") && html.includes("Westweg · Frostgrat"), "four cardinal paths are present");
+assert.ok(html.includes("label:'Nordbrücke · Flüsterwald'") && !html.includes("label:'Ostweg · Nebelmoor'") && !html.includes("label:'Südweg · Echo-Schrein'"), "Windruh has one exit to the forest only");
 assert.ok(html.includes("const inDoor=Math.abs(x+12-VW/2)<34"), "room exit has a dedicated doorway corridor");
 assert.ok(html.includes("if(!room){const px=player.x+12,py=player.y+31;const exit=world.exits.find"), "overworld exits trigger by walking");
 assert.match(html, /id="gameOver"/, "checkpoint screen is present");
@@ -26,6 +26,7 @@ assert.ok(html.includes("label:'Nordbrücke · Flüsterwald'") && !html.includes
 assert.ok(html.includes("for(let i=0;i<980;i++)") && html.includes("for(let i=0;i<420;i++)"), "forest vegetation density is increased");
 assert.ok(html.includes("for(let i=0;i<390;i++)") && html.includes("for(let i=0;i<170;i++)"), "moor vegetation density is increased");
 assert.ok(html.includes("ripple=Math.sin(now/170)") && html.includes("o.x+31,o.y+52"), "fountain has a larger ornate basin and animated water");
+assert.ok(html.includes("to:'shrine',tx:30*T") && html.includes("to:'wald',tx:110*T"), "shrine is reached from the forest and returns to the forest");
 assert.ok(html.includes("function updateNPCs(dt)") && html.includes("updateNPCs(dt)"), "NPCs have ambient roaming movement");
 assert.ok(html.includes("const pulse=Math.sin(now/210)"), "fountain has recognizable animated basin details");
 assert.ok(html.includes("function spawnCombatFx("), "combat visual effects are implemented");
