@@ -100,7 +100,7 @@ assert.ok(html.includes("birchWood") && html.includes("frostWood") && !html.incl
 
 assert.ok(html.includes("function makeRegionWorld(") && html.includes("function makeWorld(initialZone)"), "biome regions are merged into a single world");
 assert.ok(html.includes("WORLD_WIDTH=309,WORLD_HEIGHT=237"), "Avarra uses one large global tile map");
-assert.ok(html.includes("function drawWorldMap()") && html.includes("id=\\"worldMapCanvas\\""), "the interactive world map is rendered");
+assert.ok(html.includes("function drawWorldMap()") && html.includes('id="worldMapCanvas"'), "the interactive world map is rendered");
 assert.ok(html.includes("worldWaypoint={x:") && html.includes("waypoint:worldWaypoint"), "map waypoints are saved");
 assert.ok(html.includes("autosaveClock>=15") && html.includes("addEventListener('pagehide'"), "periodic and page-exit autosaving is connected");
 assert.ok(html.includes("if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}"), "the most recent save is resumed on startup");
