@@ -230,6 +230,22 @@ const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
 ctx.imageSmoothingEnabled=false;
 const VW=720,VH=405,T=16;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const REGION_LAYOUT={
+ wald:{x:100,y:0,w:121,h:88,name:'Flüsterwald'},
+ sumpf:{x:1,y:5,w:99,h:77,name:'Nebelmoor'},
+ windruh:{x:100,y:88,w:96,h:72,name:'Windruh'},
+ shrine:{x:221,y:24,w:62,h:34,name:'Echo-Schrein'},
+ hoehle:{x:100,y:160,w:99,h:74,name:'Flüsterhöhle'},
+ eispass:{x:199,y:160,w:110,h:77,name:'Frostgrat'}
+};
+const REGION_IDS=Object.keys(REGION_LAYOUT);
+const WORLD_WIDTH=309,WORLD_HEIGHT=237;
+const regionName=id=>REGION_LAYOUT[id]?.name||'Avarra';
+const regionAt=(x,y)=>{
+ const tx=Math.floor(x/T),ty=Math.floor(y/T);
+ for(const id of REGION_IDS){const r=REGION_LAYOUT[id];if(tx>=r.x&&tx<r.x+r.w&&ty>=r.y&&ty<r.y+r.h)return id}
+ return null;
+};
 const rand=(seed)=>{let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}};
 const heroes=[
 {name:'LYRA',spriteId:28,role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
@@ -305,14 +321,16 @@ let activeSlot=0,worldTransition=null,particles=[],particleClock=0,gameLoopRunni
 const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0,attackAnim:0,skillAnim:0,shield:0,hurt:0};
 const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
+const discoveredRegions={windruh:true};
+let worldWaypoint=null,autosaveClock=0;
 const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
 
-const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0,branch:0,fiber:0,oreCopper:0,oreIron:0,oreFrost:0,coal:0,fishMeal:0,rod:0,pickaxe:0,forestCloak:0,trailBoots:0,copperHelm:0,ironArmor:0,frostMantle:0,echoCharm:0};
+const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0,branch:0,fiber:0,wood:0,birchWood:0,frostWood:0,stone:0,clay:0,mushroom:0,resin:0,wildHerb:0,grain:0,flax:0,apple:0,carrot:0,peat:0,marshHerb:0,seaSalt:0,oreSilver:0,oreGold:0,oreGeode:0,iceShard:0,frostBerry:0,spiritDust:0,healingSalve:0,fieldRation:0,crystalLantern:0,oreCopper:0,oreIron:0,oreFrost:0,coal:0,fishMeal:0,rod:0,pickaxe:0,forestCloak:0,trailBoots:0,copperHelm:0,ironArmor:0,frostMantle:0,echoCharm:0};
 const gear={tool:null,head:null,body:null,feet:null,charm:null};
 const chestStorage={forestCache:{branch:2,fiber:2,berries:3},moorCache:{fish:2,blueHerb:1,berries:2},caveCache:{oreCopper:3,coal:2,crystalShard:1}};
 const openedChests={};let activeChestId=null,worldMinutes=480,lastClockText='';
 const fishing={active:false,phase:'idle',timer:0,elapsed:0,target:null};const fishLog={};const BAG_SLOTS=24;
-const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},wood:{name:'Holz',icon:'🪵'},birchWood:{name:'Birkenholz',icon:'🌳'},frostWood:{name:'Frostholz',icon:'❄'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
+const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},wood:{name:'Holz',icon:'🪵'},birchWood:{name:'Birkenholz',icon:'🌳'},frostWood:{name:'Frostholz',icon:'❄'},stone:{name:'Stein',icon:'🪨'},clay:{name:'Lehm',icon:'🟤'},mushroom:{name:'Pilz',icon:'🍄'},resin:{name:'Harz',icon:'🟡'},wildHerb:{name:'Wildkraut',icon:'🌿'},grain:{name:'Getreide',icon:'🌾'},flax:{name:'Flachs',icon:'🧶'},apple:{name:'Apfel',icon:'🍎'},carrot:{name:'Möhre',icon:'🥕'},peat:{name:'Torf',icon:'🟫'},marshHerb:{name:'Moorblatt',icon:'🍃'},seaSalt:{name:'Salzkristall',icon:'🧂'},oreSilver:{name:'Silbererz',icon:'⚪'},oreGold:{name:'Golderz',icon:'🟨'},oreGeode:{name:'Geode',icon:'🔮'},iceShard:{name:'Eissplitter',icon:'💠'},frostBerry:{name:'Frostbeere',icon:'🫐'},spiritDust:{name:'Echostaub',icon:'✨'},healingSalve:{name:'Heilsalbe',icon:'🧴'},fieldRation:{name:'Wegzehrung',icon:'🥖'},crystalLantern:{name:'Kristalllaterne',icon:'🏮'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
 const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
 const RECIPES=[
 {id:'rod',name:'Angelrute',icon:'🎣',desc:'Ein stabiler Holzschaft mit geflochtener Faserschnur.',cost:{wood:2,fiber:2}},
@@ -335,8 +353,8 @@ const sideQuests={
  frost:{state:0,items:0,need:3},
  watch:{state:0,items:0,need:2}
 };
-const seedSpots=[{x:32*T+8,y:30*T+8,found:false},{x:62*T+8,y:39*T+8,found:false},{x:73*T+8,y:36*T+8,found:false}];
-const flowerSpots=[{x:33*T+8,y:41*T+8,found:false},{x:80*T+8,y:18*T+8,found:false},{x:80*T+8,y:67*T+8,found:false}];
+const seedSpots=[{x:(REGION_LAYOUT.windruh.x+32)*T+8,y:(REGION_LAYOUT.windruh.y+30)*T+8,found:false},{x:(REGION_LAYOUT.windruh.x+62)*T+8,y:(REGION_LAYOUT.windruh.y+39)*T+8,found:false},{x:(REGION_LAYOUT.windruh.x+73)*T+8,y:(REGION_LAYOUT.windruh.y+36)*T+8,found:false}];
+const flowerSpots=[{x:(REGION_LAYOUT.wald.x+33)*T+8,y:(REGION_LAYOUT.wald.y+41)*T+8,found:false},{x:(REGION_LAYOUT.wald.x+80)*T+8,y:(REGION_LAYOUT.wald.y+18)*T+8,found:false},{x:(REGION_LAYOUT.wald.x+80)*T+8,y:(REGION_LAYOUT.wald.y+67)*T+8,found:false}];
 const rooms={
  mira:{title:'Miras gemütliches Haus',kind:'home',npc:'mira'},
  inn:{title:'Zum singenden Krug',kind:'inn',npc:'runa'},
@@ -368,7 +386,7 @@ function updateNPCs(dt){
   if(canOccupy(nx,ny)&&Math.hypot(nx-n.homeX,ny-n.homeY)<58){n.x=nx;n.y=ny;n.walkBlend=Math.min(1,(n.walkBlend||0)+dt*4)}else{n.roamTarget=null;n.roamTimer=.2}
  }
 }
-function makeWorld(id){
+function makeRegionWorld(id){
  const sizes={windruh:[96,72],wald:[121,88],sumpf:[99,77],hoehle:[99,74],eispass:[110,77],shrine:[62,34]};
  const size=sizes[id]||sizes.windruh,W=size[0],H=size[1];
  const names={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',eispass:'Frostgrat',shrine:'Echo-Schrein'};
@@ -1107,17 +1125,20 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:4,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:5,worldVersion:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,discoveredRegions,waypoint:worldWaypoint,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
  return [null,null,null];
 }
-function saveGame(slot){
+function saveGame(slot,silent){
  const n=clamp(Number(slot)||0,0,2),slots=readSlots();
- try{slots[n]={savedAt:new Date().toISOString(),data:makeSaveState()};localStorage.setItem(slotsKey,JSON.stringify(slots));activeSlot=n;showToast('Spielstand '+(n+1)+' gespeichert')}
- catch(e){showToast('Speichern war nicht möglich')}
- return true;
+ try{
+  const savedAt=new Date().toISOString(),data=makeSaveState();
+  slots[n]={savedAt,data};localStorage.setItem(slotsKey,JSON.stringify(slots));localStorage.setItem(saveKey,JSON.stringify(data));activeSlot=n;
+  if(!silent)showToast('Spielstand '+(n+1)+' gespeichert');
+  return true;
+ }catch(e){if(!silent)showToast('Speichern fehlgeschlagen · Browser-Speicher prüfen');return false}
 }
 function loadGame(slot){
  const n=clamp(Number(slot)||0,0,2);
@@ -1148,8 +1169,9 @@ Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.f
  }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
 }
 function hasAnySave(){
- const slots=readSlots();const first=slots.findIndex(v=>v&&v.data);if(first>=0){activeSlot=first;return true;}
- try{return !!JSON.parse(localStorage.getItem(saveKey)||'null')}catch(e){return false}
+ const slots=readSlots().map((slot,index)=>({slot,index})).filter(v=>v.slot&&v.slot.data).sort((a,b)=>Date.parse(b.slot.savedAt||0)-Date.parse(a.slot.savedAt||0));
+ if(slots.length){activeSlot=slots[0].index;return true}
+ try{const legacy=JSON.parse(localStorage.getItem(saveKey)||'null');return !!(legacy&&legacy.version)}catch(e){return false}
 }
 function showToast(s){
  const el=document.getElementById('toast');el.textContent=s;el.style.display='block';
