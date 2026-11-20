@@ -18,6 +18,15 @@ assert.match(html, /id="gameOver"/, "checkpoint screen is present");
 assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
 assert.match(html, /id="questLine"/, "quest HUD is present");
+assert.match(html, /id="skillCooldown"/, "ability cooldown is visible");
+assert.match(html, /id="attackCooldown"/, "attack cooldown is visible");
+assert.ok(html.includes("function spawnCombatFx("), "combat visual effects are implemented");
+assert.ok(html.includes("function drawCombatEffects("), "combat effects are rendered");
+assert.ok(html.includes("function combatTarget("), "combat targeting uses facing direction and range");
+assert.ok(html.includes("function damageMonster("), "shared enemy damage handling is present");
+assert.ok(html.includes("player.attackAnim=.24"), "basic attacks trigger an animation");
+assert.ok(html.includes("player.skillAnim=.72"), "hero abilities trigger an animation");
+assert.ok(html.includes("STEINHAUT · SCHUTZ AKTIV") && html.includes("STERNENSCHUSS") && html.includes("ECHOWELLE"), "hero abilities have distinct feedback");
 
 assert.ok(html.includes("frame16x20.png"), "default 16x20 character sheets are used");
 assert.ok(html.includes("const HERO_SPRITE_IDS=[28,8,1,31,24]"), "five distinct pack heroes are configured");
@@ -40,7 +49,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v3"'), "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v4"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
