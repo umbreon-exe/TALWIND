@@ -141,12 +141,38 @@ body{display:grid;place-items:center;touch-action:none}
 #menuButtons .menuBtn{min-height:34px}
 #gameOver{z-index:50}#gameOver .card{width:min(92%,560px)}#gameOver .intro{max-width:460px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+#worldClock{position:absolute;right:10px;top:76px;z-index:4;min-width:112px;text-align:center;padding:6px 9px;font:11px ui-monospace,monospace;color:#fff0ce;background:linear-gradient(180deg,#263e5b,#14243a);border:2px solid #d7ab5d;box-shadow:inset 0 0 0 1px #657e96,2px 3px #0b1825;pointer-events:none}
+#panel.inventoryPanel .panelCard{width:min(94vw,900px);max-width:900px;text-align:left;padding:clamp(12px,2vw,22px)}
+#panel.inventoryPanel #panelTitle{font-size:clamp(19px,2.6vw,27px);letter-spacing:1px}
+.inventoryTop{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#e9d8b5;font:11px ui-monospace,monospace;margin:4px 0 12px}
+.inventoryLayout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(190px,.8fr);gap:12px}
+.inventoryBox,.chestBox{border:2px solid #b99053;background:linear-gradient(145deg,#1b3049,#101d30);padding:10px;box-shadow:inset 0 0 0 1px #526a83}
+.inventoryBox h3,.chestBox h3{margin:0 0 9px;color:#ffdc8d;font:bold 12px ui-monospace,monospace;letter-spacing:1px}
+.inventoryGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+.invSlot{position:relative;min-width:0;min-height:66px;border:2px solid #88704d;background:linear-gradient(145deg,#394b5c,#202f41);color:#f5e8c8;padding:5px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;cursor:pointer}
+.invSlot:hover:not(:disabled){border-color:#f3d17b;background:linear-gradient(145deg,#56616a,#2a3c4d)}
+.invSlot .invIcon{font-size:22px;line-height:1.2;text-shadow:1px 2px #172536}.invSlot .invCount{position:absolute;right:4px;top:2px;color:#fff0ae;font:bold 10px ui-monospace,monospace}
+.invSlot .invName{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:8px ui-monospace,monospace;color:#d5dfdf}
+.invSlot.empty{border-style:dashed;background:#14243a66;cursor:default}
+.equipmentList{display:grid;gap:7px}.equipSlot{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:8px;border:1px solid #8f754d;background:#273d52;padding:7px;color:#f5e8c8;min-height:56px}
+.equipIcon{width:38px;height:38px;display:grid;place-items:center;background:#17283d;border:1px solid #c49e5d;font-size:22px}
+.equipSlot b{display:block;color:#ffdc8d;font:bold 10px ui-monospace,monospace}.equipSlot small{display:block;color:#c5d0d7;font:9px ui-monospace,monospace;margin-top:3px}
+.equipSlot button{grid-column:2;border:1px solid #d4ae68;background:#57432e;color:#fff0d1;padding:5px;font:9px ui-monospace,monospace;cursor:pointer}
+.craftList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.craftCard{display:grid;grid-template-columns:48px 1fr;gap:9px;border:2px solid #a88650;background:linear-gradient(145deg,#2b435d,#17283f);padding:9px;min-width:0}
+.craftIcon{width:46px;height:46px;display:grid;place-items:center;background:#15263c;border:1px solid #d0a960;font-size:27px}
+.craftCard h3{margin:0;color:#ffe0a0;font:bold 12px ui-monospace,monospace}.craftCard p{margin:4px 0;color:#d0dbe0;font:10px/1.4 ui-monospace,monospace}
+.craftCard button{grid-column:1/-1;border:2px solid #e2bd70;background:linear-gradient(#bd7949,#704036);color:#fff1d3;padding:7px;font:bold 10px ui-monospace,monospace;cursor:pointer}
+.craftCard button:disabled{opacity:.42;filter:grayscale(1);cursor:default}
+.chestLayout{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}.chestNote{color:#cbd7dc;font:10px/1.5 ui-monospace,monospace;margin:0 0 8px}
+#panel.inventoryPanel .row{justify-content:flex-end}
+@media(max-width:650px){#worldClock{top:60px;right:5px;min-width:88px;font-size:9px;padding:4px 5px}#panel.inventoryPanel .panelCard{width:96vw;padding:10px}.inventoryLayout{grid-template-columns:1fr}.inventoryGrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}.invSlot{min-height:52px;padding:3px 1px}.invSlot .invIcon{font-size:18px}.invSlot .invName{font-size:7px}.equipmentList{grid-template-columns:repeat(2,minmax(0,1fr))}.equipSlot{grid-template-columns:32px 1fr;padding:5px;gap:5px;min-height:48px}.equipIcon{width:31px;height:31px;font-size:18px}.craftList{grid-template-columns:1fr}.chestLayout{grid-template-columns:1fr;gap:8px}}
 </style></head>
 <body><main id="game" tabindex="0" aria-label="TALWIND-Spiel. Mit WASD oder Pfeiltasten bewegen.">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
 <div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
-<div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
-<div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
+<div class="plate" id="worldClock">☀ TAG · 08:00</div><div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
+<div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="craft">⚒ Handwerk</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small id="skillName">FÄHIGKEIT</small><span class="cooldownText" id="skillCooldown">BEREIT</span></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small><span class="cooldownText" id="attackCooldown">BEREIT</span></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small><span class="cooldownText" id="rollCooldown">BEREIT</span></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
 <div id="stick"><div id="nub"></div></div><div id="combatBanner" aria-live="polite"></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
@@ -245,7 +271,26 @@ const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,
 const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
 const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
-const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0};
+
+const inventory={seeds:0,blueHerb:0,letters:0,fish:0,berries:0,meals:0,reed:0,shell:0,crystalShard:0,runeStone:0,frostPetal:0,watchSigil:0,branch:0,fiber:0,oreCopper:0,oreIron:0,oreFrost:0,coal:0,fishMeal:0,rod:0,pickaxe:0,forestCloak:0,trailBoots:0,copperHelm:0,ironArmor:0,frostMantle:0,echoCharm:0};
+const gear={tool:null,head:null,body:null,feet:null,charm:null};
+const chestStorage={forestCache:{branch:2,fiber:2,berries:3},moorCache:{fish:2,blueHerb:1,berries:2},caveCache:{oreCopper:3,coal:2,crystalShard:1}};
+const openedChests={};let activeChestId=null,worldMinutes=480,lastClockText='';
+const fishing={active:false,phase:'idle',timer:0,elapsed:0,target:null};const fishLog={};const BAG_SLOTS=24;
+const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
+const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
+const RECIPES=[
+{id:'rod',name:'Angelrute',icon:'🎣',desc:'Zum Angeln an Flussufern und im Moor.',cost:{branch:3,fiber:2}},
+{id:'pickaxe',name:'Spitzhacke',icon:'⛏',desc:'Zum Abbau von Erzadern in Höhlen und am Frostgrat.',cost:{branch:3,fiber:3}},
+{id:'forestCloak',name:'Waldmantel',icon:'🧥',desc:'Leichter Schutz. In der Nacht bist du etwas schneller.',cost:{fiber:4,blueHerb:2,berries:1}},
+{id:'trailBoots',name:'Wanderstiefel',icon:'🥾',desc:'Leichte Sohlen geben dir mehr Lauftempo.',cost:{branch:2,fiber:3,berries:2}},
+{id:'copperHelm',name:'Kupferhelm',icon:'⛑',desc:'Ein einfacher Helm aus Kupfererz.',cost:{oreCopper:2,fiber:1}},
+{id:'ironArmor',name:'Eisenrüstung',icon:'🛡',desc:'Solider Körperschutz aus Eisen und Kupfer.',cost:{oreIron:3,oreCopper:2,fiber:2}},
+{id:'frostMantle',name:'Frostmantel',icon:'❄',desc:'Ein warmer Mantel aus Frostkristallen.',cost:{oreFrost:2,oreIron:1,fiber:3}},
+{id:'fishMeal',name:'Fischmahlzeit',icon:'🍲',desc:'Eine stärkende Mahlzeit aus Fisch und Beeren.',cost:{fish:1,berries:1}},
+{id:'echoCharm',name:'Echotalisman',icon:'🔮',desc:'Erhöht deine Chance auf seltene Fänge.',cost:{crystalShard:1,runeStone:1,blueHerb:1}}
+];
+
 const collectedItems={};
 const sideQuests={
  reed:{state:0,items:0,need:3},
@@ -802,8 +847,17 @@ function renderScene(now){
  if(zone==='shrine'&&bossState.active){const guardian=monsters.find(m=>m.type==='guardian'&&m.hp>0);if(guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 11px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,22);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,42)}ctx.restore()}}
  if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-10);ctx.textAlign='left'}
 }
+function drawDayNight(){if(room||zone==='hoehle'||zone==='shrine')return;const h=worldMinutes/60;let a=0;if(h>=20||h<5.5)a=.38;else if(h>=18)a=.38*clamp((h-18)/2,0,1);else if(h<8)a=.38*clamp((8-h)/2.5,0,1);if(a<=.005)return;ctx.save();ctx.fillStyle='rgba(10,18,45,'+a+')';ctx.fillRect(0,0,VW,VH);if(a>.17){for(let i=0;i<34;i++){const sx=(i*97+31)%VW,sy=(i*53+19)%170;ctx.globalAlpha=a*.9;ctx.fillStyle=i%4===0?'#ffe8ab':'#e5efff';ctx.fillRect(sx,sy,2,2)}ctx.globalAlpha=a;ctx.fillStyle='#fff0c9';ctx.beginPath();ctx.arc(VW-110,53,10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172c46';ctx.beginPath();ctx.arc(VW-105,49,10,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function findFishingSpot(){if(room||!world)return null;const px=player.x+16,py=player.y+30,cx=Math.floor(px/T),cy=Math.floor(py/T);let best=null,bestD=Infinity;for(let ty=cy-2;ty<=cy+2;ty++)for(let tx=cx-2;tx<=cx+2;tx++){if(tx<0||ty<0||tx>=world.width||ty>=world.height||world.tiles[ty*world.width+tx]!==2)continue;const x=tx*T+8,y=ty*T+8,d=Math.hypot(x-px,y-py);if(d>48||d<12||d>=bestD)continue;best={x,y};bestD=d}return best}
+function startFishing(){if(gear.tool!=='rod'){showToast('Stelle zuerst eine Angelrute im Handwerk her.');return}const target=findFishingSpot();if(!target){showToast('Hier ist kein Angelplatz.');return}fishing.active=true;fishing.phase='cast';fishing.timer=.55;fishing.elapsed=0;fishing.target=target;player.walk=0;showToast('Du wirfst die Angel aus …')}
+function updateFishing(dt){if(!fishing.active)return;fishing.elapsed+=dt;fishing.timer-=dt;if(fishing.phase==='cast'&&fishing.timer<=0){fishing.phase='wait';fishing.timer=2.2+Math.random()*3.1}else if(fishing.phase==='wait'&&fishing.timer<=0){fishing.phase='bite';fishing.timer=1.7;showToast('ANBEISSEN! Drücke E zum Einholen!')}else if(fishing.phase==='bite'&&fishing.timer<=0){fishing.active=false;fishing.phase='idle';fishing.target=null;showToast('Der Fisch ist entkommen. Versuch es erneut.')}}
+function fishingAction(){if(!fishing.active)return;if(fishing.phase==='bite'){const fish=Math.random()<.18?getFishSpecies()[2]:getFishSpecies()[Math.floor(Math.random()*2)];inventory.fish++;fishLog[fish]=(fishLog[fish]||0)+1;showToast('Gefangen: '+fish);fishing.active=false;fishing.phase='idle';fishing.target=null;saveGame(activeSlot)}else{fishing.active=false;fishing.phase='idle';fishing.target=null;showToast('Angel eingeholt.')}}
+function getFishSpecies(){return zone==='sumpf'?['Moorforelle','Schilfkarpfen','Nebelbarsch']:zone==='eispass'?['Eisforelle','Schneesaibling','Kristallfisch']:['Bachforelle','Silberfisch','Sonnenkarpfen']}
+function drawFishingRod(now){if(!fishing.active||!fishing.target)return;const sx=Math.round(player.x-camera.x)+22,sy=Math.round(player.y-camera.y)+23,tx=fishing.target.x-camera.x,ty=fishing.target.y-camera.y,angle=Math.atan2(ty-sy,tx-sx),swing=fishing.phase==='cast'?Math.sin(fishing.elapsed*9)*.3:0,ex=sx+Math.cos(angle+swing)*31,ey=sy+Math.sin(angle+swing)*31;ctx.save();ctx.strokeStyle='#513a2b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#c18d50';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#e8e4cd';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(tx,ty+Math.sin(now/140)*2);ctx.stroke();ctx.fillStyle='#ed6954';ctx.fillRect(tx-2,ty-2+Math.sin(now/110)*2,5,5);if(fishing.phase==='bite'){ctx.strokeStyle='#eaffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(tx,ty,7+Math.sin(now/45)*4,0,Math.PI*2);ctx.stroke()}ctx.restore()}
 function drawWorld(now){
  renderScene(now);
+ drawDayNight();
+ drawFishingRod(now);
  drawParticles(now);
  if(worldTransition){
   const q=clamp((performance.now()-worldTransition.start)/worldTransition.duration,0,1);
@@ -871,7 +925,7 @@ function updateBoss(m,dt,now){
    if(attack==='Schallwelle')hit=d<(bossState.phase===2?190:150);
    else if(attack==='Rankenschlag')hit=d<105&&Math.abs(dx)<75;
    else hit=d>45&&d<(bossState.phase===2?210:165);
-   if(hit&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=.8;damageFlash=.18;updateQuest()}
+   if(hit&&player.inv<=0)takePlayerHit();
    bossState.ring=.55;
   }
  }else{
@@ -899,7 +953,7 @@ function updateEnemies(dt,now){
   }else if(m.behavior==='chase'&&d<190){m.x+=dx/d*speed*dt;m.y+=dy/d*speed*dt}
   else if(m.behavior==='ranged'&&d<220&&m.timer<=0){m.windup=.72;m.timer=2.2;showToast('Fernangriff wird vorbereitet!')}
   else if(m.behavior==='ambush'&&d<120&&m.timer<=0){m.windup=.85;m.timer=2.6;showToast('Achtung – Hinterhalt!')}
-  if(m.windup>0){m.windup-=dt;if(m.windup<=0&&d<(m.behavior==='ranged'?220:95)&&player.inv<=0){player.hp=Math.max(0,player.hp-1);player.inv=.7;damageFlash=.16}}
+  if(m.windup>0){m.windup-=dt;if(m.windup<=0&&d<(m.behavior==='ranged'?220:95)&&player.inv<=0)takePlayerHit()}
   m.x=clamp(m.x,m.homeX-limit,m.homeX+limit);m.y=clamp(m.y,m.homeY-limit,m.homeY+limit);
  }
 }
@@ -945,7 +999,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:3,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -968,7 +1022,14 @@ function loadGame(slot){
   selected=clamp(Number(d.selected)||0,0,4);zone=nextZone;world=makeWorld(zone);
   Object.assign(player,{x:Number(d.x)||31*T,y:Number(d.y)||27*T,hp:clamp(Number(d.hp)||5,1,5),coins:Math.max(0,Number(d.coins)||35),potions:Math.max(0,Number(d.potions)||0),xp:Math.max(0,Number(d.xp)||0),inv:0,rolling:0});
   if(player.x>world.width*T-30||player.y>world.height*T-30||player.x<25||player.y<25){player.x=zone==='windruh'?31*T:zone==='shrine'?360:Math.floor(world.width*.45)*T;player.y=zone==='windruh'?27*T:zone==='shrine'?220:Math.floor(world.height*.5)*T}
-  Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
+  
+Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
+Object.assign(gear,{tool:null,head:null,body:null,feet:null,charm:null},d.gear||{});
+if(d.chestStorage){for(const id of Object.keys(chestStorage)){for(const key of Object.keys(chestStorage[id]))delete chestStorage[id][key];Object.assign(chestStorage[id],d.chestStorage[id]||{})}}
+Object.keys(openedChests).forEach(key=>delete openedChests[key]);Object.assign(openedChests,d.openedChests||{});
+if(Number.isFinite(Number(d.worldMinutes)))worldMinutes=((Number(d.worldMinutes)%1440)+1440)%1440;
+Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.fishLog||{});
+
   Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});
   for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
@@ -996,7 +1057,7 @@ function updateQuest(){
  document.getElementById('heroLabel').textContent=heroes[selected].name+' · '+heroes[selected].role;
  document.getElementById('hearts').textContent='♥ '.repeat(player.hp)+'♡ '.repeat(5-player.hp);
  document.getElementById('seedLabel').textContent=main.seeds;document.getElementById('coinLabel').textContent=player.coins;
- document.getElementById('levelLabel').textContent='STUFE '+(1+Math.floor(player.xp/100))+' · '+player.xp+' EP';const cd=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v>0?v.toFixed(1)+'s':'BEREIT'};cd('skillCooldown',skillCD);cd('attackCooldown',attackCD);cd('rollCooldown',rollCD);const sn=document.getElementById('skillName');if(sn)sn.textContent=heroes[selected].skill.toUpperCase();for(const [id,v] of [['skillBtn',skillCD],['attackBtn',attackCD],['rollBtn',rollCD]]){const el=document.getElementById(id);if(el){el.classList.toggle('cooldown',v>0);el.classList.toggle('ready',v<=0)}}
+ document.getElementById('levelLabel').textContent='STUFE '+(1+Math.floor(player.xp/100))+' · '+player.xp+' EP';const hour=Math.floor(worldMinutes/60)%24,minute=Math.floor(worldMinutes%60),timeText=(hour<10?'0':'')+hour+':'+(minute<10?'0':'')+minute,clock=document.getElementById('worldClock');if(clock&&timeText!==lastClockText){lastClockText=timeText;clock.textContent=(hour>=20||hour<6?'☾ NACHT':'☀ TAG')+' · '+timeText}const cd=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v>0?v.toFixed(1)+'s':'BEREIT'};cd('skillCooldown',skillCD);cd('attackCooldown',attackCD);cd('rollCooldown',rollCD);const sn=document.getElementById('skillName');if(sn)sn.textContent=heroes[selected].skill.toUpperCase();for(const [id,v] of [['skillBtn',skillCD],['attackBtn',attackCD],['rollBtn',rollCD]]){const el=document.getElementById(id);if(el){el.classList.toggle('cooldown',v>0);el.classList.toggle('ready',v<=0)}}
 }
 function rewardQuest(key){
  const q=sideQuests[key];if(!q||q.state!==1||q.items<q.need)return false;
@@ -1080,6 +1141,44 @@ function openShop(){
  buy('Heiltrank',20,()=>{player.potions++;showToast('Heiltrank gekauft')});buy('Beerenkorb',10,()=>{inventory.berries+=3;showToast('Drei Beeren gekauft')});
  const close=document.createElement('button');close.className='uiButton';close.textContent='Schließen';close.onclick=closePanel;buttons.appendChild(close);
 }
+
+function getBagEntries(){return Object.keys(ITEM_INFO).filter(k=>(Number(inventory[k])||0)>0)}
+function canPay(cost){return Object.entries(cost).every(([k,n])=>(Number(inventory[k])||0)>=n)}
+function hasBagSpace(key){return getBagEntries().includes(key)||getBagEntries().length<BAG_SLOTS}
+function costText(cost){return Object.entries(cost).map(([k,n])=>ITEM_INFO[k].icon+' '+n+' '+ITEM_INFO[k].name).join(' · ')}
+function armorBlockChance(){let c=0;if(gear.body==='ironArmor')c+=.42;if(gear.body==='frostMantle')c+=.5;if(gear.body==='forestCloak')c+=.08;if(gear.head==='copperHelm')c+=.18;if(gear.charm==='echoCharm')c+=.05;if(gear.feet==='trailBoots')c+=.04;return Math.min(.8,c)}
+function takePlayerHit(){if(player.inv>0)return;if(Math.random()<armorBlockChance()){player.inv=.42;showToast('RÜSTUNG BLOCKT DEN TREFFER');return}player.hp=Math.max(0,player.hp-1);player.inv=.82;damageFlash=.18;updateQuest()}
+function getNightLevel(){const h=worldMinutes/60;if(h>=20||h<5.5)return .38;if(h>=18)return .38*clamp((h-18)/2,0,1);if(h<8)return .38*clamp((8-h)/2.5,0,1);return 0}
+function drawDayNight(){if(room||zone==='hoehle'||zone==='shrine')return;const a=getNightLevel();if(a<=.005)return;ctx.save();ctx.fillStyle='rgba(10,18,45,'+a+')';ctx.fillRect(0,0,VW,VH);if(a>.17){for(let i=0;i<34;i++){const sx=(i*97+31)%VW,sy=(i*53+19)%170;ctx.globalAlpha=a*.9;ctx.fillStyle=i%4===0?'#ffe8ab':'#e5efff';ctx.fillRect(sx,sy,2,2)}ctx.globalAlpha=a;ctx.fillStyle='#fff0c9';ctx.beginPath();ctx.arc(VW-110,53,10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172c46';ctx.beginPath();ctx.arc(VW-105,49,10,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function getFishSpecies(){return zone==='sumpf'?['Moorforelle','Schilfkarpfen','Nebelbarsch']:zone==='eispass'?['Eisforelle','Schneesaibling','Kristallfisch']:['Bachforelle','Silberfisch','Sonnenkarpfen']}
+function findFishingSpot(){if(room||!world)return null;const px=player.x+16,py=player.y+30,cx=Math.floor(px/T),cy=Math.floor(py/T);let best=null,bestD=Infinity;for(let ty=cy-2;ty<=cy+2;ty++)for(let tx=cx-2;tx<=cx+2;tx++){if(tx<0||ty<0||tx>=world.width||ty>=world.height||world.tiles[ty*world.width+tx]!==2)continue;const x=tx*T+8,y=ty*T+8,d=Math.hypot(x-px,y-py);if(d>48||d<12||d>=bestD)continue;best={x,y};bestD=d}return best}
+function startFishing(){if(gear.tool!=='rod'){showToast('Stelle die Angelrute im Handwerk her und rüste sie aus.');return}const target=findFishingSpot();if(!target){showToast('Hier ist kein Angelplatz.');return}fishing.active=true;fishing.phase='cast';fishing.timer=.55;fishing.elapsed=0;fishing.target=target;player.walk=0;showToast('Du wirfst die Angel aus …')}
+function updateFishing(dt){if(!fishing.active)return;fishing.elapsed+=dt;fishing.timer-=dt;if(fishing.phase==='cast'&&fishing.timer<=0){fishing.phase='wait';fishing.timer=2.2+Math.random()*3.1}else if(fishing.phase==='wait'&&fishing.timer<=0){fishing.phase='bite';fishing.timer=1.7;showToast('ANBEISSEN! Drücke E zum Einholen!')}else if(fishing.phase==='bite'&&fishing.timer<=0){fishing.active=false;fishing.phase='idle';fishing.target=null;showToast('Der Fisch ist entkommen. Versuch es erneut.')}}
+function fishingAction(){if(!fishing.active)return;if(fishing.phase==='bite'){const fish=Math.random()<.18?getFishSpecies()[2]:getFishSpecies()[Math.floor(Math.random()*2)];inventory.fish++;fishLog[fish]=(fishLog[fish]||0)+1;showToast('Gefangen: '+fish);fishing.active=false;fishing.phase='idle';fishing.target=null;saveGame(activeSlot)}else{fishing.active=false;fishing.phase='idle';fishing.target=null;showToast('Angel eingeholt.')}}
+function drawFishingRod(now){if(!fishing.active||!fishing.target)return;const sx=Math.round(player.x-camera.x)+22,sy=Math.round(player.y-camera.y)+23,tx=fishing.target.x-camera.x,ty=fishing.target.y-camera.y,angle=Math.atan2(ty-sy,tx-sx),swing=fishing.phase==='cast'?Math.sin(fishing.elapsed*9)*.3:0,ex=sx+Math.cos(angle+swing)*31,ey=sy+Math.sin(angle+swing)*31;ctx.save();ctx.strokeStyle='#513a2b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#c18d50';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.strokeStyle='#e8e4cd';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(tx,ty+Math.sin(now/140)*2);ctx.stroke();ctx.fillStyle='#ed6954';ctx.fillRect(tx-2,ty-2+Math.sin(now/110)*2,5,5);if(fishing.phase==='bite'){ctx.strokeStyle='#eaffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(tx,ty,7+Math.sin(now/45)*4,0,Math.PI*2);ctx.stroke()}ctx.restore()}
+function equipFromBag(id){const it=EQUIPMENT[id];if(!it||!inventory[id])return;const old=gear[it.slot];if(old)inventory[old]=(inventory[old]||0)+1;inventory[id]--;gear[it.slot]=id;saveGame(activeSlot);renderInventoryPanel();showToast(it.name+' angelegt')}
+function unequipGear(slot){const id=gear[slot];if(!id)return;if(!hasBagSpace(id)){showToast('Rucksack voll.');return}inventory[id]=(inventory[id]||0)+1;gear[slot]=null;saveGame(activeSlot);renderInventoryPanel()}
+function craftItem(id){const r=RECIPES.find(x=>x.id===id);if(!r||!canPay(r.cost)){showToast('Materialien fehlen.');return}if(!hasBagSpace(id)){showToast('Rucksack hat keinen freien Slot.');return}Object.entries(r.cost).forEach(([k,n])=>inventory[k]-=n);inventory[id]=(inventory[id]||0)+1;saveGame(activeSlot);renderCraftPanel();showToast(r.name+' hergestellt!')}
+function renderInventoryPanel(){
+ const panel=document.getElementById('panel'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');panel.classList.add('inventoryPanel');document.getElementById('panelTitle').textContent='RUCKSACK & AUSRÜSTUNG';
+ const entries=getBagEntries(),slots=Array.from({length:BAG_SLOTS},(_,i)=>{const k=entries[i],it=k?ITEM_INFO[k]:null;if(!k)return '<div class="invSlot empty"></div>';return EQUIPMENT[k]?'<button class="invSlot" data-equip="'+k+'"><span class="invCount">'+inventory[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+' · ANLEGEN</span></button>':'<div class="invSlot"><span class="invCount">'+inventory[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+'</span></div>'}).join('');
+ const order=['tool','head','body','feet','charm'],labels={tool:'Werkzeug',head:'Kopf',body:'Körper',feet:'Füße',charm:'Talisman'};
+ const equipment=order.map(slot=>{const id=gear[slot],it=id?EQUIPMENT[id]:null;return '<div class="equipSlot"><span class="equipIcon">'+(it?it.icon:'◇')+'</span><div><b>'+labels[slot]+'</b><small>'+(it?it.name:'Nicht ausgerüstet')+'</small></div>'+(it?'<button data-unequip="'+slot+'">Ablegen</button>':'')+'</div>'}).join('');
+ const armor=Math.round(armorBlockChance());text.innerHTML='<div class="inventoryTop"><span>✦ '+player.coins+' Windtaler</span><span>♥ '+player.hp+'/5</span><span>🧪 '+player.potions+' Tränke</span><span>'+entries.length+'/'+BAG_SLOTS+' Slots</span></div><div class="inventoryLayout"><section class="inventoryBox"><h3>RUCKSACK</h3><div class="inventoryGrid">'+slots+'</div><p class="chestNote">Ausrüstung antippen, um sie anzulegen.</p></section><section class="inventoryBox"><h3>AUSRÜSTUNG</h3><div class="equipmentList">'+equipment+'</div><p class="chestNote">Schutzchance: '+armor+'%</p></section></div>';
+ text.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>equipFromBag(b.dataset.equip));text.querySelectorAll('[data-unequip]').forEach(b=>b.onclick=()=>unequipGear(b.dataset.unequip));buttons.innerHTML='';
+ const add=(label,fn)=>{const b=document.createElement('button');b.className='uiButton';b.textContent=label;b.onclick=fn;buttons.appendChild(b)};
+ add('HEILTRANK',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);saveGame(activeSlot);renderInventoryPanel();updateQuest()}else showToast('Nicht nötig.')});add('HANDWERK',renderCraftPanel);add('SCHLIESSEN',closePanel);
+}
+function renderCraftPanel(){
+ const panel=document.getElementById('panel'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');panel.classList.add('inventoryPanel');document.getElementById('panelTitle').textContent='WERKBANK · HANDWERK';
+ const stock=['branch','fiber','oreCopper','oreIron','oreFrost','fish'];text.innerHTML='<div class="inventoryTop"><span>Werkzeuge, Rüstung und Nahrung herstellen</span><span>'+stock.map(k=>ITEM_INFO[k].icon+' '+(inventory[k]||0)).join('　')+'</span></div><div class="craftList">'+RECIPES.map(r=>'<article class="craftCard"><span class="craftIcon">'+r.icon+'</span><div><h3>'+r.name+'</h3><p>'+r.desc+'</p><p>Benötigt: '+costText(r.cost)+'</p></div><button data-craft="'+r.id+'" '+(canPay(r.cost)&&hasBagSpace(r.id)?'':'disabled')+'>HERSTELLEN</button></article>').join('')+'</div>';
+ text.querySelectorAll('[data-craft]').forEach(b=>b.onclick=()=>craftItem(b.dataset.craft));buttons.innerHTML='';const bag=document.createElement('button');bag.className='uiButton';bag.textContent='RUCKSACK';bag.onclick=renderInventoryPanel;buttons.appendChild(bag);const close=document.createElement('button');close.className='uiButton';close.textContent='SCHLIESSEN';close.onclick=closePanel;buttons.appendChild(close);
+}
+function renderChestGrid(data,side,slots){const keys=Object.keys(ITEM_INFO).filter(k=>(Number(data[k])||0)>0);return Array.from({length:slots},(_,i)=>{const k=keys[i],it=k?ITEM_INFO[k]:null;return k?'<button class="invSlot" data-transfer="'+k+'" data-from="'+side+'"><span class="invCount">'+data[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+'</span></button>':'<div class="invSlot empty"></div>'}).join('')}
+function transferChestItem(key,from){const chest=chestStorage[activeChestId];if(!chest)return;if(from==='chest'){const n=Number(chest[key])||0;if(!n)return;if(!hasBagSpace(key)){showToast('Rucksack voll.');return}inventory[key]=(inventory[key]||0)+n;delete chest[key]}else{const n=Number(inventory[key])||0;if(!n)return;chest[key]=(chest[key]||0)+n;inventory[key]=0}saveGame(activeSlot);renderChestPanel(activeChestId)}
+function renderChestPanel(id){const chest=chestStorage[id];if(!chest)return;activeChestId=id;const text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons'),names={forestCache:'WALDTRUHE',moorCache:'MOORTRUHE',caveCache:'HÖHLENTRUHE'};document.getElementById('panelTitle').textContent=names[id]||'TRUHE';text.innerHTML='<p class="chestNote">Gegenstände antippen, um sie zwischen Truhe und Rucksack zu verschieben.</p><div class="chestLayout"><section class="chestBox"><h3>TRUHE</h3><div class="inventoryGrid">'+renderChestGrid(chest,'chest',12)+'</div></section><section class="chestBox"><h3>RUCKSACK</h3><div class="inventoryGrid">'+renderChestGrid(inventory,'bag',BAG_SLOTS)+'</div></section></div>';text.querySelectorAll('[data-transfer]').forEach(b=>b.onclick=()=>transferChestItem(b.dataset.transfer,b.dataset.from));buttons.innerHTML='';const close=document.createElement('button');close.className='uiButton';close.textContent='SCHLIESSEN';close.onclick=closePanel;buttons.appendChild(close)}
+function openChestPanel(id){if(!chestStorage[id])return;openedChests[id]=true;panelOpen=true;const p=document.getElementById('panel');p.classList.remove('hidden');p.classList.add('inventoryPanel');p.style.display='grid';renderChestPanel(id);saveGame(activeSlot)}
+
 function openPanel(kind){
  panelOpen=true;const panel=document.getElementById('panel');panel.classList.remove('hidden');panel.style.display='grid';
  const title=document.getElementById('panelTitle'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');buttons.innerHTML='';
@@ -1087,9 +1186,8 @@ function openPanel(kind){
  if(kind==='quest'){
   title.textContent='QUESTBUCH';
   text.innerHTML='<p><b>Hauptgeschichte: Die sieben Echos</b><br>'+(['Finde Mira am Brunnen.','Sammle drei Echosamen in Windruh.','Bringe die Samen zum Brunnen.','Finde drei blaue Waldblüten im Flüsterwald.','Erwecke das Echo im Schrein.','Das erste Echo ist gerettet. Sechs weitere Schreine warten.','Das erste Echo ist erwacht. Der Abspann ist erreicht.'][main.stage])+'</p><p><b>Nebenquests</b><br>Schilflichter: '+sideQuests.reed.items+'/'+sideQuests.reed.need+' · Flussmuscheln: '+sideQuests.shell.items+'/'+sideQuests.shell.need+'<br>Kristallsplitter: '+sideQuests.crystal.items+'/'+sideQuests.crystal.need+' · Runensteine: '+sideQuests.rune.items+'/'+sideQuests.rune.need+'<br>Frostblüten: '+sideQuests.frost.items+'/'+sideQuests.frost.need+' · Wachtzeichen: '+sideQuests.watch.items+'/'+sideQuests.watch.need+'</p><p><b>Bewohner helfen</b><br>'+(side.blueHerb===0?'Eda hat dich noch nicht um Hilfe gebeten.':side.blueHerb===1?'Eda wartet auf drei blaue Waldblüten.':'Eda hat dir zwei Heiltränke geschenkt.')+'<br>'+(side.letter===0?'Runa hat noch keinen Briefauftrag gegeben.':side.letter===1?'Bringe Runas Brief zu Tomke am Fluss.':side.letter===2?'Gib Runas Antwort in der Taverne ab.':'Der Brief wurde zugestellt.')+'</p>';
- }else if(kind==='bag'){
-  title.textContent='RUCKSACK';text.innerHTML='<p>✦ Echosamen: '+inventory.seeds+'<br>❀ Blaue Waldblüten: '+inventory.blueHerb+'<br>✉ Briefe: '+inventory.letters+'<br>🍓 Beeren: '+inventory.berries+'<br>🥧 Mahlzeiten: '+inventory.meals+'<br>❄ Frostblüten: '+inventory.frostPetal+'<br>◈ Wachtzeichen: '+inventory.watchSigil+'<br>🧪 Heiltränke: '+player.potions+'<br>◈ Windtaler: '+player.coins+'</p>';
-  action('Heiltrank benutzen',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);showToast('Zwei Herzen wiederhergestellt');openPanel('bag');saveGame(activeSlot)}else showToast('Du brauchst einen Heiltrank und musst verletzt sein.')});
+ }else if(kind==='bag'){renderInventoryPanel();return;
+ }else if(kind==='craft'){renderCraftPanel();return;
  }else if(kind==='map'){
   title.textContent='WELTKARTE';text.innerHTML='<p><b>Avarra · Windruh und die vier Himmelswege</b></p><p>⬆ Norden: Flüsterwald<br>➡ Osten: Nebelmoor<br>⬇ Süden: Echo-Schrein (öffnet sich nach den drei Waldblüten)<br>⬅ Westen: Frostgrat</p><p>Windruh liegt als eigene Stadt auf einer Insel, vollständig von einem Fluss umgeben. Jeder der vier Wege führt über eine Brücke direkt in ein eigenes, großes Gebiet. Die Flüsterhöhle bleibt als Nebenpfad im Wald erreichbar.</p>';
  }else if(kind==='save'||kind==='load'){
@@ -1108,7 +1206,7 @@ function openPanel(kind){
  }
  action('Schließen',closePanel);
 }
-function closePanel(){panelOpen=false;const p=document.getElementById('panel');p.classList.add('hidden');p.style.display='none'}
+function closePanel(){panelOpen=false;activeChestId=null;const p=document.getElementById('panel');p.classList.add('hidden');p.classList.remove('inventoryPanel');p.style.display='none'}
 function enterRoom(b){
  currentRoom=b.id;roomNPC=rooms[b.id]||{title:b.name,kind:'home',npc:''};
  insideDoorSpawn={x:b.doorX,y:b.doorY+26};room={w:30,h:17};
@@ -1151,8 +1249,8 @@ function interact(){
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
-function attack(){if(attackCD>0||dialogOpen||panelOpen||gameOver)return;attackCD=.38;player.attackAnim=.24;const dx=player.faceX||0,dy=player.faceY||1;spawnCombatFx('slash',player.x+16+dx*22,player.y+19+dy*22,dx,dy,selected===2?'#bceeff':'#ffe6a0',.25);const e=combatTarget(78,-.05)[0];if(e){damageMonster(e,selected===2?2:1,dx*38,dy*38);showToast('TREFFER!')}else showToast('Daneben – richte dich zum Gegner aus.');updateQuest();saveGame(activeSlot)}
-function ability(){if(skillCD>0||dialogOpen||panelOpen||gameOver)return;const h=heroes[selected],dx=player.faceX||0,dy=player.faceY||1;skillCD=4.5;player.skillAnim=.72;if(selected===0||selected===4){const distance=selected===0?112:92;for(let i=1;i<=12;i++){const nx=player.x+dx*distance/12,ny=player.y+dy*distance/12;if(!canOccupy(nx,ny))break;player.x=nx;player.y=ny}player.inv=selected===0?1.05:.72;spawnCombatFx('ring',player.x+16,player.y+20,0,0,h.cape,.42);showToast(h.skill+'!')}else if(selected===1){player.inv=2.35;player.shield=2.35;spawnCombatFx('shield',player.x+16,player.y+20,0,0,'#9dd9ff',.62);for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<104)){m.windup=0;const ax=m.x-player.x,ay=m.y-player.y,d=Math.hypot(ax,ay)||1;m.x+=ax/d*24;m.y+=ay/d*24;spawnCombatFx('hit',m.x+16,m.y+18,0,0,'#a8dfff',.3)}showToast('STEINHAUT · SCHUTZ AKTIV')}else if(selected===2){const e=combatTarget(280,.35)[0];const tx=e?e.x+16:player.x+16+dx*180,ty=e?e.y+18:player.y+18+dy*180;spawnCombatFx('shot',player.x+16,player.y+18,dx*390,dy*390,'#9ceaff',.72);spawnCombatFx('ring',tx,ty,0,0,'#bceeff',.35);if(e){damageMonster(e,4,dx*45,dy*45);showToast('STERNENSCHUSS · '+e.type.toUpperCase())}else showToast('STERNENSCHUSS · KEIN ZIEL')}else{let hit=0;for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<118)){damageMonster(m,3,(m.x-player.x)*.25,(m.y-player.y)*.25);hit++}const healed=player.hp<5;if(healed)player.hp=Math.min(5,player.hp+1);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#c8a6ff',.65);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#e8d9ff',.48);showToast('ECHOWELLE · '+(hit?hit+' TREFFER':'UMGEBUNG GESÄUBERT')+(healed?' · +1 HERZ':''))}updateQuest();saveGame(activeSlot)}
+function attack(){if(attackCD>0||dialogOpen||panelOpen||gameOver||fishing.active)return;attackCD=.38;player.attackAnim=.24;const dx=player.faceX||0,dy=player.faceY||1;spawnCombatFx('slash',player.x+16+dx*22,player.y+19+dy*22,dx,dy,selected===2?'#bceeff':'#ffe6a0',.25);const e=combatTarget(78,-.05)[0];if(e){damageMonster(e,selected===2?2:1,dx*38,dy*38);showToast('TREFFER!')}else showToast('Daneben – richte dich zum Gegner aus.');updateQuest();saveGame(activeSlot)}
+function ability(){if(skillCD>0||dialogOpen||panelOpen||gameOver||fishing.active)return;const h=heroes[selected],dx=player.faceX||0,dy=player.faceY||1;skillCD=4.5;player.skillAnim=.72;if(selected===0||selected===4){const distance=selected===0?112:92;for(let i=1;i<=12;i++){const nx=player.x+dx*distance/12,ny=player.y+dy*distance/12;if(!canOccupy(nx,ny))break;player.x=nx;player.y=ny}player.inv=selected===0?1.05:.72;spawnCombatFx('ring',player.x+16,player.y+20,0,0,h.cape,.42);showToast(h.skill+'!')}else if(selected===1){player.inv=2.35;player.shield=2.35;spawnCombatFx('shield',player.x+16,player.y+20,0,0,'#9dd9ff',.62);for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<104)){m.windup=0;const ax=m.x-player.x,ay=m.y-player.y,d=Math.hypot(ax,ay)||1;m.x+=ax/d*24;m.y+=ay/d*24;spawnCombatFx('hit',m.x+16,m.y+18,0,0,'#a8dfff',.3)}showToast('STEINHAUT · SCHUTZ AKTIV')}else if(selected===2){const e=combatTarget(280,.35)[0];const tx=e?e.x+16:player.x+16+dx*180,ty=e?e.y+18:player.y+18+dy*180;spawnCombatFx('shot',player.x+16,player.y+18,dx*390,dy*390,'#9ceaff',.72);spawnCombatFx('ring',tx,ty,0,0,'#bceeff',.35);if(e){damageMonster(e,4,dx*45,dy*45);showToast('STERNENSCHUSS · '+e.type.toUpperCase())}else showToast('STERNENSCHUSS · KEIN ZIEL')}else{let hit=0;for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<118)){damageMonster(m,3,(m.x-player.x)*.25,(m.y-player.y)*.25);hit++}const healed=player.hp<5;if(healed)player.hp=Math.min(5,player.hp+1);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#c8a6ff',.65);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#e8d9ff',.48);showToast('ECHOWELLE · '+(hit?hit+' TREFFER':'UMGEBUNG GESÄUBERT')+(healed?' · +1 HERZ':''))}updateQuest();saveGame(activeSlot)}
 function dodge(){
  if(rollCD>0||dialogOpen||panelOpen)return;
  rollCD=.65;player.inv=.5;player.rolling=.24;
@@ -1176,7 +1274,7 @@ function move(dt){
  let m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m}
  if(m<.05){player.walk=0;return}
  if(Math.abs(ix)>Math.abs(iy)){player.faceX=Math.sign(ix);player.faceY=0}else{player.faceX=0;player.faceY=Math.sign(iy)}
- player.walk+=dt*9;const speed=heroes[selected].speed*(player.inv>0?1.12:1),dx=ix*speed*dt,dy=iy*speed*dt;
+ player.walk+=dt*9;const hour=worldMinutes/60,gearBoost=(gear.feet==='trailBoots'?1.12:1)*(gear.body==='forestCloak'&&(hour>=20||hour<6)?1.08:1);const speed=heroes[selected].speed*gearBoost*(player.inv>0?1.12:1),dx=ix*speed*dt,dy=iy*speed*dt;
  if(canOccupy(player.x+dx,player.y))player.x+=dx;
  if(canOccupy(player.x,player.y+dy))player.y+=dy;
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
@@ -1214,7 +1312,9 @@ function retryFromCheckpoint(){
 }
 function update(dt,now){
  if(!gameOver&&!dialogOpen&&!panelOpen){
-  move(dt);
+  worldMinutes=(worldMinutes+dt*4)%1440;
+  if(!fishing.active)move(dt);
+  updateFishing(dt);
   updateNPCs(dt);
   attackCD=Math.max(0,attackCD-dt);
   skillCD=Math.max(0,skillCD-dt);
@@ -1236,6 +1336,8 @@ function update(dt,now){
 function keyDown(e){
  if(gameOver)return;
  const k=e.key.toLowerCase();keys[k]=true;
+ if(k==='i'&&!e.repeat&&!dialogOpen&&!panelOpen){e.preventDefault();openPanel('bag');return}
+ if(k==='c'&&!e.repeat&&!dialogOpen&&!panelOpen){e.preventDefault();openPanel('craft');return}
  if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();
  if(e.repeat)return;
  if(k==='e'||k===' ')interact();if(k==='j')attack();if(k==='k')ability();if(k==='shift')dodge();
