@@ -58,7 +58,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v6"'), "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v8"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
@@ -77,3 +77,15 @@ assert.ok(fs.existsSync(path.join(root, "assets/windruh.svg")), "title art exist
 assert.ok(fs.existsSync(path.join(root, "assets/icon.svg")), "app icon exists");
 
 console.log("TALWIND validation passed.");
+
+
+assert.ok(html.includes('id="worldClock"') && html.includes("function drawDayNight("), "day/night cycle and clock HUD exist");
+assert.ok(html.includes("function renderInventoryPanel(") && html.includes("const BAG_SLOTS=24"), "24-slot inventory exists");
+assert.ok(html.includes("function openChestPanel(") && html.includes("function transferChestItem("), "storage chests can transfer items");
+assert.ok(html.includes("function startFishing(") && html.includes("function drawFishingRod("), "fishing minigame and rod animation exist");
+assert.ok(html.includes("const RECIPES=") && html.includes("ironArmor") && html.includes("frostMantle"), "armor crafting recipes exist");
+assert.ok(html.includes("function takePlayerHit(") && html.includes("function armorBlockChance("), "armor affects incoming damage");
+assert.ok(html.includes("copperVein1") && html.includes("ironVein1") && html.includes("frostVein1"), "ore nodes exist in caves and ice biome");
+assert.ok(html.includes("drawTreeVariant(") && html.includes("'berryBush'") && html.includes("'snowPine'"), "tree, bush and snow foliage variants exist");
+assert.ok(html.includes("id:'forestCache'") && html.includes("id:'moorCache'") && html.includes("id:'caveCache'"), "three world chests exist");
+assert.ok(html.includes("function collectQuestItem(item)") && html.includes("nodeId"), "resource mining and persistence are implemented");
