@@ -1,5 +1,5 @@
 "use strict";
-const CACHE_NAME = "talwind-shell-v6";
+const CACHE_NAME = "talwind-shell-v7";
 const CORE_ASSETS = [
   "./",
   "./index.html",
