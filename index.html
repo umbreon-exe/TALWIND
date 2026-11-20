@@ -756,7 +756,7 @@ function questGuideTarget(){
  if(main.stage===1&&zone==='windruh'){const v=nearest(seedSpots);return v?{x:v.x+8,y:v.y+8,label:'ECHOSAMEN'}:null}
  if(main.stage===2&&zone==='windruh'){const v=world.decor.find(function(o){return o.type==='fountain'});return v?{x:v.x+27,y:v.y+28,label:'BRUNNEN'}:null}
  if(main.stage===3&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
- if(main.stage===3&&zone==='wald'){const v=nearest(world.items.filter(function(i){return i.kind==='mainFlower'}));return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
+ if(main.stage===3&&zone==='wald'){const v=nearest(flowerSpots);return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
  if(main.stage===4&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='shrine'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'ECHO-SCHREIN'}:null}
  if(main.stage===4&&zone==='shrine'){const g=monsters.find(function(m){return m.type==='guardian'&&m.hp>0});return g?{x:g.x+16,y:g.y+24,label:'WÄCHTER'}:null}
  if(zone!=='windruh'&&main.stage<3){const e=world.exits.find(function(v){return v.to==='windruh'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'WINDRUH'}:null}
@@ -1138,7 +1138,7 @@ function interact(){
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
- if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+16-px,fountain.y+14-py)<58&&main.stage===2){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+27-px,fountain.y+29-py)<66&&main.stage===2){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
