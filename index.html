@@ -117,7 +117,7 @@ body{display:grid;place-items:center;touch-action:none}
 #panel button{pointer-events:auto;touch-action:manipulation}
 .menuBtn:focus-visible,.act:focus-visible,.uiButton:focus-visible{outline:3px solid #fff0a8;outline-offset:2px}
 .menuBtn:active{transform:translateY(2px);filter:brightness(1.15)}
-.act.cooldown{filter:saturate(.55);opacity:.82}
+.act.cooldown{filter:saturate(.55);opacity:.82;position:relative;overflow:hidden}.act .cooldownText{font-size:9px;color:#ffe6a3;min-height:10px;text-shadow:1px 1px #1b2431}.act.ready{filter:drop-shadow(0 0 5px #f3d477)}#combatBanner{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;padding:6px 12px;border:2px solid #e3bb68;background:linear-gradient(#2b4561,#14253b);color:#fff0ca;font:10px ui-monospace,monospace;letter-spacing:1px;box-shadow:2px 3px #101b29;pointer-events:none;opacity:0;transition:opacity .12s}#combatBanner.show{opacity:1}@media(max-width:650px){#combatBanner{bottom:6px;font-size:8px;padding:4px 7px}}
 .act.cooldown small{color:#ffe18a}
 #rollBtn{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 #rollBtn:disabled{cursor:default}
@@ -147,8 +147,8 @@ body{display:grid;place-items:center;touch-action:none}
 <div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
 <div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
 <div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
-<div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small>FÄHIGKEIT</small></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
-<div id="stick"><div id="nub"></div></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
+<div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small id="skillName">FÄHIGKEIT</small><span class="cooldownText" id="skillCooldown">BEREIT</span></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small><span class="cooldownText" id="attackCooldown">BEREIT</span></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small><span class="cooldownText" id="rollCooldown">BEREIT</span></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
+<div id="stick"><div id="nub"></div></div><div id="combatBanner" aria-live="polite"></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
 <div class="overlay" id="mainMenu"><div class="card"><img src="assets/windruh.svg" width="480" height="220" alt="Windruh" style="display:block;width:min(100%,480px);height:auto;max-height:220px;object-fit:cover;margin:0 auto 12px;border:3px solid #d6a64e"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Ein Abenteuer beginnt. Erkunde Windruh, überquere den Fluss und entdecke vier Wege in die Welt von Avarra.</p><button class="uiButton" id="openHeroMenuBtn">SPIEL STARTEN</button><p class="smallNote">Wähle im nächsten Menü deinen Helden und starte deine Reise.</p></div></div>
 <div class="overlay hidden" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
@@ -239,9 +239,9 @@ const ROOM_DRESSING={
 
 const keys={},stick={x:0,y:0},camera={x:0,y:0};
 let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,roomNPC=null,currentRoom=null;
-let dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0,currentPrompt='';
+let dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0,currentPrompt='',combatFx=[];
 let activeSlot=0,worldTransition=null,particles=[],particleClock=0,gameLoopRunning=false;
-const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0};
+const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0,attackAnim:0,skillAnim:0,shield:0,hurt:0};
 const saveKey='talwind-world-save-v4',slotsKey='talwind-save-slots-v1';
 const main={stage:0,seeds:0,forestFlowers:0,shrineDone:false};
 const side={blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false};
@@ -599,7 +599,7 @@ function drawHero(x,y,now){
   return;
  }
  if(player.inv>0&&Math.floor(now/85)%2===0){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#fff';ctx.fillRect(px+1,py,30,37);ctx.restore()}
- if(player.rolling>0){ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle='#e1f6ed';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px+15,py+19,18,12,frame,0,Math.PI*2);ctx.stroke();ctx.restore()}
+ if(player.attackAnim>0){const t=player.attackAnim/.24;ctx.save();ctx.translate(px+16+player.faceX*13,py+19+player.faceY*13);ctx.rotate(Math.atan2(player.faceY,player.faceX));ctx.globalAlpha=Math.min(1,t*1.7);ctx.strokeStyle=selected===2?'#bceeff':'#fff0bf';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,23+(1-t)*7,-1.15,1.15);ctx.stroke();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,18+(1-t)*7,-.9,.9);ctx.stroke();ctx.restore()}if(player.skillAnim>0){ctx.save();ctx.globalAlpha=Math.min(.9,player.skillAnim*2);ctx.strokeStyle=heroes[selected].cape;ctx.lineWidth=3;ctx.beginPath();ctx.arc(px+16,py+20,18+(1-player.skillAnim)*22,0,Math.PI*2);ctx.stroke();ctx.restore()}if(player.shield>0){ctx.save();ctx.globalAlpha=.45+.2*Math.sin(performance.now()/90);ctx.strokeStyle='#9dd9ff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px+16,py+18,22,25,0,0,Math.PI*2);ctx.stroke();ctx.restore()}if(player.rolling>0){ctx.save();ctx.globalAlpha=.45;ctx.strokeStyle='#e1f6ed';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(px+15,py+19,18,12,frame,0,Math.PI*2);ctx.stroke();ctx.restore()}
  if(damageFlash>0){ctx.save();ctx.globalAlpha=.65;ctx.fillStyle='#fff';ctx.fillRect(px+1,py+1,29,34);ctx.restore()}
 }
 function drawHeroFallback(x,y,now){
@@ -744,7 +744,7 @@ function renderScene(now){
  if(zone==='wald'&&main.stage===3)flowerSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#7cdbed')})});
  monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>items.push({y:m.y+31,fn:()=>drawMonster(m,now)}));
  items.push({y:player.y+35,fn:()=>drawHero(player.x,player.y,now)});
- items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());
+ items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());drawCombatEffects(now);
  currentPrompt=nearbyPrompt();
  if(zone==='shrine'&&bossState.active){const guardian=monsters.find(m=>m.type==='guardian'&&m.hp>0);if(guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 11px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,22);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,42)}ctx.restore()}}
  if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-10);ctx.textAlign='left'}
@@ -758,6 +758,11 @@ function drawWorld(now){
   if(q>=1)worldTransition=null;
  }
 }
+function spawnCombatFx(type,x,y,dx,dy,color,life){combatFx.push({type,x,y,dx:dx||0,dy:dy||0,color:color||'#fff0c5',life:life||.38,max:life||.38,phase:Math.random()*6.28});if(combatFx.length>80)combatFx.shift()}
+function updateCombatFx(dt){for(let i=combatFx.length-1;i>=0;i--){const e=combatFx[i];e.life-=dt;if(e.type==='shot'){e.x+=e.dx*dt;e.y+=e.dy*dt}if(e.life<=0)combatFx.splice(i,1)}}
+function drawCombatEffects(now){ctx.save();for(const e of combatFx){const x=e.x-camera.x,y=e.y-camera.y,t=1-e.life/e.max,a=Math.max(0,e.life/e.max);ctx.globalAlpha=a;if(e.type==='slash'){ctx.strokeStyle=e.color;ctx.lineWidth=5;ctx.beginPath();ctx.arc(x,y,17+t*23,-1.1,1.1);ctx.stroke();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x,y,13+t*22,-.9,.9);ctx.stroke()}else if(e.type==='ring'||e.type==='shield'){ctx.strokeStyle=e.color;ctx.lineWidth=e.type==='shield'?4:3;ctx.beginPath();ctx.arc(x,y,10+t*75,0,Math.PI*2);ctx.stroke();ctx.fillStyle=e.color;ctx.globalAlpha=a*.12;ctx.beginPath();ctx.arc(x,y,10+t*75,0,Math.PI*2);ctx.fill()}else if(e.type==='shot'){ctx.fillStyle=e.color;ctx.shadowColor=e.color;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(x,y,5+Math.sin(now/30)*2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0}else if(e.type==='hit'){ctx.strokeStyle=e.color;ctx.lineWidth=3;for(let k=0;k<6;k++){const ang=k*Math.PI/3;ctx.beginPath();ctx.moveTo(x+Math.cos(ang)*4,y+Math.sin(ang)*4);ctx.lineTo(x+Math.cos(ang)*(9+t*15),y+Math.sin(ang)*(9+t*15));ctx.stroke()}}}ctx.restore()}
+function combatTarget(range,cone){const dx=player.faceX||0,dy=player.faceY||1;return monsters.filter(m=>m.zone===zone&&m.hp>0&&(!m.type||m.type!=='guardian'||bossState.active)).map(m=>({m,dx:m.x-player.x,dy:m.y-player.y,d:Math.hypot(m.x-player.x,m.y-player.y)})).filter(v=>v.d<=range&&(v.d<1||((v.dx*dx+v.dy*dy)/v.d)>=cone)).sort((a,b)=>a.d-b.d).map(v=>v.m)}
+function damageMonster(m,amount,kx,ky){if(!m||m.hp<=0)return false;m.hp=Math.max(0,m.hp-amount);m.flash=.16;m.hitX=kx||0;m.hitY=ky||0;spawnCombatFx('hit',m.x+17,m.y+18,0,0,m.type==='guardian'?'#a9f5ed':'#ffe6a0',.28);if(m.hp<=0){player.xp+=m.type==='guardian'?150:18;player.coins+=m.type==='guardian'?60:5;if(m.type==='guardian'){main.stage=5;main.shrineDone=true;player.potions++;bossState.active=false;showDialogue('DAS ERSTE ECHO','Der Wächter löst sich in Licht auf. Ein warmer Klang kehrt nach Avarra zurück. Ein Heiltrank und 60 Windtaler gehören dir.')}else showToast('+18 EP · +5 Taler');saveGame(activeSlot)}return true}
 function makeParticles(){
  particles=[];
  for(let i=0;i<26;i++)particles.push({x:rand(i*113+97)()*VW,y:rand(i*41+33)()*VH,vx:(rand(i*7+1)()-.5)*10,vy:rand(i*9+4)()*8+3,phase:i*.77,size:i%4===0?3:2});
@@ -875,7 +880,7 @@ function updateCamera(){
 function changeZone(id,x,y){
  const snapshot=document.createElement('canvas');snapshot.width=VW;snapshot.height=VH;
  try{snapshot.getContext('2d').drawImage(canvas,0,0)}catch(e){}
- const from=zone;zone=id;room=null;currentRoom=null;roomNPC=null;
+ const from=zone;zone=id;room=null;currentRoom=null;roomNPC=null;combatFx=[];
  world=makeWorld(id);player.x=x;player.y=y;player.inv=.28;
  camera.x=0;camera.y=0;updateCamera();
  worldTransition={snapshot,start:performance.now(),duration:420,from,to:id};
@@ -934,7 +939,7 @@ function updateQuest(){
  document.getElementById('heroLabel').textContent=heroes[selected].name+' · '+heroes[selected].role;
  document.getElementById('hearts').textContent='♥ '.repeat(player.hp)+'♡ '.repeat(5-player.hp);
  document.getElementById('seedLabel').textContent=main.seeds;document.getElementById('coinLabel').textContent=player.coins;
- document.getElementById('levelLabel').textContent='STUFE '+(1+Math.floor(player.xp/100))+' · '+player.xp+' EP';
+ document.getElementById('levelLabel').textContent='STUFE '+(1+Math.floor(player.xp/100))+' · '+player.xp+' EP';const cd=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v>0?v.toFixed(1)+'s':'BEREIT'};cd('skillCooldown',skillCD);cd('attackCooldown',attackCD);cd('rollCooldown',rollCD);const sn=document.getElementById('skillName');if(sn)sn.textContent=heroes[selected].skill.toUpperCase();for(const [id,v] of [['skillBtn',skillCD],['attackBtn',attackCD],['rollBtn',rollCD]]){const el=document.getElementById(id);if(el){el.classList.toggle('cooldown',v>0);el.classList.toggle('ready',v<=0)}}
 }
 function rewardQuest(key){
  const q=sideQuests[key];if(!q||q.state!==1||q.items<q.need)return false;
@@ -1089,25 +1094,8 @@ function interact(){
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
-function attack(){
- if(attackCD>0||dialogOpen||panelOpen)return;attackCD=.32;
- const candidates=monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<62);
- const e=candidates.sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y))[0];
- if(e){
-  e.hp-=selected===2?2:1;
-  if(e.hp<=0){player.xp+=e.type==='guardian'?150:18;player.coins+=e.type==='guardian'?60:5;if(e.type==='guardian'){main.stage=5;main.shrineDone=true;player.potions++;bossState.active=false;showDialogue('DAS ERSTE ECHO','Der Wächter löst sich in Licht auf. Ein warmer Klang kehrt nach Avarra zurück. Ein Heiltrank und 60 Windtaler gehören dir. Sechs weitere Echos warten.')}else showToast('+18 EP · +5 Taler');saveGame(activeSlot)}
-  else showToast('Treffer!');
-  saveGame(activeSlot);
- }else showToast('Kein Gegner in Reichweite.');
-}
-function ability(){
- if(skillCD>0||dialogOpen||panelOpen)return;skillCD=4.2;const h=heroes[selected];
- if(selected===0||selected===4){const dx=player.faceX||0,dy=player.faceY||0;player.x=clamp(player.x+dx*88,20,world.width*T-20);player.y=clamp(player.y+dy*88,20,world.height*T-20);player.inv=1;showToast(h.skill+'!')}
- else if(selected===1){player.inv=2.1;monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<85).forEach(m=>m.windup=0);showToast('Steinhaut schützt dich!')}
- else if(selected===2){const e=monsters.find(m=>m.zone===zone&&m.hp>0&&m.type!=='guardian');if(e){e.hp-=3;if(e.hp<=0){player.xp+=18;player.coins+=5}}showToast('Sternenschuss!')}
- else{player.hp=Math.min(5,player.hp+1);monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<90).forEach(m=>m.hp-=2);showToast('Echowelle!')}
- updateQuest();saveGame(activeSlot);
-}
+function attack(){if(attackCD>0||dialogOpen||panelOpen||gameOver)return;attackCD=.38;player.attackAnim=.24;const dx=player.faceX||0,dy=player.faceY||1;spawnCombatFx('slash',player.x+16+dx*22,player.y+19+dy*22,dx,dy,selected===2?'#bceeff':'#ffe6a0',.25);const e=combatTarget(78,-.05)[0];if(e){damageMonster(e,selected===2?2:1,dx*38,dy*38);showToast('TREFFER!')}else showToast('Daneben – richte dich zum Gegner aus.');updateQuest();saveGame(activeSlot)}
+function ability(){if(skillCD>0||dialogOpen||panelOpen||gameOver)return;const h=heroes[selected],dx=player.faceX||0,dy=player.faceY||1;skillCD=4.5;player.skillAnim=.72;if(selected===0||selected===4){const distance=selected===0?112:92;for(let i=1;i<=12;i++){const nx=player.x+dx*distance/12,ny=player.y+dy*distance/12;if(!canOccupy(nx,ny))break;player.x=nx;player.y=ny}player.inv=selected===0?1.05:.72;spawnCombatFx('ring',player.x+16,player.y+20,0,0,h.cape,.42);showToast(h.skill+'!')}else if(selected===1){player.inv=2.35;player.shield=2.35;spawnCombatFx('shield',player.x+16,player.y+20,0,0,'#9dd9ff',.62);for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<104)){m.windup=0;const ax=m.x-player.x,ay=m.y-player.y,d=Math.hypot(ax,ay)||1;m.x+=ax/d*24;m.y+=ay/d*24;spawnCombatFx('hit',m.x+16,m.y+18,0,0,'#a8dfff',.3)}showToast('STEINHAUT · SCHUTZ AKTIV')}else if(selected===2){const e=combatTarget(280,.35)[0];const tx=e?e.x+16:player.x+16+dx*180,ty=e?e.y+18:player.y+18+dy*180;spawnCombatFx('shot',player.x+16,player.y+18,dx*360,dy*360,'#9ceaff',.55);spawnCombatFx('ring',tx,ty,0,0,'#bceeff',.35);if(e){damageMonster(e,4,dx*45,dy*45);showToast('STERNENSCHUSS · '+e.type.toUpperCase())}else showToast('STERNENSCHUSS · KEIN ZIEL')}else{let hit=0;for(const m of monsters.filter(m=>m.zone===zone&&m.hp>0&&Math.hypot(m.x-player.x,m.y-player.y)<118)){damageMonster(m,3,(m.x-player.x)*.25,(m.y-player.y)*.25);hit++}const healed=player.hp<5;if(healed)player.hp=Math.min(5,player.hp+1);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#c8a6ff',.65);spawnCombatFx('ring',player.x+16,player.y+20,0,0,'#e8d9ff',.48);showToast('ECHOWELLE · '+(hit?hit+' TREFFER':'UMGEBUNG GESÄUBERT')+(healed?' · +1 HERZ':''))}updateQuest();saveGame(activeSlot)}
 function dodge(){
  if(rollCD>0||dialogOpen||panelOpen)return;
  rollCD=.65;player.inv=.5;player.rolling=.24;
@@ -1174,7 +1162,7 @@ function update(dt,now){
   skillCD=Math.max(0,skillCD-dt);
   rollCD=Math.max(0,rollCD-dt);
   player.inv=Math.max(0,player.inv-dt);
-  player.rolling=Math.max(0,player.rolling-dt);
+  player.rolling=Math.max(0,player.rolling-dt);player.attackAnim=Math.max(0,player.attackAnim-dt);player.skillAnim=Math.max(0,player.skillAnim-dt);player.shield=Math.max(0,player.shield-dt);player.hurt=Math.max(0,player.hurt-dt);updateCombatFx(dt);
   updateEnemies(dt,now);
   updateParticles(dt,now);
   if(player.hp<=0)triggerGameOver();
