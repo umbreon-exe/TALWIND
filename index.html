@@ -351,7 +351,7 @@ function makeWorld(id){
  }else if(id==='wald'){
   // Forest is its own large, complete map, not part of the village scenery.
   rect(0,29,88,6,1);path(29,32,29,7,2,1);path(29,32,57,13,1,1);path(29,32,57,49,1,1);path(29,7,40,7,2,1);
-  path(57,13,78,13,1,1);path(57,49,78,49,1,1);
+  path(57,13,78,13,1,1);path(57,49,78,49,1,1);path(57,31,82,31,1,1);
   oval(13,12,7,5,2,4);oval(74,12,5,4,2,4);oval(14,51,6,4,2,4);
   const open=[[12,32,7,6],[29,32,7,7],[57,13,7,6],[57,49,7,6],[78,32,6,7]];
   for(const [cx,cy,rx,ry] of open)for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++)if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<1)set(x,y,5);
@@ -365,6 +365,7 @@ function makeWorld(id){
   w.exits.push({x:38*T,y:0,w:70,h:42,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
   path(44,61,44,32,2,1);path(44,32,29,32,2,1);
   w.exits.push({x:40*T,y:61*T,w:70,h:30,to:'hoehle',tx:7*T,ty:36*T,label:'Zum Höhlenpfad',open:()=>true});
+  w.exits.push({x:81*T,y:27*T,w:36,h:72,to:'shrine',tx:30*T,ty:19*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
  }else if(id==='sumpf'){
@@ -410,7 +411,7 @@ function makeWorld(id){
   path(22,18,22,33,2,3);
   w.decor.push({type:'altar',x:21*T,y:9*T},{type:'torch',x:8*T,y:7*T},{type:'torch',x:36*T,y:7*T},{type:'crystal',x:10*T,y:18*T},{type:'crystal',x:35*T,y:18*T});
   w.npcs=[makeNPC('echo','Echo-Wächter',22,7,'gold','blue','guardian','Das erste Echo schläft in meinem Herzen. Zeig mir, dass du den Mut hast, den Klang zurückzubringen.')];
-  w.exits.push({x:19*T,y:23*T,w:16*T,h:58,to:'windruh',tx:48*T,ty:60*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:19*T,y:23*T,w:16*T,h:58,to:'wald',tx:110*T,ty:31*T,label:'Zurück in den Flüsterwald',open:()=>true});
  }
  // Rebuild Windruh as a separate island village. Only the northern bridge leads to the forest.
  if(id==='windruh'){
@@ -763,7 +764,8 @@ function questGuideTarget(){
  if(main.stage===2&&zone==='windruh'){const v=world.decor.find(function(o){return o.type==='fountain'});return v?{x:v.x+31,y:v.y+40,label:'BRUNNEN'}:null}
  if(main.stage===3&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
  if(main.stage===3&&zone==='wald'){const v=nearest(flowerSpots);return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
- if(main.stage===4&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='shrine'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'ECHO-SCHREIN'}:null}
+ if(main.stage===4&&zone==='wald'){const e=world.exits.find(function(v){return v.to==='shrine'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'ECHO-SCHREIN'}:null}
+ if(main.stage===4&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
  if(main.stage===4&&zone==='shrine'){const g=monsters.find(function(m){return m.type==='guardian'&&m.hp>0});return g?{x:g.x+16,y:g.y+24,label:'WÄCHTER'}:null}
  if(zone!=='windruh'&&main.stage<3){const e=world.exits.find(function(v){return v.to==='windruh'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'WINDRUH'}:null}
  return null;
