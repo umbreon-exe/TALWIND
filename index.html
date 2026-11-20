@@ -363,6 +363,7 @@ function makeWorld(id){
   for(let i=0;i<12;i++){const x=12+(i*19)%68,y=8+(i*13)%48;add(i%2?'flowerBed':'fireflyPlant',x,y,false)}
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
   w.exits.push({x:38*T,y:0,w:70,h:42,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:0,y:24*T,w:30,h:72,to:'sumpf',tx:7*T,ty:37*T,label:'Zum Nebelmoor',open:()=>true});
   path(44,61,44,32,2,1);path(44,32,29,32,2,1);
   w.exits.push({x:40*T,y:61*T,w:70,h:30,to:'hoehle',tx:7*T,ty:36*T,label:'Zum Höhlenpfad',open:()=>true});
   w.exits.push({x:81*T,y:27*T,w:36,h:72,to:'shrine',tx:30*T,ty:19*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
@@ -382,7 +383,7 @@ function makeWorld(id){
   w.npcs=[makeNPC('moor_iona','Iona',20,9,'violet','silver','elder','Der Nebel trägt Stimmen aus alten Zeiten. Bleib auf den hellen Steinen – dort ist der Boden fest.',{quest:'reed'}),makeNPC('moor_pip','Pip',47,39,'gold','brown','child','Ich suche leuchtende Sumpflichter. Manche zeigen versteckte Pfade.',{quest:'shell'})];
   for(let i=0;i<3;i++)w.items.push({id:'reed'+i,kind:'quest',key:'reed',x:(12+i*5)*T,y:(18+(i%2)*3)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'shell'+i,kind:'quest',key:'shell',x:(52+i*7)*T,y:(26+i*5)*T,found:false});
-  w.exits.push({x:0,y:25*T,w:24,h:110,to:'windruh',tx:92*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
+  w.exits.push({x:0,y:25*T,w:24,h:110,to:'wald',tx:2*T,ty:30*T,label:'Zurück in den Flüsterwald',open:()=>true});
  }else if(id==='hoehle'){
   // Cave: stone paths, crystals and columns.
   fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);path(22,26,31,15,1,3);path(31,15,39,25,1,3);path(39,25,47,15,1,3);path(22,26,10,39,1,3);path(10,39,19,35,1,3);
