@@ -731,6 +731,29 @@ function drawShrine(now){
  if(bossState.active&&guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 12px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,27);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,49);ctx.strokeStyle='#f4d78b';ctx.lineWidth=4;ctx.beginPath();ctx.arc(360,205,70+Math.sin(now/80)*8,0,Math.PI*2);ctx.stroke()}ctx.restore()}
  ctx.fillStyle='#fff0c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · Zurück in den Wald',VW/2,VH-13);ctx.textAlign='left';
 }
+function questGuideTarget(){
+ if(room)return null;
+ const nearest=function(list){return list.filter(function(v){return !v.found}).sort(function(a,b){return Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y)})[0]};
+ if(main.stage===0){const n=world.npcs.find(function(v){return v.id==='mira'});return n?{x:n.x+12,y:n.y+28,label:'MIRA'}:null}
+ if(main.stage===1&&zone==='windruh'){const v=nearest(seedSpots);return v?{x:v.x+8,y:v.y+8,label:'ECHOSAMEN'}:null}
+ if(main.stage===2&&zone==='windruh'){const v=world.decor.find(function(o){return o.type==='fountain'});return v?{x:v.x+27,y:v.y+28,label:'BRUNNEN'}:null}
+ if(main.stage===3&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
+ if(main.stage===3&&zone==='wald'){const v=nearest(world.items.filter(function(i){return i.kind==='mainFlower'}));return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
+ if(main.stage===4&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='shrine'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'ECHO-SCHREIN'}:null}
+ if(main.stage===4&&zone==='shrine'){const g=monsters.find(function(m){return m.type==='guardian'&&m.hp>0});return g?{x:g.x+16,y:g.y+24,label:'WÄCHTER'}:null}
+ if(zone!=='windruh'&&main.stage<3){const e=world.exits.find(function(v){return v.to==='windruh'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'WINDRUH'}:null}
+ return null;
+}
+function drawQuestGuide(now){
+ const target=questGuideTarget();if(!target)return;
+ const dx=target.x-(player.x+12),dy=target.y-(player.y+14),dist=Math.hypot(dx,dy);if(dist<8)return;
+ const a=Math.atan2(dy,dx),sx=player.x-camera.x+12+Math.cos(a)*43,sy=player.y-camera.y+10+Math.sin(a)*43;
+ ctx.save();ctx.translate(sx,sy);ctx.rotate(a+Math.PI/2);const pulse=1+Math.sin(now/150)*.12;ctx.scale(pulse,pulse);
+ ctx.fillStyle='rgba(34,45,43,.76)';ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#ffe18a';ctx.strokeStyle='#68472b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-12);ctx.lineTo(9,8);ctx.lineTo(0,4);ctx.lineTo(-9,8);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+ const tx=clamp(sx+Math.cos(a)*18,45,VW-45),ty=clamp(sy+Math.sin(a)*18-17,18,VH-18);
+ ctx.save();ctx.font='bold 8px monospace';ctx.textAlign='center';ctx.fillStyle='rgba(35,43,38,.82)';ctx.fillRect(tx-34,ty-7,68,13);ctx.fillStyle='#fff0c6';ctx.fillText(target.label,tx,ty+2);ctx.restore();
+}
 function renderScene(now){
  ctx.clearRect(0,0,VW,VH);
  if(room){drawRoom(now);return}
@@ -747,7 +770,7 @@ function renderScene(now){
  if(zone==='wald'&&main.stage===3)flowerSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#7cdbed')})});
  monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>items.push({y:m.y+31,fn:()=>drawMonster(m,now)}));
  items.push({y:player.y+35,fn:()=>drawHero(player.x,player.y,now)});
- items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());drawCombatEffects(now);
+ items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());drawQuestGuide(now);drawCombatEffects(now);
  currentPrompt=nearbyPrompt();
  if(zone==='shrine'&&bossState.active){const guardian=monsters.find(m=>m.type==='guardian'&&m.hp>0);if(guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 11px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,22);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,42)}ctx.restore()}}
  if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-10);ctx.textAlign='left'}
