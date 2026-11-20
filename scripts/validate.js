@@ -58,7 +58,7 @@ const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Fre
 for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
   assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
 }
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v8"'), "service worker cache was refreshed");
+assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v9"'), "service worker cache was refreshed");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
@@ -89,3 +89,10 @@ assert.ok(html.includes("copperVein1") && html.includes("ironVein1") && html.inc
 assert.ok(html.includes("drawTreeVariant(") && html.includes("'berryBush'") && html.includes("'snowPine'"), "tree, bush and snow foliage variants exist");
 assert.ok(html.includes("id:'forestCache'") && html.includes("id:'moorCache'") && html.includes("id:'caveCache'"), "three world chests exist");
 assert.ok(html.includes("function collectQuestItem(item)") && html.includes("nodeId"), "resource mining and persistence are implemented");
+
+assert.ok(html.includes("function handleWorldPointer(e)") && html.includes("canvas.addEventListener('pointerdown',handleWorldPointer)"), "world resources can be clicked");
+assert.ok(!html.includes('id="useBtn"'), "old action button is removed");
+assert.ok(html.includes("function collectTreeTwigs(tree)") && html.includes("function collectFallenWood(node)"), "trees and fallen logs provide natural materials");
+assert.ok(html.includes("woodNode") && html.includes("treeTwigs:"), "harvested resources persist in save data");
+assert.ok(html.includes("KLICK / E · ") && html.includes("Zu weit entfernt"), "interaction feedback and distance checks are present");
+assert.ok(html.includes("birchWood") && html.includes("frostWood") && !html.includes("woodAxe"), "wood types are present without a chopping tool requirement");
