@@ -29,6 +29,11 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 - Windruh, Flüsterwald, Nebelmoor, Flüsterhöhle, Frostgrat und Echo-Schrein
 - Hauptquest, Nebenquests, Bewohnerdialoge, Häuser und Laden
 - Gegner, Bosskampf, Herzen, Erfahrung, Windtaler und Gegenstände
+- Tag-/Nachtzyklus mit sichtbarer Uhr und Abend-/Nachtstimmung
+- Valheim-inspiriertes 24-Slot-Inventar mit Ausrüstungsplätzen und Lagertruhen
+- Handwerkssystem mit Angelrute, Spitzhacke, Kleidung und Rüstung
+- Angeln mit Biss-Zeitfenster und gezeichneter Angel-Animation
+- Sammelbare Zweige, Pflanzenfasern, Kupfer-, Eisen- und Frost-Erz
 - Drei lokale Speicherplätze über den Browser-Speicher
 - Touch-Steuerung, Gamepad-Unterstützung und Vollbild-fähiges Layout
 - Installierbares PWA-Grundgerüst und Offline-Caching der Kern-Dateien
@@ -40,7 +45,7 @@ Spielstände werden aktuell lokal im Browser über `localStorage` gespeichert. S
 
 ## Grafik und Assets
 
-Die Titelillustration und das App-Symbol in `assets/` sind eigenständige SVG-Dateien für dieses Repository. Die Spielwelt verwendet ihren eingebauten Pixel-Art-Renderer. Es werden keine externen Asset-Pakete nachgeladen.
+Die Titelillustration und das App-Symbol in `assets/` sind eigenständige SVG-Dateien für dieses Repository. Die Spielwelt verwendet einen eingebauten Pixel-Art-Renderer mit verschiedenen Baumarten, Büschen, Pflanzen, abwechslungsreicheren Bodenmustern sowie eigenen Minen- und Eisdekorationen. Die neuen Ergänzungen werden direkt gezeichnet; es werden keine zusätzlichen Dateien extern nachgeladen.
 
 ## Veröffentlichung auf Render
 
