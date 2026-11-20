@@ -167,14 +167,48 @@ body{display:grid;place-items:center;touch-action:none}
 .chestLayout{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}.chestNote{color:#cbd7dc;font:10px/1.5 ui-monospace,monospace;margin:0 0 8px}
 #panel.inventoryPanel .row{justify-content:flex-end}
 @media(max-width:650px){#worldClock{top:60px;right:5px;min-width:88px;font-size:9px;padding:4px 5px}#panel.inventoryPanel .panelCard{width:96vw;padding:10px}.inventoryLayout{grid-template-columns:1fr}.inventoryGrid{grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}.invSlot{min-height:52px;padding:3px 1px}.invSlot .invIcon{font-size:18px}.invSlot .invName{font-size:7px}.equipmentList{grid-template-columns:repeat(2,minmax(0,1fr))}.equipSlot{grid-template-columns:32px 1fr;padding:5px;gap:5px;min-height:48px}.equipIcon{width:31px;height:31px;font-size:18px}.craftList{grid-template-columns:1fr}.chestLayout{grid-template-columns:1fr;gap:8px}}
+
+/* Interaction, inventory and touch UI pass */
+#world{cursor:crosshair;touch-action:manipulation}
+#rightActions{gap:9px;right:12px;bottom:14px}
+.act{width:76px;height:70px;border-radius:9px;border:2px solid #e6bd72;background:linear-gradient(160deg,#496b88,#182e48 78%);box-shadow:inset 0 0 0 2px #879cb0,0 4px 0 #101b2a;color:#fff2d3;transition:transform .12s,filter .12s,box-shadow .12s}
+.act b{font-size:25px}.act small{font-size:9px;letter-spacing:.7px}.act .cooldownText{font-size:8px;color:#f7dda0}
+.act:hover,.menuBtn:hover,.uiButton:hover,.craftCard button:hover:not(:disabled),.equipSlot button:hover{filter:brightness(1.16);transform:translateY(-1px)}
+.act:active,.menuBtn:active,.uiButton:active,.craftCard button:active:not(:disabled){transform:translateY(2px);filter:brightness(1.05)}
+.menuBtn{min-height:40px;border-radius:7px;padding:8px 12px;border:2px solid #dcb568;background:linear-gradient(180deg,#385674,#1c3049);box-shadow:inset 0 0 0 1px #8196aa,0 3px 0 #0d1c2c;color:#fff1d0;font-size:11px;letter-spacing:.3px}
+.uiButton{min-height:40px;border-radius:7px;padding:9px 16px;border:2px solid #efc66f;background:linear-gradient(180deg,#d77a4d,#843f37);box-shadow:inset 0 0 0 1px #ffe2a5,0 3px 0 #3d2620;letter-spacing:.35px}
+.menuBtn:focus-visible,.act:focus-visible,.uiButton:focus-visible,.invSlot:focus-visible{outline:3px solid #fff1a7;outline-offset:3px}
+.invSlot{border-radius:6px;border:2px solid #8c795b;background:linear-gradient(145deg,#3a5269,#1c3048);transition:border-color .12s,transform .12s,background .12s}
+.invSlot:not(:disabled){cursor:pointer}
+.invSlot:not(.empty):hover{border-color:#f4d17a;transform:translateY(-2px);background:linear-gradient(145deg,#526c82,#263d56)}
+.invSlot .invIcon{font-size:24px}
+.invSlot .invName{font-size:9px;color:#e5dfca}
+.invSlot .invCount{font-size:11px;background:#13243a;border:1px solid #c8a365;padding:1px 4px;border-radius:3px}
+.inventoryBox,.chestBox{border-radius:8px;border-color:#c29a5b;box-shadow:inset 0 0 0 1px #71869c,0 3px 8px #07152266}
+.equipSlot{border-radius:6px;border-color:#967d56}
+.craftCard{border-radius:7px;border-color:#b69259;box-shadow:inset 0 0 0 1px #657d94}
+.craftCard button,.equipSlot button{border-radius:5px;min-height:35px;cursor:pointer}
+#toast{z-index:40;max-width:min(86%,520px);line-height:1.45;border-radius:7px}
+#controlHint{border-radius:6px;line-height:1.45;max-width:300px}
+#dialog{border-radius:8px}
+@media(max-width:650px){
+ #rightActions{right:6px;bottom:7px;gap:6px}
+ .act{width:56px;height:55px;border-radius:8px}
+ .act b{font-size:20px}.act small{font-size:8px}
+ #menuButtons .menuBtn{min-height:37px}
+ #controlHint{max-width:142px;line-height:1.4}
+ .invSlot{min-height:56px}
+ .invSlot .invIcon{font-size:20px}
+ .invSlot .invName{font-size:7px}
+}
 </style></head>
 <body><main id="game" tabindex="0" aria-label="TALWIND-Spiel. Mit WASD oder Pfeiltasten bewegen.">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
 <div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
 <div class="plate" id="worldClock">☀ TAG · 08:00</div><div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
 <div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="craft">⚒ Handwerk</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
-<div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small id="skillName">FÄHIGKEIT</small><span class="cooldownText" id="skillCooldown">BEREIT</span></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small><span class="cooldownText" id="attackCooldown">BEREIT</span></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small><span class="cooldownText" id="rollCooldown">BEREIT</span></button><button class="act" id="useBtn"><b>A</b><small>AKTION</small></button></div>
-<div id="stick"><div id="nub"></div></div><div id="combatBanner" aria-live="polite"></div><div id="controlHint">WASD / Pfeile · E Aktion<br>J Angriff · K Fähigkeit</div><div id="gamepadState">Tastatur bereit</div>
+<div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small id="skillName">FÄHIGKEIT</small><span class="cooldownText" id="skillCooldown">BEREIT</span></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small><span class="cooldownText" id="attackCooldown">BEREIT</span></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small><span class="cooldownText" id="rollCooldown">BEREIT</span></button></div>
+<div id="stick"><div id="nub"></div></div><div id="combatBanner" aria-live="polite"></div><div id="controlHint">KLICK / TIPPE: SAMMELN · E: INTERAGIEREN<br>WASD / PFEILE · J ANGRIFF · K FÄHIGKEIT</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
 <div class="overlay" id="mainMenu"><div class="card"><img src="assets/windruh.svg" width="480" height="220" alt="Windruh" style="display:block;width:min(100%,480px);height:auto;max-height:220px;object-fit:cover;margin:0 auto 12px;border:3px solid #d6a64e"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Ein Abenteuer beginnt. Erkunde Windruh, überquere den Fluss und entdecke vier Wege in die Welt von Avarra.</p><button class="uiButton" id="openHeroMenuBtn">SPIEL STARTEN</button><p class="smallNote">Wähle im nächsten Menü deinen Helden und starte deine Reise.</p></div></div>
 <div class="overlay hidden" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
@@ -204,6 +238,7 @@ const heroes=[
 {name:'NIMA',spriteId:31,role:'Echomagierin',speed:87,hair:'#49334f',coat:'#9272b8',cape:'#6a4f95',detail:'#cdb9ef',skill:'Echowelle',desc:'Eine Welle trifft Gegner in der Nähe und schenkt ein Herz.',female:true},
 {name:'ROOK',spriteId:24,role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
 ];
+const TREE_TYPES=['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree'];
 const PALETTE={
  grass:'#70b65f',grassLight:'#a0d878',grassDark:'#397448',forest:'#4d8952',forestDark:'#285b3d',
  path:'#ddc99b',pathLight:'#f4e2b8',pathDark:'#a88b62',water:'#278fca',waterLight:'#83def0',
@@ -277,11 +312,12 @@ const gear={tool:null,head:null,body:null,feet:null,charm:null};
 const chestStorage={forestCache:{branch:2,fiber:2,berries:3},moorCache:{fish:2,blueHerb:1,berries:2},caveCache:{oreCopper:3,coal:2,crystalShard:1}};
 const openedChests={};let activeChestId=null,worldMinutes=480,lastClockText='';
 const fishing={active:false,phase:'idle',timer:0,elapsed:0,target:null};const fishLog={};const BAG_SLOTS=24;
-const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
-const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
+const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},wood:{name:'Holz',icon:'🪵'},birchWood:{name:'Birkenholz',icon:'🌳'},frostWood:{name:'Frostholz',icon:'❄'},woodAxe:{name:'Holzfälleraxt',icon:'🪓'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
+const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},woodAxe:{name:'Holzfälleraxt',icon:'🪓',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
 const RECIPES=[
 {id:'rod',name:'Angelrute',icon:'🎣',desc:'Zum Angeln an Flussufern und im Moor.',cost:{branch:3,fiber:2}},
 {id:'pickaxe',name:'Spitzhacke',icon:'⛏',desc:'Zum Abbau von Erzadern in Höhlen und am Frostgrat.',cost:{branch:3,fiber:3}},
+{id:'woodAxe',name:'Holzfälleraxt',icon:'🪓',desc:'Zum Fällen markierter Bäume und Sammeln von Holz.',cost:{branch:4,fiber:2}},
 {id:'forestCloak',name:'Waldmantel',icon:'🧥',desc:'Leichter Schutz. In der Nacht bist du etwas schneller.',cost:{fiber:4,blueHerb:2,berries:1}},
 {id:'trailBoots',name:'Wanderstiefel',icon:'🥾',desc:'Leichte Sohlen geben dir mehr Lauftempo.',cost:{branch:2,fiber:3,berries:2}},
 {id:'copperHelm',name:'Kupferhelm',icon:'⛑',desc:'Ein einfacher Helm aus Kupfererz.',cost:{oreCopper:2,fiber:1}},
@@ -292,6 +328,7 @@ const RECIPES=[
 ];
 
 const collectedItems={};
+const treeProgress={};
 const sideQuests={
  reed:{state:0,items:0,need:3},
  shell:{state:0,items:0,need:2},
@@ -505,7 +542,15 @@ function makeWorld(id){
   for(let x=0;x<W;x++){if(w.tiles[x]!==2&&w.tiles[x]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,0,false);if(w.tiles[(H-1)*W+x]!==2)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',x,H-1,false)}
   for(let y=1;y<H-1;y++){if(w.tiles[y*W]!==2&&w.tiles[y*W]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'pine',0,y,false);if(w.tiles[y*W+W-1]!==2&&w.tiles[y*W+W-1]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',W-1,y,false)}
  }
+ if(['wald','sumpf','eispass'].includes(id)){
+  w.decor.forEach((o,i)=>{if(!TREE_TYPES.includes(o.type))return;o.harvestable=true;o.id='tree_'+id+'_'+i+'_'+o.type;o.woodKey=(id==='eispass'||o.type==='snowPine')?'frostWood':o.type==='birch'?'birchWood':'wood';o.woodYield=3+(i%2)});
+ }
+ applyTreeState(w);
  return w;
+}
+function applyTreeState(target){
+ const scene=target||world;if(!scene)return;
+ for(const o of scene.decor){if(!o.harvestable)continue;o.chopHits=Math.max(0,Number(treeProgress[o.id])||0);o.felled=!!collectedItems['treeFelled:'+o.id];if(o.felled)o.solid=false;}
 }
 function pixel(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,w),Math.max(1,h))}
 function drawSoftShadow(x,y,rx,ry,alpha){
@@ -547,26 +592,50 @@ function drawTile(tx,ty,id,now){
   pixel(x,y,T,T,'#b5e0e7');pixel(x+2,y+3,11,2,'#e9ffff');pixel(x+5,y+10,7,2,'#82bdcd');if(seed%3===0)pixel(x+2,y+7,4,2,'#d8f1ef');if(seed%5===0)pixel(x+10,y+5,3,3,'#e8ffff');if(seed%7===0){pixel(x+4,y+13,7,1,'#82bdcd');pixel(x+12,y+2,2,3,'#f5ffff')}
  }
 }
-function drawTree(x,y,pine,apple){
- drawSoftShadow(x+13,y+30,13,5,.28);
- const sx=x-camera.x,sy=y-camera.y;
- pixel(sx+8,sy+20,7,13,PALETTE.wood);pixel(sx+5,sy+30,13,2,PALETTE.woodDark);
- if(pine){pixel(sx+5,sy+4,13,8,'#2a6947');pixel(sx+2,sy+10,19,9,'#297349');pixel(sx+5,sy+16,13,8,'#1e5c3c');pixel(sx+8,sy+2,6,4,'#54a65b')}
- else{pixel(sx+2,sy+8,22,14,'#246c45');pixel(sx+4,sy+3,18,15,'#31864b');pixel(sx+7,sy,13,12,'#3c9952');pixel(sx+8,sy+3,7,4,'#7acb69');pixel(sx+3,sy+11,6,4,'#58b95b');pixel(sx+17,sy+12,4,4,'#226341')}
- if(apple){pixel(sx+6,sy+9,3,3,'#d64d37');pixel(sx+16,sy+14,3,3,'#df583b');pixel(sx+11,sy+5,3,3,'#d94b39')}
+function drawTree(x,y,pine,apple){drawTreeVariant({x,y,type:pine?'pine':'tree',apple});}
+function drawTreeStump(o){
+ const x=o.x-camera.x,y=o.y-camera.y;drawSoftShadow(o.x+22,o.y+46,16,5,.3);
+ pixel(x+15,y+34,14,13,'#5a3929');pixel(x+13,y+31,18,6,'#795034');pixel(x+15,y+30,14,5,'#bd8a55');pixel(x+17,y+31,10,2,'#e0bb7d');pixel(x+20,y+32,4,2,'#745036');pixel(x+16,y+37,12,4,'#69432e');
 }
 function drawTreeVariant(o){
- const x=o.x-camera.x,y=o.y-camera.y;drawSoftShadow(o.x+13,o.y+31,14,5,.28);
- if(o.type==='birch'){pixel(x+9,y+19,6,15,'#e5e0cd');pixel(x+8,y+29,8,3,'#7a6e60');for(const yy of [23,27])pixel(x+9,y+yy,6,1,'#675d55');pixel(x+2,y+7,23,15,'#397d50');pixel(x+5,y+2,17,16,'#4b9659');pixel(x+8,y,11,10,'#65ac67');pixel(x+8,y+4,5,3,'#b7dc83')}
- else if(o.type==='willow'){pixel(x+9,y+17,7,17,'#6b573c');pixel(x+4,y+4,17,17,'#438d50');pixel(x+1,y+10,5,18,'#4d9958');pixel(x+22,y+8,5,20,'#4b9856');pixel(x+6,y+16,4,12,'#73b96b');pixel(x+18,y+17,4,12,'#70b76b');pixel(x+8,y+3,10,8,'#82c96d')}
- else if(o.type==='autumnTree'){pixel(x+9,y+19,6,15,'#785238');pixel(x+2,y+8,22,14,'#b65739');pixel(x+5,y+3,16,15,'#d27a3b');pixel(x+8,y+3,10,5,'#edb44b');pixel(x+4,y+12,6,5,'#e39439')}
- else if(o.type==='cherryTree'){pixel(x+9,y+20,6,14,'#6c4a42');pixel(x+2,y+8,23,13,'#a76f99');pixel(x+5,y+3,17,14,'#d69ac9');pixel(x+9,y,10,8,'#f0c1dc');pixel(x+3,y+12,7,5,'#e8b8d3')}
- else{pixel(x+9,y+19,7,16,'#6c8b9a');pixel(x+6,y+24,13,3,'#efffff');pixel(x+4,y+14,17,8,'#477f91');pixel(x+2,y+8,21,10,'#5f9caf');pixel(x+5,y+3,15,10,'#8bc5d2');pixel(x+8,y,9,7,'#ddf5f5');pixel(x+7,y+8,10,3,'#f4ffff');pixel(x+3,y+17,6,3,'#d2f0ef')}
+ let x=o.x-camera.x,y=o.y-camera.y;const type=o.type;
+ drawSoftShadow(o.x+22,o.y+49,23,8,.34);
+ if(o.chopFlash>0){x+=Math.sin(performance.now()/24)*2.5;y+=Math.cos(performance.now()/29)*1.5}
+ if(type==='deadTree'){
+  pixel(x+17,y+29,11,23,'#49392d');pixel(x+19,y+29,6,21,'#77543a');pixel(x+9,y+29,12,4,'#5e4633');pixel(x+23,y+21,16,4,'#5e4633');pixel(x+6,y+18,15,3,'#624a37');pixel(x+9,y+13,3,10,'#624a37');pixel(x+30,y+16,3,12,'#624a37');pixel(x+29,y+12,10,3,'#624a37');pixel(x+3,y+17,8,3,'#624a37');pixel(x+8,y+9,3,11,'#73563c');pixel(x+31,y+10,3,8,'#73563c');
+ }else if(type==='pine'||type==='snowPine'){
+  const snow=type==='snowPine';const edge=snow?'#315c69':'#214d36',mid=snow?'#4f8995':'#286442',light=snow?'#83c5cb':'#3e8950',top=snow?'#d9f4ef':'#75ba69';
+  pixel(x+17,y+34,11,17,'#674632');pixel(x+20,y+35,5,14,'#a27648');
+  pixel(x+7,y+27,31,8,edge);pixel(x+10,y+18,25,11,edge);pixel(x+13,y+9,19,12,edge);pixel(x+17,y+1,11,12,edge);
+  pixel(x+10,y+26,25,7,mid);pixel(x+13,y+17,19,10,mid);pixel(x+16,y+8,13,10,mid);pixel(x+19,y+2,7,9,top);
+  pixel(x+14,y+23,16,3,light);pixel(x+17,y+14,12,3,light);pixel(x+20,y+5,7,3,snow?'#f6ffff':'#9bd77b');
+  if(snow){pixel(x+11,y+25,12,2,'#eaffff');pixel(x+18,y+16,10,2,'#eaffff');pixel(x+20,y+7,6,2,'#f7ffff')}
+ }else{
+  const autumn=type==='autumnTree',cherry=type==='cherryTree',birch=type==='birch',willow=type==='willow';
+  const bark=birch?'#d9d7c4':cherry?'#755044':'#70472f';
+  const shadow=autumn?'#81442f':cherry?'#86587c':birch?'#285d42':willow?'#245a3d':'#205337';
+  const mid=autumn?'#c15e35':cherry?'#b678a6':birch?'#398657':willow?'#368450':'#2d7548';
+  const light=autumn?'#e18a3c':cherry?'#dda6d0':birch?'#65ad65':willow?'#65a95d':'#4c9b55';
+  const shine=autumn?'#f5bd58':cherry?'#f3d2e7':birch?'#b6dd87':willow?'#a3d77b':'#a6d978';
+  pixel(x+17,y+30,12,23,bark);pixel(x+20,y+32,5,18,birch?'#f5eedc':'#a87949');
+  pixel(x+10,y+39,11,4,bark);pixel(x+24,y+34,10,4,bark);
+  pixel(x+3,y+15,43,26,shadow);pixel(x+8,y+7,34,32,shadow);pixel(x+14,y+2,23,31,shadow);
+  pixel(x+7,y+17,37,22,mid);pixel(x+11,y+10,29,26,mid);pixel(x+17,y+5,19,24,mid);
+  pixel(x+11,y+14,12,9,light);pixel(x+22,y+9,13,10,light);pixel(x+28,y+21,11,9,light);pixel(x+5,y+24,12,8,light);
+  pixel(x+16,y+7,10,6,shine);pixel(x+24,y+15,9,5,shine);pixel(x+9,y+22,8,4,shine);
+  pixel(x+18,y+26,3,8,bark);pixel(x+24,y+27,3,7,bark);
+  if(willow){pixel(x+5,y+28,5,16,mid);pixel(x+12,y+31,4,17,light);pixel(x+32,y+29,5,17,mid);pixel(x+39,y+26,4,18,light)}
+  if(type==='appleTree'){for(const [ax,ay] of [[12,20],[31,17],[25,28],[7,29]]){pixel(x+ax,y+ay,4,4,'#d84c43');pixel(x+ax+1,y+ay,2,1,'#ffe2a0')}}
+  if(cherry){for(const [ax,ay] of [[13,16],[29,13],[7,27],[34,25],[22,7]])pixel(x+ax,y+ay,3,3,'#fff0f4')}
+  if(autumn){pixel(x+8,y+29,5,3,'#f4b64c');pixel(x+34,y+13,5,3,'#f1b74d')}
+  if(birch){pixel(x+20,y+37,7,2,'#756d60');pixel(x+20,y+43,6,2,'#756d60')}
+ }
+ if(o.chopHits>0){pixel(x+21,y+39,2,5,'#3e3028');pixel(x+23,y+42,4,2,'#e3bd80')}
+ if(o.apple){pixel(x+13,y+20,4,4,'#d84c43');pixel(x+32,y+17,4,4,'#e05a45')}
 }
 function drawProp(o,now){
  const x=o.x-camera.x,y=o.y-camera.y;
- if(['birch','willow','autumnTree','cherryTree','snowPine'].includes(o.type))drawTreeVariant(o);
-  else if(o.type==='tree'||o.type==='pine'||o.type==='appleTree')drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree');
+ if(TREE_TYPES.includes(o.type)){if(o.felled&&o.harvestable)drawTreeStump(o);else if(o.type==='birch'||o.type==='willow'||o.type==='autumnTree'||o.type==='cherryTree'||o.type==='snowPine'||o.type==='deadTree')drawTreeVariant(o);else drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree')}
  else if(o.type==='bush'||o.type==='smallBush'||o.type==='berryBush'){
    drawSoftShadow(o.x+8,o.y+14,10,3,.22);const berry=o.type==='berryBush';
    pixel(x+1,y+8,15,7,berry?'#245b3f':'#286d43');pixel(x+3,y+5,12,8,berry?'#317a4a':'#46a252');pixel(x+5,y+2,8,7,berry?'#3f9254':'#5ab65b');pixel(x+6,y+4,4,2,'#91d16c');
@@ -879,7 +948,7 @@ function renderScene(now){
  const ex=Math.min(world.width,Math.ceil((camera.x+VW)/T)+2),ey=Math.min(world.height,Math.ceil((camera.y+VH)/T)+2);
  for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++)drawTile(tx,ty,world.tiles[ty*world.width+tx],now);
  const items=[];
- world.decor.forEach(o=>items.push({y:o.y+28,fn:()=>drawProp(o,now)}));
+ world.decor.forEach(o=>items.push({y:o.y+48,fn:()=>drawProp(o,now)}));
  world.buildings.forEach(b=>items.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)}));
  world.items.forEach(item=>{if(!item.found)items.push({y:item.y+14,fn:()=>drawCollectible(item,now)})});
  world.npcs.forEach(n=>items.push({y:n.y+32,fn:()=>drawPerson(n,n.x,n.y,now)}));
@@ -890,7 +959,7 @@ function renderScene(now){
  items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());drawQuestGuide(now);drawCombatEffects(now);
  currentPrompt=nearbyPrompt();
  if(zone==='shrine'&&bossState.active){const guardian=monsters.find(m=>m.type==='guardian'&&m.hp>0);if(guardian){ctx.save();ctx.textAlign='center';ctx.font='bold 11px monospace';ctx.fillStyle='#fff1cb';ctx.fillText('ECHO-WÄCHTER  '+guardian.hp+'/'+guardian.maxHp,VW/2,22);if(bossState.windup>0){ctx.fillStyle='#ffe18a';ctx.fillText('⚠ '+bossState.attackType+' – AUSWEICHEN!',VW/2,42)}ctx.restore()}}
- if(currentPrompt){ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText('E · '+currentPrompt,VW/2,VH-10);ctx.textAlign='left'}
+ if(currentPrompt){ctx.save();ctx.fillStyle='#fff1c9';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.shadowColor='#17263a';ctx.shadowBlur=4;ctx.fillText('KLICK / E · '+currentPrompt,VW/2,VH-10);ctx.restore()}
 }
 function drawDayNight(){if(room||zone==='hoehle'||zone==='shrine')return;const h=worldMinutes/60;let a=0;if(h>=20||h<5.5)a=.38;else if(h>=18)a=.38*clamp((h-18)/2,0,1);else if(h<8)a=.38*clamp((8-h)/2.5,0,1);if(a<=.005)return;ctx.save();ctx.fillStyle='rgba(10,18,45,'+a+')';ctx.fillRect(0,0,VW,VH);if(a>.17){for(let i=0;i<34;i++){const sx=(i*97+31)%VW,sy=(i*53+19)%170;ctx.globalAlpha=a*.9;ctx.fillStyle=i%4===0?'#ffe8ab':'#e5efff';ctx.fillRect(sx,sy,2,2)}ctx.globalAlpha=a;ctx.fillStyle='#fff0c9';ctx.beginPath();ctx.arc(VW-110,53,10,0,Math.PI*2);ctx.fill();ctx.fillStyle='#172c46';ctx.beginPath();ctx.arc(VW-105,49,10,0,Math.PI*2);ctx.fill()}ctx.restore()}
 function findFishingSpot(){if(room||!world)return null;const px=player.x+16,py=player.y+30,cx=Math.floor(px/T),cy=Math.floor(py/T);let best=null,bestD=Infinity;for(let ty=cy-2;ty<=cy+2;ty++)for(let tx=cx-2;tx<=cx+2;tx++){if(tx<0||ty<0||tx>=world.width||ty>=world.height||world.tiles[ty*world.width+tx]!==2)continue;const x=tx*T+8,y=ty*T+8,d=Math.hypot(x-px,y-py);if(d>48||d<12||d>=bestD)continue;best={x,y};bestD=d}return best}
@@ -1020,7 +1089,9 @@ function pointBlocked(px,py){
  }
  for(const o of world.decor){
   if(!o.solid)continue;
-  if(['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree','reed','rock','iceRock'].includes(o.type)){
+  if(TREE_TYPES.includes(o.type)){
+   if(!o.felled&&px>o.x+14&&px<o.x+32&&py>o.y+37&&py<o.y+51)return true;
+  }else if(['reed','rock','iceRock'].includes(o.type)){
    if(px>o.x+3&&px<o.x+23&&py>o.y+20&&py<o.y+35)return true;
   }else if(o.type==='fountain'&&px>o.x+5&&px<o.x+58&&py>o.y+24&&py<o.y+49)return true;
   else if(o.type==='shrine'&&px>o.x&&px<o.x+48&&py>o.y+20&&py<o.y+36)return true;
@@ -1044,7 +1115,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:3,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:4,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,treeProgress,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -1075,7 +1146,7 @@ Object.keys(openedChests).forEach(key=>delete openedChests[key]);Object.assign(o
 if(Number.isFinite(Number(d.worldMinutes)))worldMinutes=((Number(d.worldMinutes)%1440)+1440)%1440;
 Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.fishLog||{});
 
-  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});
+  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});Object.assign(treeProgress,d.treeProgress||{});applyTreeState(world);
   for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
   currentRoom=null;room=null;roomNPC=null;
@@ -1207,17 +1278,17 @@ function unequipGear(slot){const id=gear[slot];if(!id)return;if(!hasBagSpace(id)
 function craftItem(id){const r=RECIPES.find(x=>x.id===id);if(!r||!canPay(r.cost)){showToast('Materialien fehlen.');return}if(!hasBagSpace(id)){showToast('Rucksack hat keinen freien Slot.');return}Object.entries(r.cost).forEach(([k,n])=>inventory[k]-=n);inventory[id]=(inventory[id]||0)+1;saveGame(activeSlot);renderCraftPanel();showToast(r.name+' hergestellt!')}
 function renderInventoryPanel(){
  const panel=document.getElementById('panel'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');panel.classList.add('inventoryPanel');document.getElementById('panelTitle').textContent='RUCKSACK & AUSRÜSTUNG';
- const entries=getBagEntries(),slots=Array.from({length:BAG_SLOTS},(_,i)=>{const k=entries[i],it=k?ITEM_INFO[k]:null;if(!k)return '<div class="invSlot empty"></div>';return EQUIPMENT[k]?'<button class="invSlot" data-equip="'+k+'"><span class="invCount">'+inventory[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+' · ANLEGEN</span></button>':'<div class="invSlot"><span class="invCount">'+inventory[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+'</span></div>'}).join('');
+ const entries=getBagEntries(),slots=Array.from({length:BAG_SLOTS},(_,i)=>{const k=entries[i],it=k?ITEM_INFO[k]:null;if(!k)return '<div class="invSlot empty" aria-hidden="true"></div>';return '<button class="invSlot" data-item="'+k+'" '+(EQUIPMENT[k]?'data-equip="'+k+'"':'')+'><span class="invCount">'+inventory[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+(EQUIPMENT[k]?' · ANLEGEN':'')+'</span></button>'}).join('');
  const order=['tool','head','body','feet','charm'],labels={tool:'Werkzeug',head:'Kopf',body:'Körper',feet:'Füße',charm:'Talisman'};
  const equipment=order.map(slot=>{const id=gear[slot],it=id?EQUIPMENT[id]:null;return '<div class="equipSlot"><span class="equipIcon">'+(it?it.icon:'◇')+'</span><div><b>'+labels[slot]+'</b><small>'+(it?it.name:'Nicht ausgerüstet')+'</small></div>'+(it?'<button data-unequip="'+slot+'">Ablegen</button>':'')+'</div>'}).join('');
  const armor=Math.round(armorBlockChance());text.innerHTML='<div class="inventoryTop"><span>✦ '+player.coins+' Windtaler</span><span>♥ '+player.hp+'/5</span><span>🧪 '+player.potions+' Tränke</span><span>'+entries.length+'/'+BAG_SLOTS+' Slots</span></div><div class="inventoryLayout"><section class="inventoryBox"><h3>RUCKSACK</h3><div class="inventoryGrid">'+slots+'</div><p class="chestNote">Ausrüstung antippen, um sie anzulegen.</p></section><section class="inventoryBox"><h3>AUSRÜSTUNG</h3><div class="equipmentList">'+equipment+'</div><p class="chestNote">Schutzchance: '+armor+'%</p></section></div>';
- text.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>equipFromBag(b.dataset.equip));text.querySelectorAll('[data-unequip]').forEach(b=>b.onclick=()=>unequipGear(b.dataset.unequip));buttons.innerHTML='';
+ text.querySelectorAll('[data-item]').forEach(b=>b.onclick=()=>{if(b.dataset.equip){equipFromBag(b.dataset.equip);return}const key=b.dataset.item,info=ITEM_INFO[key];showToast((info?info.name:key)+' · '+(inventory[key]||0)+' im Rucksack')});text.querySelectorAll('[data-unequip]').forEach(b=>b.onclick=()=>unequipGear(b.dataset.unequip));buttons.innerHTML='';
  const add=(label,fn)=>{const b=document.createElement('button');b.className='uiButton';b.textContent=label;b.onclick=fn;buttons.appendChild(b)};
  add('HEILTRANK',()=>{if(player.potions>0&&player.hp<5){player.potions--;player.hp=Math.min(5,player.hp+2);saveGame(activeSlot);renderInventoryPanel();updateQuest()}else showToast('Nicht nötig.')});add('FISCHMAHLZEIT',useFishMeal);add('HANDWERK',renderCraftPanel);add('SCHLIESSEN',closePanel);
 }
 function renderCraftPanel(){
  const panel=document.getElementById('panel'),text=document.getElementById('panelText'),buttons=document.getElementById('panelButtons');panel.classList.add('inventoryPanel');document.getElementById('panelTitle').textContent='WERKBANK · HANDWERK';
- const stock=['branch','fiber','oreCopper','oreIron','oreFrost','fish'];text.innerHTML='<div class="inventoryTop"><span>Werkzeuge, Rüstung und Nahrung herstellen</span><span>'+stock.map(k=>ITEM_INFO[k].icon+' '+(inventory[k]||0)).join('　')+'</span></div><div class="craftList">'+RECIPES.map(r=>'<article class="craftCard"><span class="craftIcon">'+r.icon+'</span><div><h3>'+r.name+'</h3><p>'+r.desc+'</p><p>Benötigt: '+costText(r.cost)+'</p></div><button data-craft="'+r.id+'" '+(canPay(r.cost)&&hasBagSpace(r.id)?'':'disabled')+'>HERSTELLEN</button></article>').join('')+'</div>';
+ const stock=['branch','fiber','wood','birchWood','frostWood','oreCopper','oreIron','oreFrost','fish'];text.innerHTML='<div class="inventoryTop"><span>Werkzeuge, Rüstung und Nahrung herstellen</span><span>'+stock.map(k=>ITEM_INFO[k].icon+' '+(inventory[k]||0)).join('　')+'</span></div><div class="craftList">'+RECIPES.map(r=>'<article class="craftCard"><span class="craftIcon">'+r.icon+'</span><div><h3>'+r.name+'</h3><p>'+r.desc+'</p><p>Benötigt: '+costText(r.cost)+'</p></div><button data-craft="'+r.id+'" '+(canPay(r.cost)&&hasBagSpace(r.id)?'':'disabled')+'>HERSTELLEN</button></article>').join('')+'</div>';
  text.querySelectorAll('[data-craft]').forEach(b=>b.onclick=()=>craftItem(b.dataset.craft));buttons.innerHTML='';const bag=document.createElement('button');bag.className='uiButton';bag.textContent='RUCKSACK';bag.onclick=renderInventoryPanel;buttons.appendChild(bag);const close=document.createElement('button');close.className='uiButton';close.textContent='SCHLIESSEN';close.onclick=closePanel;buttons.appendChild(close);
 }
 function renderChestGrid(data,side,slots){const keys=Object.keys(ITEM_INFO).filter(k=>(Number(data[k])||0)>0);return Array.from({length:slots},(_,i)=>{const k=keys[i],it=k?ITEM_INFO[k]:null;return k?'<button class="invSlot" data-transfer="'+k+'" data-from="'+side+'"><span class="invCount">'+data[k]+'</span><span class="invIcon">'+it.icon+'</span><span class="invName">'+it.name+'</span></button>':'<div class="invSlot empty"></div>'}).join('')}
@@ -1263,13 +1334,14 @@ function insideDoor(){
 }
 function nearbyPrompt(){
  if(room)return player.y>VH-58&&Math.abs(player.x+12-VW/2)<34?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
- if(fishing.active)return fishing.phase==='bite'?'FISCH BEISST · E JETZT ZIEHEN':'Angelschnur im Wasser · E zum Einholen';
+ if(fishing.active)return fishing.phase==='bite'?'FISCH BEISST · ANTIPpen':'Angelschnur im Wasser · ANTIPpen';
  const px=player.x+12,py=player.y+31;
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b)return b.name+' betreten';
  const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest)return 'Truhe öffnen';
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
- const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<30);if(item){if(item.kind==='mainFlower')return 'Blaue Waldblüte pflücken';if(item.kind==='resource'&&item.key.startsWith('ore'))return gear.tool==='pickaxe'?'Erz abbauen':'Spitzhacke benötigt · Erzader';return item.kind==='resource'?'Ressource sammeln':'Gegenstand aufheben'}
- if(findFishingSpot())return gear.tool==='rod'?'Angeln · E zum Auswerfen':'Angelrute benötigt · Handwerk';
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x+8-px,v.y+8-py)<56);if(item){if(item.kind==='mainFlower')return 'Blaue Waldblüte pflücken · KLICK';if(item.kind==='resource'&&item.key.startsWith('ore'))return gear.tool==='pickaxe'?'Erzader abbauen · KLICK':'Spitzhacke benötigt · Erzader';return item.kind==='resource'?'Ressource sammeln · KLICK':'Gegenstand aufheben · KLICK'}
+ const tree=world.decor.find(v=>v.harvestable&&!v.felled&&Math.hypot(v.x+22-px,v.y+48-py)<72);if(tree)return gear.tool==='woodAxe'?'Baum fällen · KLICK':'Holzfälleraxt benötigt · Baum';
+ if(findFishingSpot())return gear.tool==='rod'?'Angeln · KLICK':'Angelrute benötigt · Handwerk';
  if(zone==='windruh'&&main.stage===1&&seedSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Echosamen aufheben';
  if(zone==='wald'&&main.stage===3&&flowerSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Waldblüte pflücken';
  const ex=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);if(ex)return ex.label;
@@ -1279,10 +1351,46 @@ function nearbyPrompt(){
 function collectQuestItem(item){
  if(item.kind==='resource'&&item.key.startsWith('ore')&&gear.tool!=='pickaxe'){showToast('Zum Erzabbau brauchst du eine ausgerüstete Spitzhacke.');return}
  item.found=true;collectedItems[item.id]=true;if(item.nodeId)collectedItems[item.nodeId]=true;
- if(item.kind==='resource'){inventory[item.key]=(Number(inventory[item.key])||0)+1;const labels={branch:'Zweig',fiber:'Pflanzenfaser',oreCopper:'Kupfererz',oreIron:'Eisenerz',oreFrost:'Frostkristall',coal:'Kohle'};showToast(labels[item.key]+' erhalten · '+inventory[item.key])}
+ if(item.kind==='resource'){inventory[item.key]=(Number(inventory[item.key])||0)+1;const labels={branch:'Zweig',fiber:'Pflanzenfaser',wood:'Holz',birchWood:'Birkenholz',frostWood:'Frostholz',oreCopper:'Kupfererz',oreIron:'Eisenerz',oreFrost:'Frostkristall',coal:'Kohle'};showToast((labels[item.key]||ITEM_INFO[item.key]?.name||'Ressource')+' erhalten · '+inventory[item.key])}
  else if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
  else{const q=sideQuests[item.key];if(q){q.items++;const inventoryKey=({crystal:'crystalShard',rune:'runeStone',frost:'frostPetal',watch:'watchSigil'})[item.key]||item.key;inventory[inventoryKey]=(inventory[inventoryKey]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
  updateQuest();saveGame(activeSlot);
+}
+function harvestTree(tree){
+ if(!tree||tree.felled)return;
+ if(gear.tool!=='woodAxe'){showToast('Zum Fällen brauchst du eine ausgerüstete Holzfälleraxt.');return}
+ const hits=Math.min(3,(Number(treeProgress[tree.id])||0)+1);treeProgress[tree.id]=hits;tree.chopHits=hits;tree.chopFlash=.42;
+ spawnCombatFx('hit',tree.x+22,tree.y+42,0,0,'#e6c18b',.3);
+ if(hits<3){showToast('Holz fällen · '+hits+'/3');saveGame(activeSlot);return}
+ tree.felled=true;tree.solid=false;collectedItems['treeFelled:'+tree.id]=true;
+ const key=tree.woodKey||'wood',amount=tree.woodYield||3;inventory[key]=(Number(inventory[key])||0)+amount;
+ const names={wood:'Holz',birchWood:'Birkenholz',frostWood:'Frostholz'};showToast(amount+' × '+(names[key]||'Holz')+' erhalten');
+ spawnCombatFx('ring',tree.x+22,tree.y+44,0,0,'#cda16a',.42);saveGame(activeSlot);updateQuest();
+}
+function handleWorldPointer(e){
+ if(!started||gameOver||dialogOpen||panelOpen)return;
+ if(e.button!==undefined&&e.button!==0)return;
+ if(fishing.active){fishingAction();return}
+ const rect=canvas.getBoundingClientRect();if(!rect.width||!rect.height)return;
+ const wx=(e.clientX-rect.left)*VW/rect.width+camera.x,wy=(e.clientY-rect.top)*VH/rect.height+camera.y;
+ const px=player.x+12,py=player.y+31;let hit=null;
+ const addHit=(type,obj,cx,cy,radius,range)=>{const cursorD=Math.hypot(wx-cx,wy-cy);if(cursorD<=radius&&(!hit||cursorD<hit.cursorD))hit={type,obj,cx,cy,cursorD,range}};
+ if(room){if(player.y>VH-60&&Math.abs(px-VW/2)<80&&wy>VH-75){insideDoor();return}if(roomNPC&&Math.hypot(wx-VW/2,wy-205)<48){roomNPCAction();return}return}
+ for(const item of world.items){if(!item.found)addHit('item',item,item.x+8,item.y+8,22,58)}
+ for(const o of world.decor){if(o.type==='chest')addHit('chest',o,o.x+12,o.y+15,25,58);if(o.harvestable&&!o.felled&&wx>=o.x-5&&wx<=o.x+49&&wy>=o.y-7&&wy<=o.y+57)addHit('tree',o,o.x+22,o.y+48,60,72)}
+ for(const n of world.npcs)addHit('npc',n,n.x+8,n.y+13,23,50);
+ for(const b of world.buildings)addHit('building',b,b.doorX,b.doorY,27,60);
+ if(zone==='windruh'&&main.stage===1)for(const seed of seedSpots)if(!seed.found)addHit('seed',seed,seed.x+8,seed.y+8,20,54);
+ if(zone==='wald'&&main.stage===3)for(const flower of flowerSpots)if(!flower.found)addHit('flower',flower,flower.x+8,flower.y+8,20,54);
+ for(const exit of world.exits)if(wx>=exit.x-8&&wx<=exit.x+exit.w+8&&wy>=exit.y-8&&wy<=exit.y+exit.h+8)addHit('exit',exit,exit.x+exit.w/2,exit.y+exit.h/2,80,64);
+ const fountain=world.decor.find(o=>o.type==='fountain');if(zone==='windruh'&&fountain&&main.stage===2)addHit('fountain',fountain,fountain.x+31,fountain.y+40,42,80);
+ if(!hit)return;
+ if(Math.hypot(hit.cx-px,hit.cy-py)>hit.range){showToast('Zu weit entfernt – geh näher heran.');return}
+ if(hit.type==='item'){collectQuestItem(hit.obj);return}if(hit.type==='tree'){harvestTree(hit.obj);return}if(hit.type==='chest'){openChestPanel(hit.obj.id);return}if(hit.type==='npc'){talk(hit.obj);return}if(hit.type==='building'){enterRoom(hit.obj);return}
+ if(hit.type==='seed'){const seed=hit.obj;seed.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}
+ if(hit.type==='flower'){const flower=hit.obj;flower.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}
+ if(hit.type==='exit'){if(!hit.obj.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(hit.obj.to,hit.obj.tx,hit.obj.ty);return}
+ if(hit.type==='fountain'){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
 }
 function interact(){
  if(dialogOpen){closeDialogue();return}if(panelOpen)return;
@@ -1292,7 +1400,8 @@ function interact(){
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b){enterRoom(b);return}
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n){talk(n);return}
  const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest){openChestPanel(chest.id);return}
- const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<30);if(item){collectQuestItem(item);return}
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x+8-px,v.y+8-py)<56);if(item){collectQuestItem(item);return}
+ const tree=world.decor.find(v=>v.harvestable&&!v.felled&&Math.hypot(v.x+22-px,v.y+48-py)<72);if(tree){harvestTree(tree);return}
  if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}}
  if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}}
  if(findFishingSpot()){startFishing();return}
@@ -1365,6 +1474,7 @@ function retryFromCheckpoint(){
  showToast(restored?'Speicherpunkt geladen':'Du bist wieder aufgestanden');
 }
 function update(dt,now){
+ if(world)for(const o of world.decor)if(o.chopFlash>0)o.chopFlash=Math.max(0,o.chopFlash-dt);
  if(!gameOver&&!dialogOpen&&!panelOpen){
   worldMinutes=(worldMinutes+dt*4)%1440;
   if(!fishing.active)move(dt);
@@ -1457,14 +1567,15 @@ function init(){
  document.getElementById('retryBtn').onclick=retryFromCheckpoint;
  document.getElementById('continueBtn').onclick=()=>{if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}else showToast('Kein Spielstand gefunden')};
  document.getElementById('nextBtn').onclick=closeDialogue;
- document.getElementById('useBtn').onclick=interact;document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
+ document.getElementById('attackBtn').onclick=attack;document.getElementById('skillBtn').onclick=ability;document.getElementById('rollBtn').onclick=dodge;
  document.getElementById('stick').addEventListener('pointerdown',e=>{e.preventDefault();try{stickEl.setPointerCapture(e.pointerId)}catch(err){}moveStick(e)});
  stickEl.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch')moveStick(e)});
  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>stickEl.addEventListener(ev,resetStick));
  addPanelControls();document.addEventListener('keydown',keyDown);document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
  addEventListener('blur',()=>{for(const k in keys)keys[k]=false;resetStick()});
- addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Aktion · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
- addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · E Aktion · J Angriff · K Fähigkeit · Shift Rolle'});
+ addEventListener('gamepadconnected',()=>{document.getElementById('gamepadState').textContent='Controller verbunden · A Interagieren · B Angriff · X Fähigkeit · Y Rolle';document.getElementById('controlHint').textContent='WASD / Pfeile · Klick / E Interagieren · J Angriff · K Fähigkeit · Shift Rolle · Gamepad aktiv'});
+ addEventListener('gamepaddisconnected',()=>{document.getElementById('gamepadState').textContent='Tastatur bereit';document.getElementById('controlHint').textContent='WASD / Pfeile · Klick / E Interagieren · J Angriff · K Fähigkeit · Shift Rolle'});
+ canvas.addEventListener('pointerdown',handleWorldPointer);
  document.getElementById('menuButtons').style.zIndex='14';
  updateQuest();drawWorld(performance.now());
 }
