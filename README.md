@@ -28,6 +28,7 @@ Rufe danach `http://localhost:8000` im Browser auf. Für Offline-Funktionen und 
 - Fünf auswählbare Helden mit unterschiedlichen Fähigkeiten
 - Windruh, Flüsterwald, Nebelmoor, Flüsterhöhle, Frostgrat und Echo-Schrein
 - Hauptquest, Nebenquests, Bewohnerdialoge, Häuser und Laden
+- Erkundungs-Belohnungen beim erstmaligen Entdecken eines Bioms
 - Gegner, Bosskampf, Herzen, Erfahrung, Windtaler und Gegenstände
 - Tag-/Nachtzyklus mit sichtbarer Uhr und Abend-/Nachtstimmung
 - 36-Slot-Inventar mit Ausrüstungsplätzen, Lagertruhen und anklickbaren Gegenständen
