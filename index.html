@@ -769,8 +769,11 @@ function drawMonster(m,now){
 }
 function drawSeed(x,y,now,color){const pulse=Math.sin(now/160+x)*1;pixel(x-camera.x+6,y-camera.y+2,4,11+Math.max(0,pulse),color);pixel(x-camera.x+2,y-camera.y+6,4,4,'#fff4bd');pixel(x-camera.x+10,y-camera.y+4,4,4,'#fff4bd')}
 function drawCollectible(item,now){
- const x=item.x-camera.x,y=item.y-camera.y,bob=Math.sin(now/180+item.x)*2;
+ const x=item.x-camera.x,y=item.y-camera.y,bob=Math.sin(now/180+item.x)*2,k=item.key;
  if(item.kind==='mainFlower'){drawGlow(item.x+8,item.y+7,28,'#78dff0',.32);pixel(x+7,y+2+bob,3,12,'#7bd5df');pixel(x+3,y+4+bob,4,4,'#e7fdff');pixel(x+10,y+5+bob,4,4,'#e7fdff');pixel(x+7,y+1+bob,4,4,'#fff4c7')}
+ else if(item.kind==='resource'&&k==='branch'){drawGlow(item.x+8,item.y+8,20,'#c5a06b',.16);pixel(x+2,y+8+bob,13,3,'#765234');pixel(x+5,y+5+bob,3,3,'#bf9560');pixel(x+11,y+11+bob,3,2,'#d0a66b')}
+ else if(item.kind==='resource'&&k==='fiber'){drawGlow(item.x+8,item.y+8,20,'#a6db8b',.22);pixel(x+7,y+3+bob,3,12,'#4f9556');pixel(x+3,y+6+bob,5,3,'#8bbd68');pixel(x+9,y+2+bob,5,4,'#c4e39a')}
+ else if(k==='oreCopper'||k==='oreIron'||k==='oreFrost'||k==='coal'){const c=k==='oreCopper'?'#e4a05c':k==='oreIron'?'#b7c9d0':k==='oreFrost'?'#84dff2':'#515c63';drawGlow(item.x+8,item.y+8,25,c,.3);pixel(x+4,y+6+bob,9,9,k==='coal'?'#323b42':c);pixel(x+7,y+2+bob,5,6,k==='oreCopper'?'#f0c08a':k==='oreIron'?'#e9f2eb':k==='oreFrost'?'#e9ffff':'#87939a');pixel(x+3,y+8+bob,3,3,'#fff0c8')}
  else{const c=item.key==='reed'?'#a0d9ac':item.key==='shell'?'#e6c68e':item.key==='crystalShard'?'#82e0ed':item.key==='runeStone'?'#c2a6ef':'#e4f8fb';drawGlow(item.x+8,item.y+8,24,c,.25);pixel(x+4,y+4+bob,9,9,c);pixel(x+6,y+1+bob,5,4,'#f2ffff')}
 }
 function drawRoom(now){
@@ -1017,7 +1020,7 @@ function pointBlocked(px,py){
  }
  for(const o of world.decor){
   if(!o.solid)continue;
-  if(['tree','pine','appleTree','deadTree','reed','rock','iceRock'].includes(o.type)){
+  if(['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree','reed','rock','iceRock'].includes(o.type)){
    if(px>o.x+3&&px<o.x+23&&py>o.y+20&&py<o.y+35)return true;
   }else if(o.type==='fountain'&&px>o.x+5&&px<o.x+58&&py>o.y+24&&py<o.y+49)return true;
   else if(o.type==='shrine'&&px>o.x&&px<o.x+48&&py>o.y+20&&py<o.y+36)return true;
@@ -1259,10 +1262,13 @@ function insideDoor(){
 }
 function nearbyPrompt(){
  if(room)return player.y>VH-58&&Math.abs(player.x+12-VW/2)<34?'Tür – nach draußen laufen':roomNPC?'Mit Bewohner reden':'';
+ if(fishing.active)return fishing.phase==='bite'?'FISCH BEISST · E JETZT ZIEHEN':'Angelschnur im Wasser · E zum Einholen';
  const px=player.x+12,py=player.y+31;
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b)return b.name+' betreten';
+ const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest)return 'Truhe öffnen';
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
- const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item)return item.kind==='mainFlower'?'Blaue Waldblüte pflücken':'Gegenstand aufheben';
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<30);if(item){if(item.kind==='mainFlower')return 'Blaue Waldblüte pflücken';if(item.kind==='resource'&&item.key.startsWith('ore'))return gear.tool==='pickaxe'?'Erz abbauen':'Spitzhacke benötigt · Erzader';return item.kind==='resource'?'Ressource sammeln':'Gegenstand aufheben'}
+ if(findFishingSpot())return gear.tool==='rod'?'Angeln · E zum Auswerfen':'Angelrute benötigt · Handwerk';
  if(zone==='windruh'&&main.stage===1&&seedSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Echosamen aufheben';
  if(zone==='wald'&&main.stage===3&&flowerSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Waldblüte pflücken';
  const ex=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);if(ex)return ex.label;
@@ -1270,18 +1276,22 @@ function nearbyPrompt(){
  return '';
 }
 function collectQuestItem(item){
- item.found=true;collectedItems[item.id]=true;
- if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
+ if(item.kind==='resource'&&item.key.startsWith('ore')&&gear.tool!=='pickaxe'){showToast('Zum Erzabbau brauchst du eine ausgerüstete Spitzhacke.');return}
+ item.found=true;collectedItems[item.id]=true;if(item.nodeId)collectedItems[item.nodeId]=true;
+ if(item.kind==='resource'){inventory[item.key]=(Number(inventory[item.key])||0)+1;const labels={branch:'Zweig',fiber:'Pflanzenfaser',oreCopper:'Kupfererz',oreIron:'Eisenerz',oreFrost:'Frostkristall',coal:'Kohle'};showToast(labels[item.key]+' erhalten · '+inventory[item.key])}
+ else if(item.kind==='mainFlower'){main.forestFlowers++;inventory.blueHerb++;if(main.forestFlowers>=3&&main.stage===3){main.stage=4;showDialogue('WALDBLÜTEN','Drei Blüten leuchten zusammen. Der Weg zum Echo-Schrein ist offen!')}else showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)')}
  else{const q=sideQuests[item.key];if(q){q.items++;const inventoryKey=({crystal:'crystalShard',rune:'runeStone',frost:'frostPetal',watch:'watchSigil'})[item.key]||item.key;inventory[inventoryKey]=(inventory[inventoryKey]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
  updateQuest();saveGame(activeSlot);
 }
 function interact(){
  if(dialogOpen){closeDialogue();return}if(panelOpen)return;
+ if(fishing.active){fishingAction();return}
  const px=player.x+12,py=player.y+31;
  if(room){if(player.y>VH-60&&Math.abs(px-VW/2)<80){insideDoor();return}roomNPCAction();return}
  const b=world.buildings.find(v=>Math.hypot(v.doorX-px,v.doorY-py)<40);if(b){enterRoom(b);return}
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n){talk(n);return}
- const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item){collectQuestItem(item);return}
+ const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest){openChestPanel(chest.id);return}
+ const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<30);if(item){collectQuestItem(item);return}
  if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}}
  if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}}
  if(findFishingSpot()){startFishing();return}
