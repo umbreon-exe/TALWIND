@@ -275,7 +275,18 @@ let gameOver=false;
 let lastKnownHp=5,damageFlash=0,finaleShown=false;
 
 function makeNPC(id,name,tx,ty,color,hair,kind,line,extra){
- return Object.assign({id,name,x:tx*T+8,y:ty*T+8,color,hair,kind,line,homeX:tx*T+8,homeY:ty*T+8,phase:rand((tx+ty+id.length)*913)()*6},extra||{});
+ return Object.assign({id,name,x:tx*T+8,y:ty*T+8,color,hair,kind,line,homeX:tx*T+8,homeY:ty*T+8,phase:rand((tx+ty+id.length)*913)()*6,roamAngle:rand((tx+ty+id.length)*177)()*Math.PI*2,roamTimer:1+rand((tx+ty+id.length)*199)()*3,roamTarget:null,walkBlend:0},extra||{});
+}
+function updateNPCs(dt){
+ if(room||!world||dialogOpen)return;
+ for(const n of world.npcs){
+  n.roamTimer=(n.roamTimer||0)-dt;
+  if(!n.roamTarget||n.roamTimer<=0){const a=(n.roamAngle||0)+(Math.random()-.5)*2.2,r=18+Math.random()*34;n.roamAngle=a;n.roamTarget={x:n.homeX+Math.cos(a)*r,y:n.homeY+Math.sin(a)*r};n.roamTimer=2.2+Math.random()*2.8}
+  const dx=n.roamTarget.x-n.x,dy=n.roamTarget.y-n.y,d=Math.hypot(dx,dy);
+  if(d<4){n.roamTarget=null;continue}
+  const step=Math.min(d,(n.kind==='child'?18:12)*dt),nx=n.x+dx/d*step,ny=n.y+dy/d*step;
+  if(canOccupy(nx,ny)&&Math.hypot(nx-n.homeX,ny-n.homeY)<58){n.x=nx;n.y=ny;n.walkBlend=Math.min(1,(n.walkBlend||0)+dt*4)}else{n.roamTarget=null;n.roamTimer=.2}
+ }
 }
 function makeWorld(id){
  const sizes={windruh:[96,72],wald:[121,88],sumpf:[99,77],hoehle:[99,74],eispass:[110,77],shrine:[62,34]};
@@ -498,8 +509,13 @@ function drawProp(o,now){
  else if(o.type==='sign'){pixel(x+7,y+7,3,10,PALETTE.woodDark);pixel(x+1,y+1,15,8,'#805536');pixel(x+2,y+2,13,5,'#d5b276');pixel(x+4,y+3,8,1,'#80523a')}
  else if(o.type==='barrel'){pixel(x+3,y+3,10,12,PALETTE.wood);pixel(x+4,y+4,8,10,'#bf8b51');pixel(x+3,y+6,10,1,PALETTE.woodDark);pixel(x+3,y+11,10,1,PALETTE.woodDark)}
  else if(o.type==='stall'){pixel(x+1,y+7,15,8,PALETTE.woodDark);pixel(x+2,y+8,13,5,'#bc8d50');pixel(x,y+2,17,5,'#b64c42');pixel(x+2,y+2,4,5,'#f2d9a5');pixel(x+7,y+2,4,5,'#e5b96c')}
- else if(o.type==='well'){pixel(x+2,y+8,14,9,'#8a8879');pixel(x+4,y+6,10,8,'#b7b49e');pixel(x+5,y+8,8,5,PALETTE.water);pixel(x+5,y+2,2,7,PALETTE.wood);pixel(x+12,y+2,2,7,PALETTE.wood);pixel(x+4,y+1,11,2,PALETTE.wood)}
- else if(o.type==='fountain'){drawGlow(o.x+16,o.y+13,70,'#7deaff',.42);pixel(x+1,y+8,30,19,'#8a8a80');pixel(x+4,y+5,24,19,'#c4c3aa');pixel(x+7,y+8,18,13,'#2c9bd0');pixel(x+14,y,5,13,'#d0d0b9');pixel(x+12,y+3,9,3,'#e4dfc6');pixel(x+15,y-4,3,8,'#c0f0f3')}
+ else if(o.type==='well'){drawSoftShadow(o.x+10,o.y+20,13,4,.3);pixel(x+1,y+10,20,10,'#777e78');pixel(x+3,y+7,16,12,'#b7b5a2');pixel(x+5,y+10,12,7,'#267fa7');pixel(x+6,y+11,10,2,'#86d8e6');pixel(x+3,y+2,3,12,'#805735');pixel(x+16,y+2,3,12,'#805735');pixel(x+2,y+1,18,3,'#a97949');pixel(x+8,y+3,6,2,'#d4b078');pixel(x+9,y+3,2,8,'#60432f');pixel(x+8,y+8,5,2,'#60432f')}
+ else if(o.type==='fountain'){
+  const pulse=Math.sin(now/210),spark=Math.sin(now/95);drawSoftShadow(o.x+27,o.y+43,31,7,.34);drawGlow(o.x+27,o.y+24,86,'#70dff0',.28);
+  pixel(x+4,y+22,46,18,'#777f7b');pixel(x+1,y+18,52,8,'#b8b8a3');pixel(x+5,y+22,44,14,'#d2cfb8');pixel(x+9,y+25,36,9,'#278eb7');pixel(x+12,y+26,29,2,'#8ce5e9');pixel(x+8,y+32,39,3,'#236f9d');
+  pixel(x+20,y+8,14,17,'#8f978d');pixel(x+23,y+5,8,5,'#d8d8c2');pixel(x+25,y+1,4,7,'#dffcff');pixel(x+26+Math.round(pulse*2),y+8,3,14,'#8feaf0');pixel(x+18,y+17,4,5,'#bceff0');pixel(x+33,y+17,4,5,'#bceff0');
+  pixel(x+12,y+20,5,3,'#f4e4b9');pixel(x+38,y+20,5,3,'#f4e4b9');ctx.globalAlpha=.65;pixel(x+13,y+27+Math.round(spark),2,2,'#f2ffff');pixel(x+39,y+29-Math.round(spark),2,2,'#e8ffff');ctx.globalAlpha=1;
+ }
  else if(o.type==='bridge'){pixel(x,y+5,32,11,PALETTE.wood);pixel(x+2,y+2,28,3,'#d1a26d');for(let i=0;i<4;i++)pixel(x+4+i*7,y+5,2,11,PALETTE.woodDark)}
  else if(o.type==='campfire'){drawGlow(o.x+9,o.y+9,58,'#ff9b48',.32);pixel(x+3,y+9,11,4,PALETTE.woodDark);pixel(x+5,y+4,7,7,'#e97842');pixel(x+7,y+2,3,6,'#ffcf63')}
  else if(o.type==='shrine'){drawGlow(o.x+24,o.y+18,90,'#9cebf2',.38);pixel(x+3,y+20,44,15,'#8a8576');pixel(x+7,y+5,36,19,'#b2a68a');pixel(x+3,y+4,44,6,'#6b5540');pixel(x+11,y+11,6,13,PALETTE.woodDark);pixel(x+31,y+11,6,13,PALETTE.woodDark);pixel(x+20,y+13,9,12,'#283e3c');pixel(x+22,y+15,5,6,'#c9dca0')}
@@ -1188,6 +1204,7 @@ function retryFromCheckpoint(){
 function update(dt,now){
  if(!gameOver&&!dialogOpen&&!panelOpen){
   move(dt);
+  updateNPCs(dt);
   attackCD=Math.max(0,attackCD-dt);
   skillCD=Math.max(0,skillCD-dt);
   rollCD=Math.max(0,rollCD-dt);
@@ -1201,7 +1218,7 @@ function update(dt,now){
  damageFlash=Math.max(0,damageFlash-dt);
  if(zone==='windruh'&&main.stage===2){
   const f=world.decor.find(o=>o.type==='fountain');
-  if(f&&Math.hypot(f.x+16-player.x,f.y+14-player.y)<48)currentPrompt='Brunnen aktivieren';
+  if(f&&Math.hypot(f.x+27-player.x,f.y+29-player.y)<58)currentPrompt='Brunnen aktivieren';
  }
  updateQuest();
 }
