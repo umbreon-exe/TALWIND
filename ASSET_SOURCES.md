@@ -41,3 +41,16 @@ Die folgenden Sets passen zur aktuellen Top-down-Pixel-Art-Perspektive. **Die ZI
 | Alternative CC0-Stadtgrafik | [Tiny Town – Kenney](https://kenney.nl/assets/tiny-town) | 130 CC0-Elemente. Die Perspektive ist eher 3/4-Ansicht und kann daher einen Stilbruch zum bestehenden Top-down-Spiel verursachen. |
 
 **Importstatus:** Es wurden in dieser Überarbeitung keine neuen externen Binärdateien erfolgreich heruntergeladen. Die neuen Materialien und Fundobjekte werden prozedural im vorhandenen Renderer gezeichnet. Die Links oben sind deshalb als recherchierte, noch nicht importierte Assets markiert.
+
+## Weitere geprüfte 16×16-Top-down-Pakete (November 2026)
+
+| Gebiet / Nutzung | Asset-Paket | Enthaltene Inhalte und Lizenz |
+|---|---|---|
+| Landwirtschaft und Nahrung | [Free Pixel Top-down Farm Tileset – reodesuxz](https://reodesuxz.itch.io/free-pixel-top-down-farm-tileset-16x16) | 108 Assets: Ackerböden, 24 Wachstumsbilder für Weizen, Karotte, Tomate, Kürbis, Mais und Erdbeere, Zäune, Werkzeuge, Erntegegenstände und Hoftiere. Kostenlos für private und kommerzielle Projekte; keine Attribution, keine Weiterverteilung des Originalpakets. |
+| Städte und Straßen | [Free Pixel Top-down Town Tileset – reodesuxz](https://reodesuxz.itch.io/free-pixel-top-down-town-tileset-16x16) | 92 Assets: Straßen, Kopfsteinpflaster, Dächer, Wände, Fenster, Türen, Marktstände, Brunnen, Laternen, Bänke und weitere Stadt-Requisiten. Kostenlos für private und kommerzielle Projekte; keine Attribution, keine Weiterverteilung des Originalpakets. |
+| Höhlen und Minen – Ergänzung | [Free Pixel Dungeon Top-down Tileset Vol. 2 – reodesuxz](https://reodesuxz.itch.io/free-pixel-dungeon-top-down-tileset-vol-2-16x16) | 110 Assets mit Eis-, Krypta-, Obsidian-, Sandstein- und Kanalböden, Wänden, Türen, Treppen, Truhen, Fackeln, Statuen, Cauldron/Kesseln und Gegner-Sprites. Kostenlos für private und kommerzielle Projekte; keine Attribution, keine Weiterverteilung des Originalpakets. |
+| Frostgrat / arktische Küste | [Free Pixel Snow & Ice Tileset – reodesuxz](https://reodesuxz.itch.io/free-pixel-snow-ice-tileset-16x16) | 88 Assets: Schnee, Eis, gefrorenes Wasser, Eisufer, Gletscher, Kristallflächen, Kiefern, Birken, Hütten, Eishöhlen-Requisiten, Werkzeuge, Gegenstände und arktische Tiere. Kostenlos für private und kommerzielle Projekte; keine Attribution, keine Weiterverteilung des Originalpakets. |
+| Alternative Höhlenoptik | [16×16 Pixel Cave – Mr.Pixelz](https://mr-pixelz.itch.io/16x16-pixel-cave) | Top-down-Höhlen-Assets. Laut Anbieter für persönliche und kommerzielle Spiele verwendbar; Attribution nicht erforderlich, aber willkommen. |
+
+Alle oben aufgeführten neuen Pakete sind **recherchiert und noch nicht importiert**. Vor einem Import sollten die ZIPs lokal bezogen, Dateistruktur und Sprite-Maße geprüft sowie die Lizenzdatei im jeweiligen Archiv kontrolliert werden. Für TALWIND ist ein konsistenter 16×16-Atlas mit Nearest-Neighbor-Filter wichtiger als eine Mischung aus abweichenden Perspektiven und Pixelgrößen.
+
