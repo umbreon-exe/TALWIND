@@ -312,12 +312,11 @@ const gear={tool:null,head:null,body:null,feet:null,charm:null};
 const chestStorage={forestCache:{branch:2,fiber:2,berries:3},moorCache:{fish:2,blueHerb:1,berries:2},caveCache:{oreCopper:3,coal:2,crystalShard:1}};
 const openedChests={};let activeChestId=null,worldMinutes=480,lastClockText='';
 const fishing={active:false,phase:'idle',timer:0,elapsed:0,target:null};const fishLog={};const BAG_SLOTS=24;
-const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},wood:{name:'Holz',icon:'🪵'},birchWood:{name:'Birkenholz',icon:'🌳'},frostWood:{name:'Frostholz',icon:'❄'},woodAxe:{name:'Holzfälleraxt',icon:'🪓'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
-const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},woodAxe:{name:'Holzfälleraxt',icon:'🪓',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
+const ITEM_INFO={seeds:{name:'Echosamen',icon:'✦'},blueHerb:{name:'Waldblüte',icon:'✿'},letters:{name:'Brief',icon:'✉'},fish:{name:'Frischfisch',icon:'🐟'},berries:{name:'Beeren',icon:'🍓'},meals:{name:'Mahlzeiten',icon:'🥧'},reed:{name:'Schilf',icon:'🌾'},shell:{name:'Muschel',icon:'🐚'},crystalShard:{name:'Kristall',icon:'💎'},runeStone:{name:'Runenstein',icon:'ᛟ'},frostPetal:{name:'Frostblüte',icon:'❄'},watchSigil:{name:'Wachtzeichen',icon:'◈'},branch:{name:'Zweig',icon:'🪵'},fiber:{name:'Pflanzenfaser',icon:'🧵'},wood:{name:'Holz',icon:'🪵'},birchWood:{name:'Birkenholz',icon:'🌳'},frostWood:{name:'Frostholz',icon:'❄'},oreCopper:{name:'Kupfererz',icon:'🟠'},oreIron:{name:'Eisenerz',icon:'⚙'},oreFrost:{name:'Frostkristall',icon:'🔷'},coal:{name:'Kohle',icon:'⬛'},fishMeal:{name:'Fischmahlzeit',icon:'🍲'},rod:{name:'Angelrute',icon:'🎣'},pickaxe:{name:'Spitzhacke',icon:'⛏'},forestCloak:{name:'Waldmantel',icon:'🧥'},trailBoots:{name:'Wanderstiefel',icon:'🥾'},copperHelm:{name:'Kupferhelm',icon:'⛑'},ironArmor:{name:'Eisenrüstung',icon:'🛡'},frostMantle:{name:'Frostmantel',icon:'❄'},echoCharm:{name:'Echotalisman',icon:'🔮'}};
+const EQUIPMENT={rod:{name:'Angelrute',icon:'🎣',slot:'tool'},pickaxe:{name:'Spitzhacke',icon:'⛏',slot:'tool'},forestCloak:{name:'Waldmantel',icon:'🧥',slot:'body'},copperHelm:{name:'Kupferhelm',icon:'⛑',slot:'head'},ironArmor:{name:'Eisenrüstung',icon:'🛡',slot:'body'},frostMantle:{name:'Frostmantel',icon:'❄',slot:'body'},trailBoots:{name:'Wanderstiefel',icon:'🥾',slot:'feet'},echoCharm:{name:'Echotalisman',icon:'🔮',slot:'charm'}};
 const RECIPES=[
 {id:'rod',name:'Angelrute',icon:'🎣',desc:'Zum Angeln an Flussufern und im Moor.',cost:{branch:3,fiber:2}},
 {id:'pickaxe',name:'Spitzhacke',icon:'⛏',desc:'Zum Abbau von Erzadern in Höhlen und am Frostgrat.',cost:{branch:3,fiber:3}},
-{id:'woodAxe',name:'Holzfälleraxt',icon:'🪓',desc:'Zum Fällen markierter Bäume und Sammeln von Holz.',cost:{branch:4,fiber:2}},
 {id:'forestCloak',name:'Waldmantel',icon:'🧥',desc:'Leichter Schutz. In der Nacht bist du etwas schneller.',cost:{fiber:4,blueHerb:2,berries:1}},
 {id:'trailBoots',name:'Wanderstiefel',icon:'🥾',desc:'Leichte Sohlen geben dir mehr Lauftempo.',cost:{branch:2,fiber:3,berries:2}},
 {id:'copperHelm',name:'Kupferhelm',icon:'⛑',desc:'Ein einfacher Helm aus Kupfererz.',cost:{oreCopper:2,fiber:1}},
@@ -328,7 +327,6 @@ const RECIPES=[
 ];
 
 const collectedItems={};
-const treeProgress={};
 const sideQuests={
  reed:{state:0,items:0,need:3},
  shell:{state:0,items:0,need:2},
@@ -543,14 +541,14 @@ function makeWorld(id){
   for(let y=1;y<H-1;y++){if(w.tiles[y*W]!==2&&w.tiles[y*W]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'pine',0,y,false);if(w.tiles[y*W+W-1]!==2&&w.tiles[y*W+W-1]!==8)add(id==='eispass'?'iceRock':id==='hoehle'?'rock':id==='sumpf'?'reed':'tree',W-1,y,false)}
  }
  if(['wald','sumpf','eispass'].includes(id)){
-  w.decor.forEach((o,i)=>{if(!TREE_TYPES.includes(o.type))return;o.harvestable=true;o.id='tree_'+id+'_'+i+'_'+o.type;o.woodKey=(id==='eispass'||o.type==='snowPine')?'frostWood':o.type==='birch'?'birchWood':'wood';o.woodYield=3+(i%2)});
+  w.decor.forEach((o,i)=>{if(TREE_TYPES.includes(o.type)){o.harvestable=true;o.id='tree_'+id+'_'+i+'_'+o.type;}if(o.type==='fallenLog'){o.woodNode=true;o.id='log_'+id+'_'+i;o.woodKey=id==='eispass'?'frostWood':id==='wald'?'wood':'birchWood';o.woodYield=2+(i%2)}});
  }
  applyTreeState(w);
  return w;
 }
 function applyTreeState(target){
  const scene=target||world;if(!scene)return;
- for(const o of scene.decor){if(!o.harvestable)continue;o.chopHits=Math.max(0,Number(treeProgress[o.id])||0);o.felled=!!collectedItems['treeFelled:'+o.id];if(o.felled)o.solid=false;}
+ for(const o of scene.decor){if(o.harvestable)o.twigsGathered=!!collectedItems['treeTwigs:'+o.id];if(o.woodNode)o.gathered=!!collectedItems['woodNode:'+o.id];}
 }
 function pixel(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,w),Math.max(1,h))}
 function drawSoftShadow(x,y,rx,ry,alpha){
@@ -593,14 +591,9 @@ function drawTile(tx,ty,id,now){
  }
 }
 function drawTree(x,y,pine,apple){drawTreeVariant({x,y,type:pine?'pine':'tree',apple});}
-function drawTreeStump(o){
- const x=o.x-camera.x,y=o.y-camera.y;drawSoftShadow(o.x+22,o.y+46,16,5,.3);
- pixel(x+15,y+34,14,13,'#5a3929');pixel(x+13,y+31,18,6,'#795034');pixel(x+15,y+30,14,5,'#bd8a55');pixel(x+17,y+31,10,2,'#e0bb7d');pixel(x+20,y+32,4,2,'#745036');pixel(x+16,y+37,12,4,'#69432e');
-}
 function drawTreeVariant(o){
  let x=o.x-camera.x,y=o.y-camera.y;const type=o.type;
  drawSoftShadow(o.x+22,o.y+49,23,8,.34);
- if(o.chopFlash>0){x+=Math.sin(performance.now()/24)*2.5;y+=Math.cos(performance.now()/29)*1.5}
  if(type==='deadTree'){
   pixel(x+17,y+29,11,23,'#49392d');pixel(x+19,y+29,6,21,'#77543a');pixel(x+9,y+29,12,4,'#5e4633');pixel(x+23,y+21,16,4,'#5e4633');pixel(x+6,y+18,15,3,'#624a37');pixel(x+9,y+13,3,10,'#624a37');pixel(x+30,y+16,3,12,'#624a37');pixel(x+29,y+12,10,3,'#624a37');pixel(x+3,y+17,8,3,'#624a37');pixel(x+8,y+9,3,11,'#73563c');pixel(x+31,y+10,3,8,'#73563c');
  }else if(type==='pine'||type==='snowPine'){
@@ -630,12 +623,11 @@ function drawTreeVariant(o){
   if(autumn){pixel(x+8,y+29,5,3,'#f4b64c');pixel(x+34,y+13,5,3,'#f1b74d')}
   if(birch){pixel(x+20,y+37,7,2,'#756d60');pixel(x+20,y+43,6,2,'#756d60')}
  }
- if(o.chopHits>0){pixel(x+21,y+39,2,5,'#3e3028');pixel(x+23,y+42,4,2,'#e3bd80')}
  if(o.apple){pixel(x+13,y+20,4,4,'#d84c43');pixel(x+32,y+17,4,4,'#e05a45')}
 }
 function drawProp(o,now){
  const x=o.x-camera.x,y=o.y-camera.y;
- if(TREE_TYPES.includes(o.type)){if(o.felled&&o.harvestable)drawTreeStump(o);else if(o.type==='birch'||o.type==='willow'||o.type==='autumnTree'||o.type==='cherryTree'||o.type==='snowPine'||o.type==='deadTree')drawTreeVariant(o);else drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree')}
+ if(TREE_TYPES.includes(o.type)){if(o.type==='birch'||o.type==='willow'||o.type==='autumnTree'||o.type==='cherryTree'||o.type==='snowPine'||o.type==='deadTree')drawTreeVariant(o);else drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree')}
  else if(o.type==='bush'||o.type==='smallBush'||o.type==='berryBush'){
    drawSoftShadow(o.x+8,o.y+14,10,3,.22);const berry=o.type==='berryBush';
    pixel(x+1,y+8,15,7,berry?'#245b3f':'#286d43');pixel(x+3,y+5,12,8,berry?'#317a4a':'#46a252');pixel(x+5,y+2,8,7,berry?'#3f9254':'#5ab65b');pixel(x+6,y+4,4,2,'#91d16c');
@@ -948,7 +940,7 @@ function renderScene(now){
  const ex=Math.min(world.width,Math.ceil((camera.x+VW)/T)+2),ey=Math.min(world.height,Math.ceil((camera.y+VH)/T)+2);
  for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++)drawTile(tx,ty,world.tiles[ty*world.width+tx],now);
  const items=[];
- world.decor.forEach(o=>items.push({y:o.y+48,fn:()=>drawProp(o,now)}));
+ world.decor.forEach(o=>{if(!(o.woodNode&&o.gathered))items.push({y:o.y+48,fn:()=>drawProp(o,now)})});
  world.buildings.forEach(b=>items.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)}));
  world.items.forEach(item=>{if(!item.found)items.push({y:item.y+14,fn:()=>drawCollectible(item,now)})});
  world.npcs.forEach(n=>items.push({y:n.y+32,fn:()=>drawPerson(n,n.x,n.y,now)}));
@@ -1090,7 +1082,7 @@ function pointBlocked(px,py){
  for(const o of world.decor){
   if(!o.solid)continue;
   if(TREE_TYPES.includes(o.type)){
-   if(!o.felled&&px>o.x+14&&px<o.x+32&&py>o.y+37&&py<o.y+51)return true;
+   if(px>o.x+14&&px<o.x+32&&py>o.y+37&&py<o.y+51)return true;
   }else if(['reed','rock','iceRock'].includes(o.type)){
    if(px>o.x+3&&px<o.x+23&&py>o.y+20&&py<o.y+35)return true;
   }else if(o.type==='fountain'&&px>o.x+5&&px<o.x+58&&py>o.y+24&&py<o.y+49)return true;
@@ -1115,7 +1107,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot);
 }
 function makeSaveState(){
- return {version:4,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,treeProgress,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:4,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -1146,7 +1138,7 @@ Object.keys(openedChests).forEach(key=>delete openedChests[key]);Object.assign(o
 if(Number.isFinite(Number(d.worldMinutes)))worldMinutes=((Number(d.worldMinutes)%1440)+1440)%1440;
 Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.fishLog||{});
 
-  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});Object.assign(treeProgress,d.treeProgress||{});applyTreeState(world);
+  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});applyTreeState(world);
   for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
   currentRoom=null;room=null;roomNPC=null;
@@ -1340,7 +1332,8 @@ function nearbyPrompt(){
  const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest)return 'Truhe öffnen';
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n)return n.name+' ansprechen';
  const item=world.items.find(v=>!v.found&&Math.hypot(v.x+8-px,v.y+8-py)<56);if(item){if(item.kind==='mainFlower')return 'Blaue Waldblüte pflücken · KLICK';if(item.kind==='resource'&&item.key.startsWith('ore'))return gear.tool==='pickaxe'?'Erzader abbauen · KLICK':'Spitzhacke benötigt · Erzader';return item.kind==='resource'?'Ressource sammeln · KLICK':'Gegenstand aufheben · KLICK'}
- const tree=world.decor.find(v=>v.harvestable&&!v.felled&&Math.hypot(v.x+22-px,v.y+48-py)<72);if(tree)return gear.tool==='woodAxe'?'Baum fällen · KLICK':'Holzfälleraxt benötigt · Baum';
+ const log=world.decor.find(v=>v.woodNode&&!v.gathered&&Math.hypot(v.x+10-px,v.y+11-py)<54);if(log)return 'Liegendes Holz sammeln · KLICK';
+ const tree=world.decor.find(v=>v.harvestable&&!v.twigsGathered&&Math.hypot(v.x+22-px,v.y+48-py)<68);if(tree)return 'Lose Zweige sammeln · KLICK';
  if(findFishingSpot())return gear.tool==='rod'?'Angeln · KLICK':'Angelrute benötigt · Handwerk';
  if(zone==='windruh'&&main.stage===1&&seedSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Echosamen aufheben';
  if(zone==='wald'&&main.stage===3&&flowerSpots.some(s=>!s.found&&Math.hypot(s.x-px,s.y-py)<26))return 'Waldblüte pflücken';
@@ -1356,16 +1349,19 @@ function collectQuestItem(item){
  else{const q=sideQuests[item.key];if(q){q.items++;const inventoryKey=({crystal:'crystalShard',rune:'runeStone',frost:'frostPetal',watch:'watchSigil'})[item.key]||item.key;inventory[inventoryKey]=(inventory[inventoryKey]||0)+1;showToast('Gefunden: '+q.items+'/'+q.need);if(q.state===1&&q.items>=q.need){const n=world.npcs.find(v=>v.quest&&v.quest===item.key);if(n)showToast('Questgegenstände vollständig – sprich mit '+n.name)}}}
  updateQuest();saveGame(activeSlot);
 }
-function harvestTree(tree){
- if(!tree||tree.felled)return;
- if(gear.tool!=='woodAxe'){showToast('Zum Fällen brauchst du eine ausgerüstete Holzfälleraxt.');return}
- const hits=Math.min(3,(Number(treeProgress[tree.id])||0)+1);treeProgress[tree.id]=hits;tree.chopHits=hits;tree.chopFlash=.42;
- spawnCombatFx('hit',tree.x+22,tree.y+42,0,0,'#e6c18b',.3);
- if(hits<3){saveGame(activeSlot);showToast('Holz fällen · '+hits+'/3');return}
- tree.felled=true;tree.solid=false;collectedItems['treeFelled:'+tree.id]=true;
- const key=tree.woodKey||'wood',amount=tree.woodYield||3;inventory[key]=(Number(inventory[key])||0)+amount;
+function collectTreeTwigs(tree){
+ if(!tree||tree.twigsGathered)return;
+ tree.twigsGathered=true;collectedItems['treeTwigs:'+tree.id]=true;
+ inventory.branch=(Number(inventory.branch)||0)+1;
+ saveGame(activeSlot);updateQuest();showToast('+1 trockener Zweig gesammelt');
+}
+function collectFallenWood(node){
+ if(!node||node.gathered)return;
+ node.gathered=true;collectedItems['woodNode:'+node.id]=true;
+ const key=node.woodKey||'wood',amount=node.woodYield||2;
+ inventory[key]=(Number(inventory[key])||0)+amount;
  const names={wood:'Holz',birchWood:'Birkenholz',frostWood:'Frostholz'};
- spawnCombatFx('ring',tree.x+22,tree.y+44,0,0,'#cda16a',.42);saveGame(activeSlot);updateQuest();showToast(amount+' × '+(names[key]||'Holz')+' erhalten');
+ saveGame(activeSlot);updateQuest();showToast(amount+' × '+(names[key]||'Holz')+' eingesammelt');
 }
 function handleWorldPointer(e){
  if(!started||gameOver||dialogOpen||panelOpen)return;
@@ -1377,7 +1373,7 @@ function handleWorldPointer(e){
  const addHit=(type,obj,cx,cy,radius,range)=>{const cursorD=Math.hypot(wx-cx,wy-cy);if(cursorD<=radius&&(!hit||cursorD<hit.cursorD))hit={type,obj,cx,cy,cursorD,range}};
  if(room){if(player.y>VH-60&&Math.abs(px-VW/2)<80&&wy>VH-75){insideDoor();return}if(roomNPC&&Math.hypot(wx-VW/2,wy-205)<48){roomNPCAction();return}return}
  for(const item of world.items){if(!item.found)addHit('item',item,item.x+8,item.y+8,22,58)}
- for(const o of world.decor){if(o.type==='chest')addHit('chest',o,o.x+12,o.y+15,25,58);if(o.harvestable&&!o.felled&&wx>=o.x-5&&wx<=o.x+49&&wy>=o.y-7&&wy<=o.y+57)addHit('tree',o,o.x+22,o.y+48,60,72)}
+ for(const o of world.decor){if(o.type==='chest')addHit('chest',o,o.x+12,o.y+15,25,58);if(o.woodNode&&!o.gathered)addHit('woodNode',o,o.x+10,o.y+11,25,54);if(o.harvestable&&!o.twigsGathered&&wx>=o.x-5&&wx<=o.x+49&&wy>=o.y-7&&wy<=o.y+57)addHit('tree',o,o.x+22,o.y+48,60,68)}
  for(const n of world.npcs)addHit('npc',n,n.x+8,n.y+13,23,50);
  for(const b of world.buildings)addHit('building',b,b.doorX,b.doorY,27,60);
  if(zone==='windruh'&&main.stage===1)for(const seed of seedSpots)if(!seed.found)addHit('seed',seed,seed.x+8,seed.y+8,20,54);
@@ -1386,7 +1382,7 @@ function handleWorldPointer(e){
  const fountain=world.decor.find(o=>o.type==='fountain');if(zone==='windruh'&&fountain&&main.stage===2)addHit('fountain',fountain,fountain.x+31,fountain.y+40,42,80);
  if(!hit)return;
  if(Math.hypot(hit.cx-px,hit.cy-py)>hit.range){showToast('Zu weit entfernt – geh näher heran.');return}
- if(hit.type==='item'){collectQuestItem(hit.obj);return}if(hit.type==='tree'){harvestTree(hit.obj);return}if(hit.type==='chest'){openChestPanel(hit.obj.id);return}if(hit.type==='npc'){talk(hit.obj);return}if(hit.type==='building'){enterRoom(hit.obj);return}
+ if(hit.type==='item'){collectQuestItem(hit.obj);return}if(hit.type==='woodNode'){collectFallenWood(hit.obj);return}if(hit.type==='tree'){collectTreeTwigs(hit.obj);return}if(hit.type==='chest'){openChestPanel(hit.obj.id);return}if(hit.type==='npc'){talk(hit.obj);return}if(hit.type==='building'){enterRoom(hit.obj);return}
  if(hit.type==='seed'){const seed=hit.obj;seed.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}
  if(hit.type==='flower'){const flower=hit.obj;flower.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}
  if(hit.type==='exit'){if(!hit.obj.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(hit.obj.to,hit.obj.tx,hit.obj.ty);return}
@@ -1401,7 +1397,8 @@ function interact(){
  const n=world.npcs.find(v=>Math.hypot(v.x-px,v.y-py)<36);if(n){talk(n);return}
  const chest=world.decor.find(v=>v.type==='chest'&&Math.hypot(v.x+10-px,v.y+14-py)<43);if(chest){openChestPanel(chest.id);return}
  const item=world.items.find(v=>!v.found&&Math.hypot(v.x+8-px,v.y+8-py)<56);if(item){collectQuestItem(item);return}
- const tree=world.decor.find(v=>v.harvestable&&!v.felled&&Math.hypot(v.x+22-px,v.y+48-py)<72);if(tree){harvestTree(tree);return}
+ const log=world.decor.find(v=>v.woodNode&&!v.gathered&&Math.hypot(v.x+10-px,v.y+11-py)<54);if(log){collectFallenWood(log);return}
+ const tree=world.decor.find(v=>v.harvestable&&!v.twigsGathered&&Math.hypot(v.x+22-px,v.y+48-py)<68);if(tree){collectTreeTwigs(tree);return}
  if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}}
  if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}}
  if(findFishingSpot()){startFishing();return}
@@ -1474,7 +1471,6 @@ function retryFromCheckpoint(){
  showToast(restored?'Speicherpunkt geladen':'Du bist wieder aufgestanden');
 }
 function update(dt,now){
- if(world)for(const o of world.decor)if(o.chopFlash>0)o.chopFlash=Math.max(0,o.chopFlash-dt);
  if(!gameOver&&!dialogOpen&&!panelOpen){
   worldMinutes=(worldMinutes+dt*4)%1440;
   if(!fishing.active)move(dt);
