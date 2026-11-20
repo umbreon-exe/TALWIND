@@ -1039,13 +1039,13 @@ function renderScene(now){
  const ex=Math.min(world.width,Math.ceil((camera.x+VW)/T)+2),ey=Math.min(world.height,Math.ceil((camera.y+VH)/T)+2);
  for(let ty=sy;ty<ey;ty++)for(let tx=sx;tx<ex;tx++)drawTile(tx,ty,world.tiles[ty*world.width+tx],now);
  const items=[];
- world.decor.forEach(o=>{if(!(o.woodNode&&o.gathered))items.push({y:o.y+48,fn:()=>drawProp(o,now)})});
- world.buildings.forEach(b=>items.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)}));
- world.items.forEach(item=>{if(!item.found)items.push({y:item.y+14,fn:()=>drawCollectible(item,now)})});
- world.npcs.forEach(n=>items.push({y:n.y+32,fn:()=>drawPerson(n,n.x,n.y,now)}));
+ world.decor.forEach(o=>{if(o.x>=camera.x-64&&o.x<=camera.x+VW+64&&o.y>=camera.y-72&&o.y<=camera.y+VH+72&&!(o.woodNode&&o.gathered))items.push({y:o.y+48,fn:()=>drawProp(o,now)})});
+ world.buildings.forEach(b=>{if(b.x<=camera.x+VW+80&&b.x+b.w>=camera.x-80&&b.y<=camera.y+VH+80&&b.y+b.h>=camera.y-80)items.push({y:b.y+b.h+1,fn:()=>drawBuilding(b)})});
+ world.items.forEach(item=>{if(!item.found&&item.x>=camera.x-32&&item.x<=camera.x+VW+32&&item.y>=camera.y-32&&item.y<=camera.y+VH+32)items.push({y:item.y+14,fn:()=>drawCollectible(item,now)})});
+ world.npcs.forEach(n=>{if(n.x>=camera.x-48&&n.x<=camera.x+VW+48&&n.y>=camera.y-48&&n.y<=camera.y+VH+48)items.push({y:n.y+32,fn:()=>drawPerson(n,n.x,n.y,now)})});
  if(zone==='windruh'&&main.stage===1)seedSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#f2d45c')})});
  if(zone==='wald'&&main.stage===3)flowerSpots.forEach(s=>{if(!s.found)items.push({y:s.y+15,fn:()=>drawSeed(s.x,s.y,now,'#7cdbed')})});
- monsters.filter(m=>m.zone===zone&&m.hp>0).forEach(m=>items.push({y:m.y+31,fn:()=>drawMonster(m,now)}));
+ monsters.filter(m=>m.zone===zone&&m.hp>0&&m.x>=camera.x-60&&m.x<=camera.x+VW+60&&m.y>=camera.y-60&&m.y<=camera.y+VH+60).forEach(m=>items.push({y:m.y+31,fn:()=>drawMonster(m,now)}));
  items.push({y:player.y+35,fn:()=>drawHero(player.x,player.y,now)});
  items.sort((a,b)=>a.y-b.y);items.forEach(o=>o.fn());drawQuestGuide(now);drawCombatEffects(now);
  currentPrompt=nearbyPrompt();
@@ -1175,10 +1175,12 @@ function pointBlocked(px,py){
  if(tile===2)return true;
  if((zone==='sumpf'||zone==='eispass')&&(tile===4))return false;
  for(const b of world.buildings){
+  if(px<b.x-4||px>b.x+b.w+4||py<b.y-4||py>b.y+b.h+4)continue;
   const body=px>b.x+4&&px<b.x+b.w-4&&py>b.y+28&&py<b.y+b.h-4;
   if(body){const door=Math.abs(px-b.doorX)<19&&py>b.doorY-28&&py<b.doorY+10;if(!door)return true}
  }
  for(const o of world.decor){
+  if(Math.abs(px-o.x)>64||Math.abs(py-o.y)>72)continue;
   if(!o.solid)continue;
   if(TREE_TYPES.includes(o.type)){
    if(px>o.x+14&&px<o.x+32&&py>o.y+37&&py<o.y+51)return true;
@@ -1608,8 +1610,7 @@ function retryFromCheckpoint(){
   player.hp=3;
   player.inv=2;
   player.rolling=0;
-  player.x=zone==='windruh'?48*T:zone==='shrine'?480:Math.floor(world.width*.45)*T;
-  player.y=zone==='windruh'?36*T:zone==='shrine'?304:Math.floor(world.height*.5)*T;
+  zone='windruh';player.x=(REGION_LAYOUT.windruh.x+48)*T;player.y=(REGION_LAYOUT.windruh.y+36)*T;
   makeMonsters();
  }
  gameOver=false;
