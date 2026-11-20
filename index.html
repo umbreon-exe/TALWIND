@@ -401,11 +401,12 @@ function makeWorld(id){
   const open=[[12,32,7,6],[29,32,7,7],[57,13,7,6],[57,49,7,6],[78,32,6,7]];
   for(const [cx,cy,rx,ry] of open)for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++)if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<1)set(x,y,5);
   const rnd=rand(81031);
-  for(let i=0;i<980;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||(Math.abs(y-13)<4&&x>=57)||(Math.abs(y-49)<4&&x>=57)||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'pine':'tree',x,y,true)}
-  for(let i=0;i<420;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4)add(i%9===0?'mushroom':i%3===0?'flower':'tuft',x,y,false)}
+  for(let i=0;i<980;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||(Math.abs(y-13)<4&&x>=57)||(Math.abs(y-49)<4&&x>=57)||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;const kinds=['tree','pine','birch','willow','autumnTree','appleTree','cherryTree','pine'];add(kinds[i%kinds.length],x,y,true)}
+  for(let i=0;i<420;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4){const kinds=['mushroom','flower','tuft','fern','berryBush','smallBush','fallenLog'];add(kinds[i%kinds.length],x,y,false)}}
   add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('altar',78,28,false);
-  for(let i=0;i<18;i++){const x=8+(i*17)%78,y=5+(i*23)%54;if(Math.abs(y-32)>7&&Math.abs(x-29)>7)add(i%3===0?'rock':i%3===1?'bush':'mushroom',x,y,false)}
+  for(let i=0;i<18;i++){const x=8+(i*17)%78,y=5+(i*23)%54;if(Math.abs(y-32)>7&&Math.abs(x-29)>7)add(i%4===0?'rock':i%4===1?'berryBush':i%4===2?'stump':'mushroom',x,y,false)}
   for(let i=0;i<12;i++){const x=12+(i*19)%68,y=8+(i*13)%48;add(i%2?'flowerBed':'fireflyPlant',x,y,false)}
+   add('willow',64,8,false);add('cherryTree',13,44,false);add('stump',23,44,false);add('fallenLog',67,53,false);add('berryBush',47,40,false);
   w.npcs=[makeNPC('elder','Elder Noren',29,27,'cream','white','elder','Der Wald hört zu. Folge den Glühblumen. Drei blaue Blüten öffnen den Weg zum Schrein.'),makeNPC('mossy','Moos',36,37,'green','green','forestChild','Ich habe eine Blüte beim Bach entdeckt. Die anderen wachsen nahe den alten Steinen.'),makeNPC('wald_meri','Meri',42,30,'gold','auburn','gardener','Die Moorlichter bewahren Erinnerungen.'),makeNPC('wald_taro','Taro',18,11,'orange','brown','fisher','Unter den Wurzeln beginnt ein alter Höhlenpfad.')];
   w.exits.push({x:38*T,y:0,w:70,h:42,to:'windruh',tx:48*T,ty:12*T,label:'Zurück nach Windruh',open:()=>true});
   w.exits.push({x:0,y:24*T,w:30,h:72,to:'sumpf',tx:7*T,ty:37*T,label:'Zum Nebelmoor',open:()=>true});
@@ -414,6 +415,8 @@ function makeWorld(id){
   w.exits.push({x:81*T,y:27*T,w:36,h:72,to:'shrine',tx:30*T,ty:19*T,label:'Zum Echo-Schrein',open:()=>main.forestFlowers>=3});
   // Three main-quest flowers in the forest clearings.
   w.items.push({id:'flower1',kind:'mainFlower',x:25*T,y:27*T,found:false},{id:'flower2',kind:'mainFlower',x:58*T,y:11*T,found:false},{id:'flower3',kind:'mainFlower',x:59*T,y:48*T,found:false});
+   w.decor.push({type:'chest',id:'forestCache',x:36*T,y:35*T,solid:false});
+   w.items.push({id:'branch_w1',kind:'resource',key:'branch',x:21*T,y:35*T,found:false},{id:'fiber_w1',kind:'resource',key:'fiber',x:35*T,y:39*T,found:false},{id:'branch_w2',kind:'resource',key:'branch',x:61*T,y:34*T,found:false},{id:'fiber_w2',kind:'resource',key:'fiber',x:71*T,y:16*T,found:false},{id:'branch_w3',kind:'resource',key:'branch',x:17*T,y:45*T,found:false},{id:'fiber_w3',kind:'resource',key:'fiber',x:53*T,y:52*T,found:false});
  }else if(id==='sumpf'){
   // Nebelmoor: shallow water, reed islands and winding stone causeways.
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*7+y*11)%13<4)set(x,y,2);
@@ -428,6 +431,8 @@ function makeWorld(id){
   w.npcs=[makeNPC('moor_iona','Iona',20,9,'violet','silver','elder','Der Nebel trägt Stimmen aus alten Zeiten. Bleib auf den hellen Steinen – dort ist der Boden fest.',{quest:'reed'}),makeNPC('moor_pip','Pip',47,39,'gold','brown','child','Ich suche leuchtende Sumpflichter. Manche zeigen versteckte Pfade.',{quest:'shell'})];
   for(let i=0;i<3;i++)w.items.push({id:'reed'+i,kind:'quest',key:'reed',x:(12+i*5)*T,y:(18+(i%2)*3)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'shell'+i,kind:'quest',key:'shell',x:(52+i*7)*T,y:(26+i*5)*T,found:false});
+   w.decor.push({type:'chest',id:'moorCache',x:34*T,y:31*T,solid:false},{type:'willow',x:60*T,y:20*T},{type:'berryBush',x:27*T,y:39*T});
+   w.items.push({id:'fiber_m1',kind:'resource',key:'fiber',x:22*T,y:24*T,found:false},{id:'branch_m1',kind:'resource',key:'branch',x:39*T,y:33*T,found:false},{id:'fiber_m2',kind:'resource',key:'fiber',x:56*T,y:37*T,found:false});
   w.exits.push({x:0,y:25*T,w:24,h:110,to:'wald',tx:2*T,ty:30*T,label:'Zurück in den Flüsterwald',open:()=>true});
  }else if(id==='hoehle'){
   // Cave: stone paths, crystals and columns.
@@ -439,6 +444,8 @@ function makeWorld(id){
   w.npcs=[makeNPC('cave_ren','Ren',24,6,'blue','ginger','librarian','Die Wände speichern jeden Klang. Ein Echo kann hier Türen öffnen.',{quest:'crystal'}),makeNPC('cave_uma','Uma',57,43,'cream','white','elder','Du bist weit gekommen. Der Weg zurück ist immer dort, wo das Licht fällt.',{quest:'rune'})];
   for(let i=0;i<3;i++)w.items.push({id:'crystal'+i,kind:'quest',key:'crystal',x:(31+i*8)*T,y:(15+(i%2)*10)*T,found:false});
   for(let i=0;i<2;i++)w.items.push({id:'rune'+i,kind:'quest',key:'rune',x:(10+i*9)*T,y:(39-i*4)*T,found:false});
+   w.decor.push({type:'oreNode',id:'copperVein1',ore:'copper',x:15*T,y:22*T},{type:'oreNode',id:'copperVein2',ore:'copper',x:34*T,y:22*T},{type:'oreNode',id:'ironVein1',ore:'iron',x:49*T,y:10*T},{type:'oreNode',id:'ironVein2',ore:'iron',x:57*T,y:41*T},{type:'mineSupport',x:26*T,y:8*T},{type:'mineCart',x:43*T,y:29*T},{type:'rail',x:40*T,y:31*T},{type:'chest',id:'caveCache',x:37*T,y:30*T,solid:false});
+   w.items.push({id:'copperOre1',kind:'resource',key:'oreCopper',nodeId:'copperVein1',x:15*T+8,y:22*T+8,found:false},{id:'copperOre2',kind:'resource',key:'oreCopper',nodeId:'copperVein2',x:34*T+8,y:22*T+8,found:false},{id:'ironOre1',kind:'resource',key:'oreIron',nodeId:'ironVein1',x:49*T+8,y:10*T+8,found:false},{id:'ironOre2',kind:'resource',key:'oreIron',nodeId:'ironVein2',x:57*T+8,y:41*T+8,found:false},{id:'ironOre3',kind:'resource',key:'oreIron',nodeId:'ironVein1',x:49*T+22,y:10*T+10,found:false},{id:'coal1',kind:'resource',key:'coal',x:25*T,y:37*T,found:false},{id:'coal2',kind:'resource',key:'coal',x:52*T,y:28*T,found:false});
   w.exits.push({x:75*T,y:34*T,w:64,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='eispass'){
   // Frostgrat: snow fields, icy water, firs and safe switchback trails.
@@ -446,11 +453,13 @@ function makeWorld(id){
   path(38,53,38,5,2,1);path(38,22,14,22,1,1);path(38,39,68,39,1,1);
   oval(14,13,7,5,2,4);oval(68,15,6,4,2,4);
   const rnd=rand(4452);
-  for(let i=0;i<270;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<4||Math.abs(y-22)<3||Math.abs(y-39)<3||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;add(i%4===0?'iceRock':'pine',x,y,true)}
-  for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add('snowTuft',x,y,false)}
-  add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);
+  for(let i=0;i<270;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<4||Math.abs(y-22)<3||Math.abs(y-39)<3||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;const kinds=['iceRock','snowPine','snowPine','birch','deadTree','iceRock'];add(kinds[i%kinds.length],x,y,true)}
+  for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add(i%5===0?'iceFlower':i%4===0?'snowTuft':i%3===0?'iceBush':'snowTuft',x,y,false)}
+  add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);add('iceSpire',15,13,false);add('iceSpire',64,18,false);add('snowPine',72,43,false);add('iceBush',19,42,false);
   w.npcs=[makeNPC('freya','Freya',16,20,'blue','silver','elder','Der Frostgrat ist still. Folge den blauen Kristallen, dann findest du den sicheren Weg.',{quest:'frost'}),makeNPC('alrik','Alrik',63,37,'gold','brown','guard','Der Schnee verdeckt alte Spuren. Ich halte hier Wache.',{quest:'watch'})];
   w.items.push({id:'frostflower1',kind:'quest',key:'frost',x:26*T,y:22*T,found:false},{id:'frostflower2',kind:'quest',key:'frost',x:50*T,y:39*T,found:false},{id:'frostflower3',kind:'quest',key:'frost',x:66*T,y:39*T,found:false},{id:'watchSigil1',kind:'quest',key:'watch',x:38*T,y:13*T,found:false},{id:'watchSigil2',kind:'quest',key:'watch',x:38*T,y:45*T,found:false});
+   w.decor.push({type:'oreNode',id:'frostVein1',ore:'frost',x:24*T,y:31*T},{type:'oreNode',id:'frostVein2',ore:'frost',x:55*T,y:30*T});
+   w.items.push({id:'frostOre1',kind:'resource',key:'oreFrost',nodeId:'frostVein1',x:24*T+8,y:31*T+8,found:false},{id:'frostOre2',kind:'resource',key:'oreFrost',nodeId:'frostVein2',x:55*T+8,y:30*T+8,found:false});
   w.exits.push({x:75*T,y:34*T,w:64,h:110,to:'windruh',tx:10*T,ty:35*T,label:'Zurück nach Windruh',open:()=>true});
  }else if(id==='shrine'){
   rect(3,2,39,21,3);rect(7,5,31,15,1);rect(13,8,19,10,3);
@@ -516,7 +525,7 @@ function drawTile(tx,ty,id,now){
   pixel(x+((seed>>>11)%13),y+13,2,1,id===9?'#426d62':PALETTE.grassDark);
   if((seed%5)===0){pixel(x+3+(seed%8),y+7,2,3,'#a1d578');pixel(x+5+(seed%7),y+5,2,2,'#d3df8b')}
   if((seed%7)===0)pixel(x+((seed>>>7)%10)+2,y+((seed>>>13)%9)+3,2,2,id===9?'#d2c77b':id===5?'#c5d987':['#f3d18b','#e6a9c2','#d7d2f0'][seed%3]);
-  if((seed%11)===0)pixel(x+((seed>>>4)%11)+2,y+((seed>>>9)%10)+2,1,4,id===9?'#8ab88a':'#b0d879');
+  if((seed%11)===0)pixel(x+((seed>>>4)%11)+2,y+((seed>>>9)%10)+2,1,4,id===9?'#8ab88a':'#b0d879');if(seed%13===0)pixel(x+2+(seed%9),y+8,3,2,id===9?'#8fb69a':id===5?'#7ca75e':'#a6d77a');if(seed%19===0)pixel(x+10,y+3+(seed%6),3,2,id===9?'#c1c18b':'#b2d77c');if(seed%23===0){pixel(x+5,y+11,2,2,'#e0d29c');pixel(x+8,y+12,2,1,'#b2a27b')}
  }else if(id===1){
   pixel(x,y,T,T,PALETTE.path);pixel(x,y,T,2,'#eadbb6');pixel(x,y+14,T,2,PALETTE.pathDark);
   pixel(x+((seed>>>5)%10),y+5,3,2,'#f4e8ca');pixel(x+((seed>>>10)%11),y+11,2,2,PALETTE.pathDark);
@@ -531,11 +540,11 @@ function drawTile(tx,ty,id,now){
  }else if(id===4){
   pixel(x,y,T,T,PALETTE.sand);pixel(x+3,y+4,7,2,'#91b85c');pixel(x+9,y+12,5,2,'#d1bd8d');
  }else if(id===6){
-  pixel(x,y,T,T,'#62675f');pixel(x+2,y+2,12,12,'#828477');pixel(x+3,y+3,4,1,'#b7b39c');
+  pixel(x,y,T,T,'#62675f');pixel(x+2,y+2,12,12,'#828477');pixel(x+3,y+3,4,1,'#b7b39c');if(seed%3===0)pixel(x+8,y+6,5,3,'#92968a');if(seed%4===0)pixel(x+1,y+12,4,2,'#48535a');if(seed%7===0)pixel(x+11,y+1,3,2,'#c4c3b5')
  }else if(id===7){
   pixel(x,y,T,T,'#70b65f');pixel(x+2,y+3,12,10,PALETTE.wood);pixel(x+3,y+4,10,8,'#caa36a');
  }else if(id===8){
-  pixel(x,y,T,T,'#b5e0e7');pixel(x+2,y+3,11,2,'#e9ffff');pixel(x+5,y+10,7,2,'#82bdcd');
+  pixel(x,y,T,T,'#b5e0e7');pixel(x+2,y+3,11,2,'#e9ffff');pixel(x+5,y+10,7,2,'#82bdcd');if(seed%3===0)pixel(x+2,y+7,4,2,'#d8f1ef');if(seed%5===0)pixel(x+10,y+5,3,3,'#e8ffff');if(seed%7===0){pixel(x+4,y+13,7,1,'#82bdcd');pixel(x+12,y+2,2,3,'#f5ffff')}
  }
 }
 function drawTree(x,y,pine,apple){
@@ -546,10 +555,31 @@ function drawTree(x,y,pine,apple){
  else{pixel(sx+2,sy+8,22,14,'#246c45');pixel(sx+4,sy+3,18,15,'#31864b');pixel(sx+7,sy,13,12,'#3c9952');pixel(sx+8,sy+3,7,4,'#7acb69');pixel(sx+3,sy+11,6,4,'#58b95b');pixel(sx+17,sy+12,4,4,'#226341')}
  if(apple){pixel(sx+6,sy+9,3,3,'#d64d37');pixel(sx+16,sy+14,3,3,'#df583b');pixel(sx+11,sy+5,3,3,'#d94b39')}
 }
+function drawTreeVariant(o){
+ const x=o.x-camera.x,y=o.y-camera.y;drawSoftShadow(o.x+13,o.y+31,14,5,.28);
+ if(o.type==='birch'){pixel(x+9,y+19,6,15,'#e5e0cd');pixel(x+8,y+29,8,3,'#7a6e60');for(const yy of [23,27])pixel(x+9,y+yy,6,1,'#675d55');pixel(x+2,y+7,23,15,'#397d50');pixel(x+5,y+2,17,16,'#4b9659');pixel(x+8,y,11,10,'#65ac67');pixel(x+8,y+4,5,3,'#b7dc83')}
+ else if(o.type==='willow'){pixel(x+9,y+17,7,17,'#6b573c');pixel(x+4,y+4,17,17,'#438d50');pixel(x+1,y+10,5,18,'#4d9958');pixel(x+22,y+8,5,20,'#4b9856');pixel(x+6,y+16,4,12,'#73b96b');pixel(x+18,y+17,4,12,'#70b76b');pixel(x+8,y+3,10,8,'#82c96d')}
+ else if(o.type==='autumnTree'){pixel(x+9,y+19,6,15,'#785238');pixel(x+2,y+8,22,14,'#b65739');pixel(x+5,y+3,16,15,'#d27a3b');pixel(x+8,y+3,10,5,'#edb44b');pixel(x+4,y+12,6,5,'#e39439')}
+ else if(o.type==='cherryTree'){pixel(x+9,y+20,6,14,'#6c4a42');pixel(x+2,y+8,23,13,'#a76f99');pixel(x+5,y+3,17,14,'#d69ac9');pixel(x+9,y,10,8,'#f0c1dc');pixel(x+3,y+12,7,5,'#e8b8d3')}
+ else{pixel(x+9,y+19,7,16,'#6c8b9a');pixel(x+6,y+24,13,3,'#efffff');pixel(x+4,y+14,17,8,'#477f91');pixel(x+2,y+8,21,10,'#5f9caf');pixel(x+5,y+3,15,10,'#8bc5d2');pixel(x+8,y,9,7,'#ddf5f5');pixel(x+7,y+8,10,3,'#f4ffff');pixel(x+3,y+17,6,3,'#d2f0ef')}
+}
 function drawProp(o,now){
  const x=o.x-camera.x,y=o.y-camera.y;
- if(o.type==='tree'||o.type==='pine'||o.type==='appleTree')drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree');
- else if(o.type==='bush'){drawSoftShadow(o.x+8,o.y+14,9,3,.2);pixel(x+2,y+7,12,7,'#286d43');pixel(x+4,y+3,9,7,'#46a252');pixel(x+6,y+4,3,2,'#83cd68')}
+ if(['birch','willow','autumnTree','cherryTree','snowPine'].includes(o.type))drawTreeVariant(o);
+  else if(o.type==='tree'||o.type==='pine'||o.type==='appleTree')drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree');
+ else if(o.type==='bush'||o.type==='smallBush'||o.type==='berryBush'){
+   drawSoftShadow(o.x+8,o.y+14,10,3,.22);const berry=o.type==='berryBush';
+   pixel(x+1,y+8,15,7,berry?'#245b3f':'#286d43');pixel(x+3,y+5,12,8,berry?'#317a4a':'#46a252');pixel(x+5,y+2,8,7,berry?'#3f9254':'#5ab65b');pixel(x+6,y+4,4,2,'#91d16c');
+   if(berry){for(const [bx,by] of [[4,8],[11,6],[8,11],[14,10]]){pixel(x+bx,y+by,3,3,'#d84c55');pixel(x+bx,y+by-1,2,1,'#f3b28d')}}
+  }else if(o.type==='fern'){
+   drawSoftShadow(o.x+8,o.y+14,9,2,.18);pixel(x+7,y+8,2,8,'#397c4c');for(const [dx,dy,wid] of [[-5,4,6],[-6,7,7],[-4,10,5],[2,3,6],[3,6,7],[3,9,5]])pixel(x+7+dx,y+dy,wid,3,'#4d9c5d');pixel(x+7,y+2,2,5,'#85c96b')
+  }else if(o.type==='stump'){
+   drawSoftShadow(o.x+9,o.y+15,9,3,.2);pixel(x+4,y+6,10,9,'#765137');pixel(x+5,y+4,8,4,'#b88758');pixel(x+6,y+5,6,2,'#e1c18a');pixel(x+8,y+6,2,2,'#85603e')
+  }else if(o.type==='fallenLog'){
+   drawSoftShadow(o.x+10,o.y+14,11,3,.2);pixel(x+1,y+8,17,6,'#755034');pixel(x+2,y+7,15,3,'#a87849');pixel(x+3,y+9,12,2,'#c39560');pixel(x+15,y+8,3,6,'#d4ad78')
+  }else if(o.type==='iceBush'||o.type==='iceFlower'){
+   drawGlow(o.x+8,o.y+7,28,'#a7edfa',.22);pixel(x+2,y+9,12,5,o.type==='iceBush'?'#7baeb9':'#4f9eb1');pixel(x+5,y+5,7,7,'#c3edf0');pixel(x+7,y+3,3,4,'#f2ffff');if(o.type==='iceFlower')pixel(x+3,y+4,3,3,'#fff2cf')
+  }
  else if(o.type==='flower'||o.type==='mushroom'||o.type==='tuft'||o.type==='snowTuft'){pixel(x+7,y+7,2,7,'#367e44');pixel(x+3,y+5,4,3,o.type==='flower'?'#f7e8c2':o.type==='snowTuft'?'#eaffff':'#d77b65');pixel(x+9,y+4,4,4,o.type==='flower'?'#e9a9ca':'#e6c7a4');pixel(x+6,y+2,4,4,o.type==='flower'?'#fff5d0':o.type==='snowTuft'?'#e9ffff':'#a94f4b')}
  else if(o.type==='flowerBed'||o.type==='crop'){pixel(x,y+10,16,4,PALETTE.wood);pixel(x+1,y+8,14,2,'#b0824e');for(let i=0;i<4;i++)pixel(x+2+i*3,y+2+(i%2)*2,2,6,o.type==='crop'?'#4d994b':['#e9a8c8','#fff0c5','#a9a5df'][i%3])}
  else if(o.type==='fence'){pixel(x+1,y+5,14,3,PALETTE.wood);pixel(x+1,y+12,14,3,PALETTE.woodDark);pixel(x+2,y+2,3,13,PALETTE.woodDark);pixel(x+11,y+2,3,13,PALETTE.woodDark)}
@@ -571,7 +601,19 @@ function drawProp(o,now){
   for(const fx of [12,46]){pixel(x+fx,y+18,5,9,'#6c7b72');pixel(x+fx-1,y+16,7,3,'#e7dfc8');pixel(x+fx+1,y+13,3,4,'#b9c8b8')}
   ctx.globalAlpha=.72;pixel(x+15,y+34+Math.round(spark),2,2,'#ffffff');pixel(x+45,y+36-Math.round(spark),2,2,'#e8ffff');pixel(x+30,y+43+Math.round(ripple),3,1,'#f5ffff');ctx.globalAlpha=1;
  }
- else if(o.type==='bridge'){pixel(x,y+5,32,11,PALETTE.wood);pixel(x+2,y+2,28,3,'#d1a26d');for(let i=0;i<4;i++)pixel(x+4+i*7,y+5,2,11,PALETTE.woodDark)}
+ else if(o.type==='chest'){
+   const opened=!!openedChests[o.id];drawSoftShadow(o.x+10,o.y+19,14,4,.3);drawGlow(o.x+9,o.y+8,30,'#e7b85f',opened?.14:.06);
+   pixel(x+1,y+9,18,9,'#4b3023');pixel(x+2,y+8,16,2,'#c58d4d');pixel(x+3,y+11,14,5,'#a96b38');pixel(x+4,y+12,12,3,'#d4a05a');pixel(x+8,y+9,4,7,'#e8c06c');pixel(x+8,y+13,4,3,'#6a4930');
+   if(opened){pixel(x+2,y+3,16,5,'#8a5b36');pixel(x+3,y+2,14,2,'#d6a15d')}else{pixel(x+2,y+4,16,6,'#80512f');pixel(x+3,y+4,14,2,'#d4a15c')}
+  }else if(o.type==='oreNode'){
+   const depleted=!!collectedItems[o.id],pal=o.ore==='copper'?['#8a593e','#d58a4c','#ffd18a']:o.ore==='iron'?['#586b78','#9cb0ba','#e2f2ef']:['#467f9d','#7dd7ed','#e7ffff'];
+   drawSoftShadow(o.x+11,o.y+17,12,4,.25);pixel(x+1,y+10,20,9,'#424b50');pixel(x+3,y+7,15,10,depleted?'#656b68':pal[0]);pixel(x+5,y+5,11,8,depleted?'#92968b':pal[1]);pixel(x+7,y+4,5,4,depleted?'#b0b5ad':pal[2]);
+   if(!depleted){pixel(x+5,y+8,3,4,pal[2]);pixel(x+13,y+10,4,3,pal[2]);drawGlow(o.x+10,o.y+8,24,pal[2],.16)}
+  }else if(o.type==='mineSupport'){pixel(x+2,y+2,3,23,'#62432d');pixel(x+27,y+2,3,23,'#62432d');pixel(x+1,y+2,30,4,'#93653b');pixel(x+5,y+6,22,2,'#c08c53')
+  }else if(o.type==='mineCart'){pixel(x+2,y+6,24,12,'#62432d');pixel(x+4,y+5,20,3,'#b17a43');pixel(x+5,y+9,17,7,'#9a6740');for(const xx of [7,22]){ctx.fillStyle='#262e34';ctx.beginPath();ctx.arc(x+xx,y+20,3,0,Math.PI*2);ctx.fill()}
+  }else if(o.type==='rail'){pixel(x,y+5,29,3,'#6b655e');pixel(x,y+13,29,3,'#6b655e');for(let i=0;i<5;i++)pixel(x+3+i*6,y+3,3,15,'#8f7355')
+  }else if(o.type==='iceSpire'){drawGlow(o.x+9,o.y+12,45,'#81d9f1',.2);pixel(x+8,y+1,7,23,'#7ec5d8');pixel(x+5,y+7,13,15,'#a7e7ef');pixel(x+9,y+3,4,12,'#e9ffff');pixel(x+3,y+16,17,5,'#5b9fb7')
+  }else if(o.type==='bridge'){pixel(x,y+5,32,11,PALETTE.wood);pixel(x+2,y+2,28,3,'#d1a26d');for(let i=0;i<4;i++)pixel(x+4+i*7,y+5,2,11,PALETTE.woodDark)}
  else if(o.type==='campfire'){drawGlow(o.x+9,o.y+9,58,'#ff9b48',.32);pixel(x+3,y+9,11,4,PALETTE.woodDark);pixel(x+5,y+4,7,7,'#e97842');pixel(x+7,y+2,3,6,'#ffcf63')}
  else if(o.type==='shrine'){drawGlow(o.x+24,o.y+18,90,'#9cebf2',.38);pixel(x+3,y+20,44,15,'#8a8576');pixel(x+7,y+5,36,19,'#b2a68a');pixel(x+3,y+4,44,6,'#6b5540');pixel(x+11,y+11,6,13,PALETTE.woodDark);pixel(x+31,y+11,6,13,PALETTE.woodDark);pixel(x+20,y+13,9,12,'#283e3c');pixel(x+22,y+15,5,6,'#c9dca0')}
  else if(o.type==='crystal'){drawGlow(o.x+10,o.y+8,52,'#73e5ed',.34);pixel(x+6,y+2,6,14,PALETTE.crystal);pixel(x+3,y+7,12,8,'#3f9cae');pixel(x+7,y,3,4,'#c1f2ef')}
@@ -1242,6 +1284,7 @@ function interact(){
  const item=world.items.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(item){collectQuestItem(item);return}
  if(zone==='windruh'&&main.stage===1){const s=seedSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(s){s.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}}
  if(zone==='wald'&&main.stage===3){const f=flowerSpots.find(v=>!v.found&&Math.hypot(v.x-px,v.y-py)<28);if(f){f.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}}
+ if(findFishingSpot()){startFishing();return}
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
