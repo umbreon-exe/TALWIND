@@ -108,3 +108,8 @@ assert.ok(html.includes("worldVersion:2") && html.includes("discoveredRegions,wa
 assert.ok(html.includes("function seedRegionResources(") && html.includes("oreSilver") && html.includes("frostBerry"), "biome-specific resource pools are generated");
 assert.ok(html.includes("id:'healingSalve'") && html.includes("id:'fieldRation'") && html.includes("function useBagItem(key)"), "crafted food and healing items are usable");
 assert.ok(html.includes("function changeZone(id,x,y)") && !html.slice(html.indexOf("function changeZone("),html.indexOf("function makeSaveState(")).includes("world=makeWorld(id)"), "biome transitions keep the same world instance");
+
+assert.ok(html.includes("discoverRegion(id)") && html.includes("+12 Windtaler"), "first-time biome discovery rewards exploration");
+assert.ok(html.includes("carve(REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+35"), "Windruh has a walkable connector toward the cave");
+assert.ok(html.includes("if(o.x>=camera.x-64") && html.includes("Math.abs(px-o.x)>64"), "large-world renderer and collision checks cull distant props");
+assert.ok(html.includes("connect('sumpf','wald'") && html.includes("connect('hoehle','eispass'"), "major biomes have continuous paths");
