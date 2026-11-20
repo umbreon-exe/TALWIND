@@ -1255,7 +1255,7 @@ Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.f
   for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
   currentRoom=null;room=null;roomNPC=null;
-  if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};player.x=220;player.y=175}
+  if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};const rb=world.buildings.find(b=>b.id===d.room);insideDoorSpawn=rb?{x:rb.doorX,y:rb.doorY+26}:{x:(REGION_LAYOUT.windruh.x+31)*T,y:(REGION_LAYOUT.windruh.y+29)*T};player.x=220;player.y=175}
   if(slots[n])activeSlot=n;else{activeSlot=0;slots[0]={savedAt:new Date().toISOString(),data:d};localStorage.setItem(slotsKey,JSON.stringify(slots))}
   makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp!==undefined&&d.bossHp!==null)guardian.hp=clamp(Number(d.bossHp),0,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
  }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
