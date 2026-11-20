@@ -179,11 +179,11 @@ const heroes=[
 {name:'ROOK',spriteId:24,role:'Schattenklinge',speed:98,hair:'#433d47',coat:'#536b83',cape:'#344d69',detail:'#d1dce4',skill:'Schattenrolle',desc:'Ein schneller Sprung durch die Schatten.'}
 ];
 const PALETTE={
- grass:'#68ad5c',grassLight:'#83c76b',grassDark:'#3d7d49',forest:'#427c4a',forestDark:'#285b3d',
- path:'#d8c79d',pathLight:'#efe1bd',pathDark:'#ad9a70',water:'#288bc6',waterLight:'#72d2eb',
- sand:'#c5aa77',stone:'#9b9a85',stoneDark:'#686d67',wood:'#93613a',woodDark:'#5c3d2a',
+ grass:'#70b65f',grassLight:'#a0d878',grassDark:'#397448',forest:'#4d8952',forestDark:'#285b3d',
+ path:'#ddc99b',pathLight:'#f4e2b8',pathDark:'#a88b62',water:'#278fca',waterLight:'#83def0',
+ sand:'#d2b77f',stone:'#a5a28e',stoneDark:'#686d67',wood:'#9b6840',woodDark:'#5c3d2a',
  wall:'#e4cea0',wallShade:'#b48b5d',roof:'#b94f41',skin:'#edbd90',shadow:'#203d2b',
- ice:'#9dd5df',iceLight:'#def8f2',iceDark:'#4d8397',bog:'#426d65',bogWater:'#356d78',
+ ice:'#a8dfe7',iceLight:'#e8ffff',iceDark:'#4d8397',bog:'#507d6b',bogWater:'#397b83',
  crystal:'#7ed8e2',gold:'#f4cf79',red:'#d85c50'
 };
 
@@ -455,8 +455,10 @@ function drawTile(tx,ty,id,now){
   const base=id===5?PALETTE.forest:id===9?PALETTE.bog:id===8?'#d7edf0':PALETTE.grass;
   pixel(x,y,T,T,base);
   pixel(x+(seed%12),y+((seed>>>5)%12),2,2,id===8?'#f4ffff':id===9?'#6d9683':PALETTE.grassLight);
-  pixel(x+((seed>>>11)%13),y+13,2,1,id===8?'#a7d3dd':id===9?'#355e56':PALETTE.grassDark);
-  if((seed%9)===0)pixel(x+4,y+4,2,5,id===8?'#f4ffff':'#9ad475');
+  pixel(x+((seed>>>11)%13),y+13,2,1,id===8?'#b9e5ed':id===9?'#426d62':PALETTE.grassDark);
+  if((seed%9)===0)pixel(x+4,y+4,2,5,id===8?'#f4ffff':'#a8df7d');
+  if((seed%7)===0&&id!==8)pixel(x+((seed>>>7)%10)+2,y+((seed>>>13)%9)+3,2,2,id===9?'#d2c77b':id===5?'#c5d987':['#f3d18b','#e6a9c2','#d7d2f0'][seed%3]);
+  if((seed%11)===0&&id!==8)pixel(x+((seed>>>4)%11)+2,y+((seed>>>9)%10)+2,1,4,id===9?'#8ab88a':'#b0d879');
  }else if(id===1){
   pixel(x,y,T,T,PALETTE.path);pixel(x,y,T,2,PALETTE.pathLight);pixel(x,y+14,T,2,PALETTE.pathDark);
   pixel(x+((seed>>>5)%10),y+5,3,2,'#eee1bd');pixel(x+((seed>>>10)%11),y+11,2,2,PALETTE.pathDark);
@@ -766,7 +768,7 @@ function combatTarget(range,cone){const dx=player.faceX||0,dy=player.faceY||1;re
 function damageMonster(m,amount,kx,ky){if(!m||m.hp<=0)return false;m.hp=Math.max(0,m.hp-amount);m.flash=.2;m.hitTimer=.14;m.hitX=kx||0;m.hitY=ky||0;spawnCombatFx('hit',m.x+17,m.y+18,0,0,m.type==='guardian'?'#a9f5ed':'#ffe6a0',.28);if(m.hp<=0){player.xp+=m.type==='guardian'?150:18;player.coins+=m.type==='guardian'?60:5;if(m.type==='guardian'){main.stage=5;main.shrineDone=true;player.potions++;bossState.active=false;showDialogue('DAS ERSTE ECHO','Der Wächter löst sich in Licht auf. Ein warmer Klang kehrt nach Avarra zurück. Ein Heiltrank und 60 Windtaler gehören dir.')}else showToast('+18 EP · +5 Taler');saveGame(activeSlot)}return true}
 function makeParticles(){
  particles=[];
- for(let i=0;i<26;i++)particles.push({x:rand(i*113+97)()*VW,y:rand(i*41+33)()*VH,vx:(rand(i*7+1)()-.5)*10,vy:rand(i*9+4)()*8+3,phase:i*.77,size:i%4===0?3:2});
+ for(let i=0;i<38;i++)particles.push({x:rand(i*113+97)()*VW,y:rand(i*41+33)()*VH,vx:(rand(i*7+1)()-.5)*10,vy:rand(i*9+4)()*8+3,phase:i*.77,size:i%5===0?3:2});
 }
 function updateParticles(dt,now){
  particleClock+=dt;
@@ -790,6 +792,9 @@ function drawParticles(now){
   ctx.fillRect(Math.round(p.x),Math.round(p.y),p.size,p.size);
  }
  if(shrine){ctx.globalAlpha=.2;ctx.fillStyle='#c5f5ed';for(let i=0;i<9;i++)ctx.fillRect((i*83+Math.sin(now/700+i)*12)%VW,(i*47+Math.cos(now/600+i)*10)%VH,4,4)}
+ // Small, restrained ambient life: drifting leaves and fireflies.
+ if(city||forest||moor){for(let i=0;i<7;i++){const drift=(now*.012+i*113)%(VW+30)-15,yy=(i*59+Math.sin(now/900+i*2)*13+VH*.18)%VH;ctx.globalAlpha=.25+.2*Math.sin(now/500+i);ctx.fillStyle=forest?'#d7e99b':moor?'#c5e5a1':'#f6df9e';ctx.fillRect(Math.round(drift),Math.round(yy),3,2);ctx.fillRect(Math.round(drift+2),Math.round(yy-2),2,2)}}
+ if(city){for(let i=0;i<5;i++){const fx=(i*149+Math.sin(now/1300+i)*18)%VW,fy=(i*83+Math.cos(now/1100+i)*12+VH*.25)%VH;ctx.globalAlpha=.35+.35*(.5+.5*Math.sin(now/260+i));ctx.fillStyle='#fff0a6';ctx.fillRect(Math.round(fx),Math.round(fy),2,2)}}
  ctx.restore();
 }
 function makeMonsters(){
