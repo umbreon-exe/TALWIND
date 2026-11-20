@@ -644,7 +644,10 @@ function makeWorld(initialZone){
  for(const item of result.items)item.found=!!collectedItems[item.id];
  return result;
 }
-function pixel(x,y,w,h,color)
+function applyTreeState(target){
+ const scene=target||world;if(!scene)return;
+ for(const o of scene.decor){if(o.harvestable)o.twigsGathered=!!collectedItems['treeTwigs:'+o.id];if(o.woodNode)o.gathered=!!collectedItems['woodNode:'+o.id];}
+}
 function pixel(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,w),Math.max(1,h))}
 function drawSoftShadow(x,y,rx,ry,alpha){
  ctx.save();ctx.globalAlpha=alpha===undefined?.25:alpha;ctx.fillStyle=PALETTE.shadow;ctx.beginPath();ctx.ellipse(x-camera.x,y-camera.y,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.restore();
