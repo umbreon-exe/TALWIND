@@ -231,13 +231,13 @@ body{display:grid;place-items:center;touch-action:none}
 </style></head>
 <body><main id="game" tabindex="0" aria-label="TALWIND-Spiel. Mit WASD oder Pfeiltasten bewegen.">
 <canvas id="world" width="720" height="405" aria-label="TALWIND-Spielwelt"></canvas>
-<div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler</small></div></div>
+<div id="hud"><div class="plate"><div id="hearts">♥ ♥ ♥ ♥ ♥</div><span id="heroLabel">LYRA · WINDLÄUFERIN</span><small id="levelLabel">STUFE 1</small></div><div class="plate" style="text-align:right">✦ <span id="seedLabel">0</span>/3<small><span id="coinLabel">35</span> Windtaler · WELT <span id="worldSeedText">0000000</span></small></div></div>
 <div class="plate" id="worldClock">☀ TAG · 08:00</div><div class="plate" id="questLine">WINDRUH · Sprich mit Mira am Brunnen</div>
 <div id="menuButtons"><button class="menuBtn" data-panel="quest">▤ Questbuch</button><button class="menuBtn" data-panel="bag">▣ Rucksack</button><button class="menuBtn" data-panel="craft">⚒ Handwerk</button><button class="menuBtn" data-panel="map">⌖ Weltkarte</button><button class="menuBtn" data-panel="save">◈ Speichern</button><button class="menuBtn" data-panel="load">↶ Laden</button></div>
 <div id="rightActions"><button class="act purple" id="skillBtn"><b>✧</b><small id="skillName">FÄHIGKEIT</small><span class="cooldownText" id="skillCooldown">BEREIT</span></button><button class="act red" id="attackBtn"><b>⚔</b><small>ANGRIFF</small><span class="cooldownText" id="attackCooldown">BEREIT</span></button><button class="act" id="rollBtn"><b>➤</b><small>ROLLE</small><span class="cooldownText" id="rollCooldown">BEREIT</span></button></div>
 <div id="stick"><div id="nub"></div></div><div id="combatBanner" aria-live="polite"></div><div id="controlHint">KLICK / TIPPE: SAMMELN · E: INTERAGIEREN<br>WASD / PFEILE · J ANGRIFF · K FÄHIGKEIT</div><div id="gamepadState">Tastatur bereit</div>
 <div id="dialog"><strong id="speaker">MIRA</strong><p id="speech"></p><button class="uiButton" id="nextBtn">WEITER ▸</button></div><div id="toast"></div>
-<div class="overlay" id="mainMenu"><div class="card"><img src="assets/windruh.svg" width="480" height="220" alt="Windruh" style="display:block;width:min(100%,480px);height:auto;max-height:220px;object-fit:cover;margin:0 auto 12px;border:3px solid #d6a64e"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Ein Abenteuer beginnt. Erkunde Windruh, überquere den Fluss und entdecke vier Wege in die Welt von Avarra.</p><button class="uiButton" id="openHeroMenuBtn">SPIEL STARTEN</button><p class="smallNote">Wähle im nächsten Menü deinen Helden und starte deine Reise.</p></div></div>
+<div class="overlay" id="mainMenu"><div class="card"><img src="assets/windruh.svg" width="480" height="220" alt="Windruh" style="display:block;width:min(100%,480px);height:auto;max-height:220px;object-fit:cover;margin:0 auto 12px;border:3px solid #d6a64e"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Ein Abenteuer beginnt. Erkunde Windruh, überquere den Fluss und entdecke vier Wege in die Welt von Avarra.</p><button class="uiButton" id="openHeroMenuBtn">SPIEL STARTEN</button><p class="smallNote">Wähle deinen Helden. Jeder neue Abenteuerstart erschafft eine andere Welt mit eigenem Weltcode; Fortsetzen lädt deinen gespeicherten Seed.</p></div></div>
 <div class="overlay hidden" id="titleScreen"><div class="card"><img id="titleArt" src="assets/windruh.svg" width="480" height="270" alt="Windruh in Avarra"><h1 class="logo">TALWIND</h1><div class="subtitle">DIE SIEBEN ECHOS</div><p class="intro">Avarra war einst ein Land voller Musik. Doch seit die sieben Echos verschwunden sind, verstummen die Quellen, die Wälder verlieren ihr Leuchten und die alten Wege schließen sich. Beginne in der lebendigen Stadt Windruh – sprich mit ihren Bewohnern, betrete ihre Häuser und entdecke, was hinter dem Fluss wartet.</p><h3>WÄHLE DEINEN HELDEN</h3><div class="heroGrid" id="heroGrid"></div><button class="uiButton" id="startBtn">ABENTEUER BEGINNEN</button> <button class="uiButton" id="continueBtn" style="display:none;background:linear-gradient(#6b9b61,#3c7047)">FORTSETZEN</button><p class="smallNote">WASD / Pfeiltasten bewegen · E Aktion · J Angriff · K Fähigkeit · Shift Rolle · Gamepad und Touch unterstützt</p><p class="smallNote">Dies ist der ausgebaute erste Abenteuerabschnitt. Online-Koop ist noch nicht aktiviert.</p><p class="smallNote">Grafik-Credits: Super Retro World – Gif (@gif_not_jif), Noiracide (@Noiracide) und Romi (@DessRomaric). Raum-Dekoration: The Fan-tasy Tileset – Ventilatore.</p></div></div>
 <div class="overlay hidden" id="panel"><div class="panelCard"><button class="uiButton" id="closePanel" style="float:right">✕</button><h2 id="panelTitle">Questbuch</h2><div id="panelText"></div><div class="row" id="panelButtons"></div></div></div>
 
@@ -1608,7 +1608,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot,true);updateQuest();
 }
 function makeSaveState(){
- return {version:5,worldVersion:3,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,discoveredRegions,waypoint:worldWaypoint,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:6,worldVersion:4,worldSeed,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,discoveredRegions,waypoint:worldWaypoint,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -1631,7 +1631,7 @@ function loadGame(slot){
   if(!d)return false;
   const validZones=['windruh','wald','sumpf','hoehle','eispass','shrine'];
   const nextZone=validZones.includes(d.zone)?d.zone:'windruh';
-  selected=clamp(Number(d.selected)||0,0,4);zone=nextZone;world=makeWorld(zone);
+  selected=clamp(Number(d.selected)||0,0,4);zone=nextZone;worldSeed=(Number(d.worldSeed)>>>0)||createWorldSeed();world=makeWorld(zone,worldSeed);
   const savedX=Number(d.x),savedY=Number(d.y),r=REGION_LAYOUT[zone];
   const oldLayout={wald:{x:100,y:0},sumpf:{x:1,y:5},windruh:{x:100,y:88},shrine:{x:221,y:24},hoehle:{x:100,y:160},eispass:{x:199,y:160}};
   let x,y;
@@ -1675,6 +1675,7 @@ function showDialogue(name,text){
 }
 function closeDialogue(){dialogOpen=false;document.getElementById('dialog').style.display='none'}
 function updateQuest(){
+ const seedText=document.getElementById('worldSeedText');if(seedText)seedText.textContent=worldSeedCode(worldSeed);
  const text=main.stage===0?'Erkunde Windruh und sprich mit Mira':main.stage===1?'Finde drei Echosamen ('+main.seeds+'/3)':main.stage===2?'Bringe die Samen zum Brunnen':main.stage===3?'Finde drei Waldblüten ('+main.forestFlowers+'/3)':main.stage===4?'Erwecke das Echo im Schrein':main.stage===5?'Erstes Echo gerettet':'Abschluss · Erstes Echo erwacht';
  const q=document.getElementById('questLine');q.textContent=(room?roomNPC.title:regionName(zone))+' · Hauptquest '+Math.min(main.stage+1,6)+'/6 · '+text;
  document.getElementById('heroLabel').textContent=heroes[selected].name+' · '+heroes[selected].role;
@@ -1856,7 +1857,7 @@ function openPanel(kind){
  }else if(kind==='bag'){renderInventoryPanel();return;
  }else if(kind==='craft'){renderCraftPanel();return;
  }else if(kind==='map'){
-  title.textContent='AVARRA · WELTKARTE';text.innerHTML='<p>Eine gemeinsame Karte. Tippe auf eine Stelle, um einen Wegpunkt zu setzen. Gold = du · Violett = Wegpunkt.</p><canvas id="worldMapCanvas" class="worldMapCanvas" width="900" height="690" aria-label="Zusammenhängende Karte von Avarra"></canvas><p class="mapLegend">Windruh · Flüsterwald · Nebelmoor · Flüsterhöhle · Frostgrat · Echo-Schrein</p>';
+  title.textContent='AVARRA · WELTKARTE';text.innerHTML='<p>Weltcode: <b>'+worldSeedCode(worldSeed)+'</b> · Tippe auf eine Stelle, um einen Wegpunkt zu setzen. Gold = du · Violett = Wegpunkt.</p><canvas id="worldMapCanvas" class="worldMapCanvas" width="900" height="690" aria-label="Zusammenhängende Karte von Avarra"></canvas><p class="mapLegend">Windruh · Flüsterwald · Nebelmoor · Flüsterhöhle · Frostgrat · Echo-Schrein</p>';
   drawWorldMap();const mapCanvas=document.getElementById('worldMapCanvas');mapCanvas.addEventListener('pointerdown',e=>{const r=mapCanvas.getBoundingClientRect(),pad=14,scale=Math.min((mapCanvas.width-pad*2)/world.width,(mapCanvas.height-pad*2)/world.height),mw=world.width*scale,mh=world.height*scale,ox=(mapCanvas.width-mw)/2,oy=(mapCanvas.height-mh)/2,x=(e.clientX-r.left)*mapCanvas.width/r.width,y=(e.clientY-r.top)*mapCanvas.height/r.height;if(x<ox||y<oy||x>ox+mw||y>oy+mh)return;worldWaypoint={x:(x-ox)/scale*T,y:(y-oy)/scale*T};saveGame(activeSlot,true);drawWorldMap();showToast('Wegpunkt gesetzt · Pfeil zeigt die Richtung')});}else if(kind==='save'||kind==='load'){
   title.textContent=kind==='save'?'SPIELSTAND SPEICHERN':'SPIELSTAND LADEN';
   const slots=readSlots();text.innerHTML='<p>Wähle einen von drei Speicherplätzen. Alte Spielstände werden automatisch in Platz 1 übernommen.</p>';
@@ -2103,11 +2104,43 @@ function startFromLoaded(){
  document.getElementById('titleScreen').classList.add('hidden');
  started=true;gameLoopRunning=false;startLoop();showToast('Spielstand automatisch fortgesetzt');updateQuest();
 }
+function resetNewAdventure(){
+ Object.assign(main,{stage:0,seeds:0,forestFlowers:0,shrineDone:false});
+ Object.assign(side,{blueHerb:0,letter:0,cat:0,freeMeal:false,finnGift:false});
+ for(const key of Object.keys(inventory))inventory[key]=0;
+ for(const key of Object.keys(gear))gear[key]=null;
+ for(const key of Object.keys(collectedItems))delete collectedItems[key];
+ for(const key of Object.keys(openedChests))delete openedChests[key];
+ for(const key of Object.keys(fishLog))delete fishLog[key];
+ for(const key of Object.keys(chestStorage))delete chestStorage[key];
+ Object.assign(chestStorage,{forestCache:{branch:2,fiber:2,berries:3},moorCache:{fish:2,blueHerb:1,berries:2},caveCache:{oreCopper:3,coal:2,crystalShard:1}});
+ Object.assign(sideQuests,{
+  reed:{state:0,items:0,need:3},shell:{state:0,items:0,need:2},crystal:{state:0,items:0,need:3},
+  rune:{state:0,items:0,need:2},frost:{state:0,items:0,need:3},watch:{state:0,items:0,need:2}
+ });
+ seedSpots.forEach(v=>v.found=false);flowerSpots.forEach(v=>v.found=false);
+ for(const key of Object.keys(discoveredRegions))delete discoveredRegions[key];discoveredRegions.windruh=true;
+ worldWaypoint=null;worldMinutes=480;lastClockText='';zone='windruh';room=null;roomNPC=null;currentRoom=null;
+ dialogOpen=false;panelOpen=false;activeChestId=null;fishing.active=false;gameOver=false;finaleShown=false;
+ skillCD=0;attackCD=0;rollCD=0;combatFx=[];worldTransition=null;autosaveClock=0;
+ document.getElementById('dialog').style.display='none';document.getElementById('panel').classList.add('hidden');document.getElementById('gameOver').classList.add('hidden');
+ Object.assign(player,{x:(REGION_LAYOUT.windruh.x+48)*T,y:(REGION_LAYOUT.windruh.y+36)*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0,attackAnim:0,skillAnim:0,shield:0,hurt:0});
+}
 function startGame(){
+ const slots=readSlots(),freeSlot=slots.findIndex(v=>!v||!v.data);
+ if(freeSlot>=0)activeSlot=freeSlot;
+ else{
+  let oldest=0,stamp=Infinity;
+  for(let i=0;i<slots.length;i++){const t=Date.parse(slots[i]?.savedAt||'')||0;if(t<stamp){stamp=t;oldest=i}}
+  if(!window.confirm('Alle drei Speicherplätze sind belegt. Soll Platz '+(oldest+1)+' durch ein neues Abenteuer ersetzt werden?'))return;
+  activeSlot=oldest;
+ }
+ resetNewAdventure();worldSeed=createWorldSeed();world=makeWorld('windruh',worldSeed);makeMonsters();makeParticles();updateCamera();
  document.getElementById('mainMenu').classList.add('hidden');
  document.getElementById('titleScreen').classList.add('hidden');
  started=true;document.getElementById('game').focus({preventScroll:true});
- updateQuest();startLoop();showToast('Willkommen in Windruh! Sprich mit Mira am Brunnen.');
+ buildHeroCards();updateQuest();startLoop();
+ showToast('Neue Welt '+worldSeedCode(worldSeed)+' · Sprich mit Mira am Brunnen.');
  saveGame(activeSlot,true);
 }
 function startLoop(){if(gameLoopRunning)return;gameLoopRunning=true;last=performance.now();requestAnimationFrame(gameLoop)}
@@ -2121,13 +2154,10 @@ function addPanelControls(){
  document.getElementById('closePanel').onclick=closePanel;
 }
 function init(){
- world=makeWorld('windruh');player.x=(REGION_LAYOUT.windruh.x+48)*T;player.y=(REGION_LAYOUT.windruh.y+36)*T;
+ worldSeed=createWorldSeed();world=makeWorld('windruh',worldSeed);player.x=(REGION_LAYOUT.windruh.x+48)*T;player.y=(REGION_LAYOUT.windruh.y+36)*T;
  updateCamera();makeMonsters();makeParticles();buildHeroCards();
  const hasSave=hasAnySave();
- if(hasSave){
-  document.getElementById('continueBtn').style.display='inline-block';
-  if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}
- }
+ if(hasSave)document.getElementById('continueBtn').style.display='inline-block';
  document.getElementById('openHeroMenuBtn').onclick=()=>{document.getElementById('mainMenu').classList.add('hidden');document.getElementById('titleScreen').classList.remove('hidden')};
  document.getElementById('startBtn').onclick=startGame;
  document.getElementById('retryBtn').onclick=retryFromCheckpoint;
