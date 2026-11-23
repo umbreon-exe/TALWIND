@@ -305,7 +305,10 @@ const PALETTE={
 const NPC_SPRITE_IDS={
  mira:12,tomke:2,eda:22,finn:18,runa:5,pavo:7,lina:26,orin:14,sela:4,tavi:15,wulf:17,pippa:25,
  elder:21,mossy:16,wald_meri:10,wald_taro:23,moor_iona:11,moor_pip:6,cave_ren:19,cave_uma:20,
- freya:18,alrik:13,echo:3
+ freya:18,alrik:13,echo:3,
+ harbor_meri:9,harbor_jann:27,harbor_ole:29,
+ eichen_ilda:30,eichen_boro:32,eichen_lio:1,
+ stone_freya:8,stone_hald:24,stone_anni:28,ruin_soren:31,farm_elsa:13
 };
 // Use the pack author's default 16x20 sprites: 3 animation frames x 4 directions.
 const HERO_SPRITE_IDS=[28,8,1,31,24];
@@ -329,9 +332,17 @@ for(const [name,file] of Object.entries({
 }
 const buildingAssetBase='./assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Buildings/';
 const BUILDING_SPRITES_BY_ID={
+ // Windruh: vier klar unterscheidbare Dach- und Hausvarianten aus dem importierten Tileset.
  mira:'House_Hay_3.png',inn:'House_Hay_2.png',shop:'House_Hay_1.png',library:'House_Hay_3.png',
  home2:'House_Hay_4_Purple.png',tailor:'House_Hay_1.png',smith:'House_Hay_3.png',
- bakery:'House_Hay_2.png',garden:'House_Hay_1.png',clinic:'House_Hay_4_Purple.png'
+ bakery:'House_Hay_2.png',garden:'House_Hay_1.png',clinic:'House_Hay_4_Purple.png',
+ // Hafenweiler: abwechslungsreiche Häuser statt prozeduraler Ersatzgebäude.
+ harbor_inn:'House_Hay_2.png',harbor_shop:'House_Hay_1.png',harbor_home:'House_Hay_3.png',harbor_store:'House_Hay_4_Purple.png',
+ // Eichenruh: Waldhäuser mit unterschiedlichen Dächern.
+ eichen_inn:'House_Hay_2.png',eichen_shop:'House_Hay_1.png',eichen_home:'House_Hay_3.png',eichen_smith:'House_Hay_4_Purple.png',eichen_hall:'House_Hay_3.png',
+ // Steinwacht und der Südweg.
+ stone_inn:'House_Hay_2.png',stone_smith:'House_Hay_4_Purple.png',stone_home:'House_Hay_1.png',stone_store:'House_Hay_3.png',
+ farm_house:'House_Hay_1.png'
 };
 const buildingImages=new Map();
 for(const file of new Set(Object.values(BUILDING_SPRITES_BY_ID))){
@@ -726,6 +737,14 @@ function makeWorld(initialZone){
  road([[332,246],[344,218],[355,194],[365,177]],2);
  road([[244,154],[260,147],[278,143],[296,148]],2);
  road([[269,78],[283,99],[295,119],[298,143]],2);
+ // Zusätzliche Dorf- und Nebenwege: kurze Schleifen führen zu Läden, Höfen und Aussichtspunkten.
+ road([[167,160],[181,160],[197,160],[212,160]],1);
+ road([[176,137],[176,150],[176,165],[176,177]],1);
+ road([[72,107],[80,108],[89,108],[96,112]],1);
+ road([[195,105],[211,105],[225,105],[236,112]],1);
+ road([[354,185],[368,185],[382,193],[389,202]],1);
+ road([[236,217],[247,218],[259,218],[266,225]],1);
+ road([[258,91],[270,95],[281,102]],1);
  prop('bridge',126,119,false);prop('bridge',149,221,false);prop('bridge',184,309,false);
  // Hafenweiler – Fischerdorf, Kai, Markt und Leuchtturm.
  clearPatch(81,98,19,17,0);
@@ -825,6 +844,33 @@ function makeWorld(initialZone){
  landmark('frostgrat','Frostgrat',REGION_LAYOUT.eispass.x+50,REGION_LAYOUT.eispass.y+38,'region');
  landmark('fluestergrotte','Flüsterhöhle',REGION_LAYOUT.hoehle.x+48,REGION_LAYOUT.hoehle.y+35,'dungeon');
  landmark('fluesterwald','Flüsterwald',REGION_LAYOUT.wald.x+60,REGION_LAYOUT.wald.y+32,'region');
+ // Kleine, deterministische Naturgruppen füllen leere Zwischenräume, ohne Wege, Wasser oder Häuser zu verdecken.
+ const occupied=new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT);
+ const mark=(tx,ty,radius)=>{
+  for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
+   const xx=tx+ox,yy=ty+oy;if(xx>=0&&yy>=0&&xx<WORLD_WIDTH&&yy<WORLD_HEIGHT)occupied[yy*WORLD_WIDTH+xx]=1;
+  }
+ };
+ for(const b of result.buildings){
+  const x=Math.floor((b.x+b.w/2)/T),y=Math.floor((b.y+b.h/2)/T);
+  for(let oy=-5;oy<=5;oy++)for(let ox=-5;ox<=5;ox++)if(x+ox>=0&&y+oy>=0&&x+ox<WORLD_WIDTH&&y+oy<WORLD_HEIGHT)occupied[(y+oy)*WORLD_WIDTH+x+ox]=1;
+ }
+ for(const o of result.decor)mark(Math.floor(o.x/T),Math.floor(o.y/T),o.solid?2:1);
+ for(let ty=4;ty<WORLD_HEIGHT-4;ty+=4)for(let tx=4;tx<WORLD_WIDTH-4;tx+=4){
+  const idx=ty*WORLD_WIDTH+tx,tile=result.tiles[idx];
+  if(occupied[idx]||!(tile===0||tile===5||tile===9))continue;
+  const inside=REGION_IDS.some(id=>{
+   const r=REGION_LAYOUT[id],nx=(tx+.5-r.x-r.w/2)/(r.w*.56),ny=(ty+.5-r.y-r.h/2)/(r.h*.58);
+   return nx*nx+ny*ny<1.12;
+  });
+  if(!inside)continue;
+  const hash=((tx*374761393+ty*668265263)>>>0)%100;
+  if(hash>6)continue;
+  const choices=tile===9?['reed','mushroom','tuft','flower','fern']:tile===5?['fern','mushroom','smallBush','flower','berryBush']:['tuft','flower','smallBush','berryBush','mushroom'];
+  const type=choices[hash%choices.length];
+  result.decor.push({type,x:tx*T+((hash*3)%7),y:ty*T+((hash*5)%7),solid:false,ambient:true});
+  mark(tx,ty,1);
+ }
  // Die sechs Gebiete teilen sich ein einziges begehbares Tile-Grid; es gibt keine Gebiets-Teleports.
  result.exits=[];
  applyTreeState(result);
@@ -1045,7 +1091,7 @@ function drawPerson(n,x,y,now){
  const sprite=characterSpriteImages.get(NPC_SPRITE_IDS[n.id]);
  const dx=player.x-x,dy=player.y-y;
  const direction=spriteDirection(dx,dy);
- const frame=Math.floor(now/420+(n.phase||0))%3;
+ const frame=Math.floor(now/190+(n.phase||0))%3;
  drawSoftShadow(x+16,y+32,12,4,.32);
  // The source frame is 16x20. Scale it evenly and align the feet to the shadow.
  if(drawPackCharacter(sprite,bx,by-9,frame,direction,32,40)){
@@ -1813,7 +1859,7 @@ function move(dt){
  let m=Math.hypot(ix,iy);if(m>1){ix/=m;iy/=m}
  if(m<.05){player.walk=0;return}
  if(Math.abs(ix)>Math.abs(iy)){player.faceX=Math.sign(ix);player.faceY=0}else{player.faceX=0;player.faceY=Math.sign(iy)}
- player.walk+=dt*9;const hour=worldMinutes/60,gearBoost=(gear.feet==='trailBoots'?1.12:1)*(gear.body==='forestCloak'&&(hour>=20||hour<6)?1.08:1);const speed=heroes[selected].speed*gearBoost*(player.inv>0?1.12:1),dx=ix*speed*dt,dy=iy*speed*dt;
+ player.walk+=dt*9;const hour=worldMinutes/60,gearBoost=(gear.feet==='trailBoots'?1.12:1)*(gear.body==='forestCloak'&&(hour>=20||hour<6)?1.08:1);const speed=heroes[selected].speed*1.3*gearBoost*(player.inv>0?1.12:1),dx=ix*speed*dt,dy=iy*speed*dt;
  if(canOccupy(player.x+dx,player.y))player.x+=dx;
  if(canOccupy(player.x,player.y+dy))player.y+=dy;
  player.x=clamp(player.x,20,world.width*T-20);player.y=clamp(player.y,20,world.height*T-20);
