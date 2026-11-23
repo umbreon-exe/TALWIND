@@ -16,7 +16,7 @@ assert.match(html, /id="questLine"/, "quest HUD is present");
 assert.match(html, /id="gameOver"/, "checkpoint screen is present");
 assert.ok(html.includes("const WORLD_WIDTH=440,WORLD_HEIGHT=360"), "Avarra uses the current large world map");
 assert.ok(html.includes("function makeRegionWorld(") && html.includes("function makeWorld(initialZone)"), "the six regions are assembled into one world");
-assert.ok(html.includes("function changeZone(id,x,y)") && html.includes("function regionAt("), "regions remain connected in one world");
+assert.ok(html.includes("function changeZone(id,x,y)") && html.includes("const regionAt="), "regions remain connected in one world");
 assert.ok(html.includes("function updateNPCs(dt)") && html.includes("updateNPCs(dt)"), "NPCs have ambient movement");
 assert.ok(html.includes("heroes[selected].speed*1.3*gearBoost"), "player travel speed has been improved");
 assert.ok(html.includes("now/190+(n.phase||0)"), "imported NPC sprites animate at a readable pace");
