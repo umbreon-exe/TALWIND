@@ -442,7 +442,8 @@ function updateNPCs(dt){
   if(canOccupy(nx,ny)&&Math.hypot(nx-n.homeX,ny-n.homeY)<58){n.x=nx;n.y=ny;n.walkBlend=Math.min(1,(n.walkBlend||0)+dt*4)}else{n.roamTarget=null;n.roamTimer=.2}
  }
 }
-function makeRegionWorld(id){
+function makeRegionWorld(id,seed){
+ const regionSeed=(Number(seed)>>>0)||81031;
  const sizes={windruh:[96,72],wald:[121,88],sumpf:[99,77],hoehle:[99,74],eispass:[110,77],shrine:[62,34]};
  const size=sizes[id]||sizes.windruh,W=size[0],H=size[1];
  const names={windruh:'Windruh',wald:'Flüsterwald',sumpf:'Nebelmoor',hoehle:'Flüsterhöhle',eispass:'Frostgrat',shrine:'Echo-Schrein'};
@@ -509,7 +510,7 @@ function makeRegionWorld(id){
   oval(13,12,7,5,2,4);oval(74,12,5,4,2,4);oval(14,51,6,4,2,4);
   const open=[[12,32,7,6],[29,32,7,7],[57,13,7,6],[57,49,7,6],[78,32,6,7]];
   for(const [cx,cy,rx,ry] of open)for(let y=cy-ry;y<=cy+ry;y++)for(let x=cx-rx;x<=cx+rx;x++)if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<1)set(x,y,5);
-  const rnd=rand(81031);
+  const rnd=rand(hashSeed(regionSeed,'forest-foliage'));
   for(let i=0;i<980;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<5||Math.abs(x-29)<4||Math.abs(x-57)<4||(Math.abs(y-13)<4&&x>=57)||(Math.abs(y-49)<4&&x>=57)||open.some(c=>Math.abs(x-c[0])<c[2]+2&&Math.abs(y-c[1])<c[3]+2)||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;const kinds=['tree','pine','birch','willow','autumnTree','appleTree','cherryTree','pine'];add(kinds[i%kinds.length],x,y,true)}
   for(let i=0;i<420;i++){const x=2+Math.floor(rnd()*84),y=2+Math.floor(rnd()*60);if(Math.abs(y-32)<4||Math.abs(x-29)<3||Math.abs(x-57)<3)continue;if(w.tiles[y*W+x]!==2&&w.tiles[y*W+x]!==4){const kinds=['mushroom','flower','tuft','fern','berryBush','smallBush','fallenLog'];add(kinds[i%kinds.length],x,y,false)}}
   add('bridge',10,29,false);add('campfire',18,48,false);add('sign',7,34,false);add('crystal',44,21,false);add('bench',32,35,false);add('altar',78,28,false);
@@ -531,7 +532,7 @@ function makeRegionWorld(id){
   for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*7+y*11)%13<4)set(x,y,2);
   path(3,28,68,28,2,1);path(18,28,18,10,1,1);path(18,10,44,10,1,1);path(44,10,44,42,1,1);path(44,42,68,42,1,1);path(18,20,12,18,1,1);path(18,21,22,18,1,1);path(44,10,52,26,1,1);path(52,26,59,31,1,1);
   oval(31,28,7,6,5,4);oval(58,15,6,5,5,4);
-  const rnd=rand(1193);
+  const rnd=rand(hashSeed(regionSeed,'moor-foliage'));
   for(let i=0;i<390;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(Math.abs(y-28)<4||Math.abs(x-18)<3||Math.abs(x-44)<3||(Math.abs(y-(18+(x-12)*.5))<3&&x>=12&&x<=22)||(Math.abs(y-(26+(x-44)*.71))<3&&x>=44&&x<=59)||w.tiles[y*W+x]===1)continue;add(i%3===0?'reed':'deadTree',x,y,true)}
   for(let i=0;i<170;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*52);if(w.tiles[y*W+x]===1)continue;add(i%2?'mushroom':'fireflyPlant',x,y,false)}
   add('campfire',48,44,false);add('crystal',15,14,false);add('sign',5,30,false);
@@ -546,7 +547,7 @@ function makeRegionWorld(id){
  }else if(id==='hoehle'){
   // Cave: stone paths, crystals and columns.
   fillGround();rect(1,1,W-2,H-2,6);path(3,26,68,26,2,3);path(22,26,22,8,1,3);path(22,8,55,8,1,3);path(55,8,55,44,1,3);path(22,26,55,44,1,3);path(22,26,31,15,1,3);path(31,15,39,25,1,3);path(39,25,47,15,1,3);path(22,26,10,39,1,3);path(10,39,19,35,1,3);
-  const rnd=rand(7731);
+  const rnd=rand(hashSeed(regionSeed,'cave-foliage'));
   for(let i=0;i<200;i++){const x=2+Math.floor(rnd()*68),y=2+Math.floor(rnd()*50);if(Math.abs(y-26)<4||Math.abs(x-22)<3||Math.abs(x-55)<3||Math.hypot(x-31,y-15)<5||Math.hypot(x-39,y-25)<5||Math.hypot(x-47,y-15)<5||Math.hypot(x-10,y-39)<5||Math.hypot(x-19,y-35)<5)continue;add(i%3===0?'crystal':'rock',x,y,true)}
   for(let i=0;i<34;i++){const x=3+Math.floor(rnd()*65),y=3+Math.floor(rnd()*46);if(w.tiles[y*W+x]===3)add('crystal',x,y,false)}
   add('torch',12,23,false);add('torch',42,12,false);add('torch',60,40,false);
@@ -561,7 +562,7 @@ function makeRegionWorld(id){
   fillGround();for(let y=0;y<H;y++)for(let x=0;x<W;x++)if((x*13+y*5)%29<3)set(x,y,2);
   path(38,53,38,5,2,1);path(38,22,14,22,1,1);path(38,39,68,39,1,1);
   oval(14,13,7,5,2,4);oval(68,15,6,4,2,4);
-  const rnd=rand(4452);
+  const rnd=rand(hashSeed(regionSeed,'ice-foliage'));
   for(let i=0;i<270;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<4||Math.abs(y-22)<3||Math.abs(y-39)<3||w.tiles[y*W+x]===2||w.tiles[y*W+x]===4)continue;const kinds=['iceRock','snowPine','snowPine','birch','deadTree','iceRock'];add(kinds[i%kinds.length],x,y,true)}
   for(let i=0;i<95;i++){const x=2+Math.floor(rnd()*76),y=2+Math.floor(rnd()*52);if(Math.abs(x-38)<3||Math.abs(y-22)<3||w.tiles[y*W+x]===2)add(i%5===0?'iceFlower':i%4===0?'snowTuft':i%3===0?'iceBush':'snowTuft',x,y,false)}
   add('crystal',12,34,false);add('campfire',42,45,false);add('sign',34,48,false);add('crystal',67,32,false);add('iceSpire',15,13,false);add('iceSpire',64,18,false);add('snowPine',72,43,false);add('iceBush',19,42,false);
@@ -638,19 +639,21 @@ function seedRegionResources(region,id,count,seed){
   spots.push({x:px,y:py});made++;
  }
 }
-function makeWorld(initialZone){
+function makeWorld(initialZone,seed){
+ const activeSeed=(Number(seed)>>>0)||(Number(worldSeed)>>>0)||createWorldSeed();worldSeed=activeSeed;
+ const seedJitter=(activeSeed%100003)/100003;
  const result={id:'avarra',name:'Avarra',width:WORLD_WIDTH,height:WORLD_HEIGHT,ground:0,tiles:new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT),regionGrid:new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT),decor:[],buildings:[],npcs:[],exits:[],items:[],solids:[],regions:{},landmarks:[]};
  result.tiles.fill(0);
  // Jede bisherige Gebiets-Karte wird als natürliche Landschaftsform in dieselbe Welt gesetzt.
  for(const id of REGION_IDS){
-  const local=makeRegionWorld(id),r=REGION_LAYOUT[id];
+  const local=makeRegionWorld(id,hashSeed(activeSeed,'region:'+id)),r=REGION_LAYOUT[id];
   result.regions[id]={x:r.x,y:r.y,width:local.width,height:local.height};
-  seedRegionResources(local,id,id==='wald'?54:id==='sumpf'?42:id==='hoehle'?40:id==='eispass'?40:id==='windruh'?22:16,81031+REGION_IDS.indexOf(id)*1709);
+  seedRegionResources(local,id,id==='wald'?54:id==='sumpf'?42:id==='hoehle'?40:id==='eispass'?40:id==='windruh'?22:16,hashSeed(activeSeed,'resources:'+id));
   for(let y=0;y<local.height;y++)for(let x=0;x<local.width;x++){
    const gx=r.x+x,gy=r.y+y;if(gx<0||gy<0||gx>=WORLD_WIDTH||gy>=WORLD_HEIGHT)continue;
    const nx=(x+.5-local.width/2)/(local.width*.55),ny=(y+.5-local.height/2)/(local.height*.57);
-   const d=Math.sqrt(nx*nx+ny*ny),edgeNoise=Math.sin(gx*.17+gy*.11)*.035+Math.sin(gx*.071-gy*.19)*.025,edge=1+edgeNoise;
-   const hash=((gx*374761393+gy*668265263)>>>0)%1000/1000,feather=clamp((edge+.13-d)/.27,0,1),localTile=local.tiles[y*local.width+x];
+   const d=Math.sqrt(nx*nx+ny*ny),edgeNoise=Math.sin((gx+activeSeed%97)*.17+(gy+Math.floor(activeSeed/97)%89)*.11)*.035+Math.sin(gx*.071-gy*.19+seedJitter)*.025,edge=1+edgeNoise;
+   const hash=((Math.imul(gx+1,374761393)^Math.imul(gy+1,668265263)^activeSeed)>>>0)%1000/1000,feather=clamp((edge+.13-d)/.27,0,1),localTile=local.tiles[y*local.width+x];
    let copy=d<edge-.13||hash<feather;
    if(localTile===1&&d<1.25)copy=true;
    if(copy)result.tiles[gy*WORLD_WIDTH+gx]=localTile;
