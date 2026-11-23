@@ -897,6 +897,8 @@ function makeWorld(initialZone,seed){
  landmark('frostgrat','Frostgrat',REGION_LAYOUT.eispass.x+50,REGION_LAYOUT.eispass.y+38,'region');
  landmark('fluestergrotte','Flüsterhöhle',REGION_LAYOUT.hoehle.x+48,REGION_LAYOUT.hoehle.y+35,'dungeon');
  landmark('fluesterwald','Flüsterwald',REGION_LAYOUT.wald.x+60,REGION_LAYOUT.wald.y+32,'region');
+ // Ressourcen, die durch eine zufällige neue Felsflanke eingeschlossen wären, werden entfernt.
+ result.items=result.items.filter(item=>{const tx=Math.floor(item.x/T),ty=Math.floor(item.y/T),tile=result.tiles[ty*WORLD_WIDTH+tx];return tile!==10&&tile!==11&&tile!==2});
  // Gebäude, Gartenhöfe und Türvorplätze werden vor dem Dekorieren reserviert.
  const occupied=new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT);
  const mark=(tx,ty,radius)=>{
@@ -910,7 +912,7 @@ function makeWorld(initialZone,seed){
   mark(Math.floor(b.doorX/T),Math.floor(b.doorY/T),3);
  }
  const tallPlants=new Set(['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree','worldTree','rock','iceRock','reed']);
- const softPlants=new Set(['flower','tuft','fern','mushroom','smallBush','berryBush','flowerBed','fireflyPlant','iceBush','iceFlower','snowTuft']);
+ const softPlants=new Set(['flower','tuft','fern','mushroom','smallBush','berryBush','flowerBed','fireflyPlant','iceBush','iceFlower','snowTuft','fallenLog','crop']);
  const nearRoad=(tx,ty,radius)=>{
   for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
    const xx=tx+ox,yy=ty+oy;if(xx<0||yy<0||xx>=WORLD_WIDTH||yy>=WORLD_HEIGHT)continue;
