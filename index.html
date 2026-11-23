@@ -897,7 +897,7 @@ function makeWorld(initialZone,seed){
  landmark('frostgrat','Frostgrat',REGION_LAYOUT.eispass.x+50,REGION_LAYOUT.eispass.y+38,'region');
  landmark('fluestergrotte','Flüsterhöhle',REGION_LAYOUT.hoehle.x+48,REGION_LAYOUT.hoehle.y+35,'dungeon');
  landmark('fluesterwald','Flüsterwald',REGION_LAYOUT.wald.x+60,REGION_LAYOUT.wald.y+32,'region');
- // Kleine, deterministische Naturgruppen füllen leere Zwischenräume, ohne Wege, Wasser oder Häuser zu verdecken.
+ // Gebäude, Gartenhöfe und Türvorplätze werden vor dem Dekorieren reserviert.
  const occupied=new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT);
  const mark=(tx,ty,radius)=>{
   for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
@@ -906,23 +906,79 @@ function makeWorld(initialZone,seed){
  };
  for(const b of result.buildings){
   const x=Math.floor((b.x+b.w/2)/T),y=Math.floor((b.y+b.h/2)/T);
-  for(let oy=-5;oy<=5;oy++)for(let ox=-5;ox<=5;ox++)if(x+ox>=0&&y+oy>=0&&x+ox<WORLD_WIDTH&&y+oy<WORLD_HEIGHT)occupied[(y+oy)*WORLD_WIDTH+x+ox]=1;
+  for(let oy=-5;oy<=5;oy++)for(let ox=-5;ox<=5;ox++)mark(x+ox,y+oy,0);
+  mark(Math.floor(b.doorX/T),Math.floor(b.doorY/T),3);
  }
+ const tallPlants=new Set(['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree','worldTree','rock','iceRock','reed']);
+ const softPlants=new Set(['flower','tuft','fern','mushroom','smallBush','berryBush','flowerBed','fireflyPlant','iceBush','iceFlower','snowTuft']);
+ const nearRoad=(tx,ty,radius)=>{
+  for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
+   const xx=tx+ox,yy=ty+oy;if(xx<0||yy<0||xx>=WORLD_WIDTH||yy>=WORLD_HEIGHT)continue;
+   if(result.tiles[yy*WORLD_WIDTH+xx]===1)return true;
+  }
+  return false;
+ };
+ const nearBuilding=(x,y,pad)=>result.buildings.some(b=>x>b.x-pad&&x<b.x+b.w+pad&&y>b.y-pad&&y<b.y+b.h+pad);
+ // Bereits gesetzte Bäume verschwinden, wenn Stamm, Wurzeln oder Schatten in einen Weg hineinragen.
+ result.decor=result.decor.filter(o=>{
+  if(!tallPlants.has(o.type)&&!softPlants.has(o.type))return true;
+  const tall=tallPlants.has(o.type),tx=Math.floor((o.x+(tall?22:8))/T),ty=Math.floor((o.y+(tall?43:8))/T);
+  if(tx<0||ty<0||tx>=WORLD_WIDTH||ty>=WORLD_HEIGHT)return false;
+  const tile=result.tiles[ty*WORLD_WIDTH+tx];
+  if(tile===2||tile===10||tile===11)return false;
+  if(nearRoad(tx,ty,tall?2:0))return false;
+  if(nearBuilding(o.x,o.y,tall?18:8))return false;
+  return true;
+ });
  for(const o of result.decor)mark(Math.floor(o.x/T),Math.floor(o.y/T),o.solid?2:1);
- for(let ty=4;ty<WORLD_HEIGHT-4;ty+=4)for(let tx=4;tx<WORLD_WIDTH-4;tx+=4){
-  const idx=ty*WORLD_WIDTH+tx,tile=result.tiles[idx];
-  if(occupied[idx]||!(tile===0||tile===5||tile===9))continue;
-  const inside=REGION_IDS.some(id=>{
-   const r=REGION_LAYOUT[id],nx=(tx+.5-r.x-r.w/2)/(r.w*.56),ny=(ty+.5-r.y-r.h/2)/(r.h*.58);
-   return nx*nx+ny*ny<1.12;
-  });
-  if(!inside)continue;
-  const hash=((tx*374761393+ty*668265263)>>>0)%100;
-  if(hash>6)continue;
-  const choices=tile===9?['reed','mushroom','tuft','flower','fern']:tile===5?['fern','mushroom','smallBush','flower','berryBush']:['tuft','flower','smallBush','berryBush','mushroom'];
-  const type=choices[hash%choices.length];
-  result.decor.push({type,x:tx*T+((hash*3)%7),y:ty*T+((hash*5)%7),solid:false,ambient:true});
-  mark(tx,ty,1);
+ // Jede Landschaft erhält eigene, gruppierte Vegetation und eigene kleine Akzentpflanzen.
+ const dressing=[
+  {key:'capital',box:{x:164,y:139,w:82,h:58},clusters:13,spread:5,items:3,types:['flowerBed','smallBush','tuft','appleTree','flower']},
+  {key:'forest',box:{x:112,y:18,w:121,h:88},clusters:28,spread:10,items:6,types:['tree','pine','birch','willow','fern','mushroom','berryBush','fallenLog']},
+  {key:'moor',box:{x:15,y:151,w:99,h:77},clusters:21,spread:9,items:5,types:['willow','reed','deadTree','fireflyPlant','mushroom','fern']},
+  {key:'cavern',box:{x:152,y:240,w:99,h:74},clusters:14,spread:8,items:4,types:['rock','crystal','mushroom','tuft','fern']},
+  {key:'frost',box:{x:287,y:220,w:110,h:77},clusters:22,spread:10,items:5,types:['snowPine','iceRock','iceFlower','snowTuft','iceBush']},
+  {key:'shrine',box:{x:292,y:34,w:62,h:34},clusters:8,spread:6,items:4,types:['cherryTree','flower','fireflyPlant','crystal','tuft']},
+  {key:'harbor',box:{x:65,y:86,w:31,h:29},clusters:7,spread:4,items:3,types:['flowerBed','smallBush','tuft','reed']},
+  {key:'eichenruh',box:{x:193,y:80,w:43,h:36},clusters:8,spread:5,items:3,types:['flowerBed','appleTree','smallBush','fern','flower']},
+  {key:'steinwacht',box:{x:350,y:158,w:43,h:34},clusters:7,spread:5,items:3,types:['snowTuft','iceBush','smallBush','iceFlower','rock']},
+  {key:'farm',box:{x:236,y:205,w:31,h:29},clusters:7,spread:4,items:3,types:['crop','flowerBed','smallBush','tuft','appleTree']}
+ ];
+ for(const area of dressing){
+  const rng=rand(hashSeed(activeSeed,'vegetation:'+area.key));
+  for(let c=0;c<area.clusters;c++){
+   const cx=area.box.x+2+rng()*Math.max(1,area.box.w-4),cy=area.box.y+2+rng()*Math.max(1,area.box.h-4);
+   for(let j=0;j<area.items;j++){
+    const angle=rng()*Math.PI*2,dist=Math.sqrt(rng())*area.spread;
+    const tx=Math.round(cx+Math.cos(angle)*dist),ty=Math.round(cy+Math.sin(angle)*dist);
+    if(tx<2||ty<2||tx>=WORLD_WIDTH-2||ty>=WORLD_HEIGHT-2)continue;
+    const idx=ty*WORLD_WIDTH+tx,tile=result.tiles[idx];
+    if(tile===1||tile===2||tile===4||tile===10||tile===11||occupied[idx])continue;
+    if(nearRoad(tx,ty,1))continue;
+    const type=area.types[Math.floor(rng()*area.types.length)];
+    if(area.key==='forest'&&tile!==5&&tile!==0)continue;
+    if(area.key==='moor'&&tile!==9&&tile!==0)continue;
+    if(area.key==='frost'&&tile!==8&&tile!==0)continue;
+    if(nearBuilding(tx*T+8,ty*T+8,12))continue;
+    const solid=tallPlants.has(type),ox=tx*T+Math.floor(rng()*7),oy=ty*T+Math.floor(rng()*7);
+    result.decor.push({type,x:ox,y:oy,solid,ambient:true,cluster:area.key,variant:Math.floor(rng()*4)});
+    mark(tx,ty,solid?2:1);
+   }
+  }
+ }
+ // Hausdächer und Farbwelt unterscheiden sich je nach Dorf und ändern sich mit dem Welt-Seed.
+ const houseLooks={
+  windruh:{files:['House_Hay_2.png','House_Hay_1.png','House_Hay_3.png','House_Hay_4_Purple.png'],hue:0,saturation:1.04},
+  harbor:{files:['House_Hay_1.png','House_Hay_3.png','House_Hay_4_Purple.png'],hue:155,saturation:1.16},
+  eichenruh:{files:['House_Hay_2.png','House_Hay_4_Purple.png','House_Hay_3.png'],hue:28,saturation:1.12},
+  steinwacht:{files:['House_Hay_3.png','House_Hay_1.png','House_Hay_4_Purple.png'],hue:205,saturation:.9},
+  farm:{files:['House_Hay_2.png','House_Hay_1.png','House_Hay_3.png'],hue:12,saturation:1.08}
+ };
+ for(const b of result.buildings){
+  const village=b.village||(b.id.startsWith('harbor_')?'harbor':b.id.startsWith('eichen_')?'eichenruh':b.id.startsWith('stone_')?'steinwacht':b.id==='farm_house'?'farm':'windruh');
+  const look=houseLooks[village]||houseLooks.windruh,variantSeed=hashSeed(activeSeed,'roof:'+b.id);
+  b.village=village;b.spriteFile=look.files[variantSeed%look.files.length];
+  b.roofHue=look.hue+(((variantSeed>>>8)%3)-1)*5;b.roofSaturation=look.saturation;
  }
  // Die sechs Gebiete teilen sich ein einziges begehbares Tile-Grid; es gibt keine Gebiets-Teleports.
  result.exits=[];
