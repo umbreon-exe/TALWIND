@@ -641,11 +641,16 @@ function makeWorld(initialZone){
    if(localTile===1&&d<1.25)copy=true;
    if(copy)result.tiles[gy*WORLD_WIDTH+gx]=localTile;
   }
+  const organic=(x,y)=>{
+   const nx=(x-local.width/2)/(local.width*.55),ny=(y-local.height/2)/(local.height*.57),d=Math.sqrt(nx*nx+ny*ny);
+   const edgeNoise=Math.sin((r.x+x)*.17+(r.y+y)*.11)*.035+Math.sin((r.x+x)*.071-(r.y+y)*.19)*.025;
+   return d<1.06+edgeNoise;
+  };
   const offset=o=>{o.x+=r.x*T;o.y+=r.y*T};
-  for(const o of local.decor){offset(o);o.region=id;result.decor.push(o)}
-  for(const b of local.buildings){b.x+=r.x*T;b.y+=r.y*T;b.doorX+=r.x*T;b.doorY+=r.y*T;b.region=id;result.buildings.push(b)}
-  for(const n of local.npcs){offset(n);n.homeX+=r.x*T;n.homeY+=r.y*T;n.region=id;result.npcs.push(n)}
-  for(const item of local.items){offset(item);item.region=id;result.items.push(item)}
+  for(const o of local.decor){if(!organic(o.x/T,o.y/T))continue;offset(o);o.region=id;result.decor.push(o)}
+  for(const b of local.buildings){if(!organic((b.x+b.w/2)/T,(b.y+b.h/2)/T))continue;b.x+=r.x*T;b.y+=r.y*T;b.doorX+=r.x*T;b.doorY+=r.y*T;b.region=id;result.buildings.push(b)}
+  for(const n of local.npcs){if(!organic(n.x/T,n.y/T))continue;offset(n);n.homeX+=r.x*T;n.homeY+=r.y*T;n.region=id;result.npcs.push(n)}
+  for(const item of local.items){if(!organic(item.x/T,item.y/T))continue;offset(item);item.region=id;result.items.push(item)}
  }
  // Die unsichtbare Regionszuordnung dient nur Quests und Gegnern, sie zeichnet keine Kasten-Grenzen.
  for(let y=0;y<WORLD_HEIGHT;y++)for(let x=0;x<WORLD_WIDTH;x++){
@@ -1646,6 +1651,7 @@ function drawWorldMap(){
   c.fillStyle='#fff0c8';c.textAlign='center';c.fillText(label,labelX,labelY+3);
  }
  for(const p of (world.landmarks||[])){
+  if(p.kind==='secret'&&Math.hypot(player.x-p.x,player.y-p.y)>520&&!openedChests.moonIslandCache)continue;
   const x=ox+p.x/T*scale,y=oy+p.y/T*scale;
   c.fillStyle=p.kind==='settlement'?'#f0c56c':p.kind==='dungeon'?'#b99bea':'#d8e7c6';
   c.beginPath();c.arc(x,y,p.kind==='settlement'?3.2:2.5,0,Math.PI*2);c.fill();
