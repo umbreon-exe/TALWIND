@@ -258,20 +258,26 @@ ctx.imageSmoothingEnabled=false;
 const VW=720,VH=405,T=16;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const REGION_LAYOUT={
- wald:{x:100,y:0,w:121,h:88,name:'Flüsterwald'},
- sumpf:{x:1,y:5,w:99,h:77,name:'Nebelmoor'},
- windruh:{x:100,y:88,w:96,h:72,name:'Windruh'},
- shrine:{x:221,y:24,w:62,h:34,name:'Echo-Schrein'},
- hoehle:{x:100,y:160,w:99,h:74,name:'Flüsterhöhle'},
- eispass:{x:199,y:160,w:110,h:77,name:'Frostgrat'}
+ wald:{x:112,y:18,w:121,h:88,name:'Flüsterwald'},
+ sumpf:{x:15,y:151,w:99,h:77,name:'Nebelmoor'},
+ windruh:{x:157,y:132,w:96,h:72,name:'Windruh'},
+ shrine:{x:292,y:34,w:62,h:34,name:'Echo-Schrein'},
+ hoehle:{x:152,y:240,w:99,h:74,name:'Flüsterhöhle'},
+ eispass:{x:287,y:220,w:110,h:77,name:'Frostgrat'}
 };
 const REGION_IDS=Object.keys(REGION_LAYOUT);
-const WORLD_WIDTH=309,WORLD_HEIGHT=237;
+const REGION_CODES=Object.fromEntries(REGION_IDS.map((id,i)=>[id,i+1]));
+const WORLD_WIDTH=440,WORLD_HEIGHT=360;
 const regionName=id=>REGION_LAYOUT[id]?.name||'Avarra';
 const regionAt=(x,y)=>{
  const tx=Math.floor(x/T),ty=Math.floor(y/T);
- for(const id of REGION_IDS){const r=REGION_LAYOUT[id];if(tx>=r.x&&tx<r.x+r.w&&ty>=r.y&&ty<r.y+r.h)return id}
- return null;
+ if(world&&world.regionGrid&&tx>=0&&ty>=0&&tx<world.width&&ty<world.height){
+  const code=world.regionGrid[ty*world.width+tx];
+  return REGION_IDS[code-1]||null;
+ }
+ let best=null,bestScore=Infinity;
+ for(const id of REGION_IDS){const r=REGION_LAYOUT[id],dx=(tx-r.x-r.w/2)/(r.w*.72),dy=(ty-r.y-r.h/2)/(r.h*.72),score=dx*dx+dy*dy;if(score<bestScore){bestScore=score;best=id}}
+ return best;
 };
 function discoverRegion(id){
  if(!id||discoveredRegions[id])return false;
@@ -623,50 +629,171 @@ function seedRegionResources(region,id,count,seed){
  }
 }
 function makeWorld(initialZone){
- const result={id:'avarra',name:'Avarra',width:WORLD_WIDTH,height:WORLD_HEIGHT,ground:0,tiles:new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT),decor:[],buildings:[],npcs:[],exits:[],items:[],solids:[],regions:{}};
- result.tiles.fill(2);
+ const result={id:'avarra',name:'Avarra',width:WORLD_WIDTH,height:WORLD_HEIGHT,ground:0,tiles:new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT),regionGrid:new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT),decor:[],buildings:[],npcs:[],exits:[],items:[],solids:[],regions:{},landmarks:[]};
+ result.tiles.fill(0);
+ // Jede bisherige Gebiets-Karte wird als natürliche Landschaftsform in dieselbe Welt gesetzt.
  for(const id of REGION_IDS){
   const local=makeRegionWorld(id),r=REGION_LAYOUT[id];
   result.regions[id]={x:r.x,y:r.y,width:local.width,height:local.height};
-  seedRegionResources(local,id,id==='wald'?36:id==='sumpf'?28:id==='hoehle'?32:id==='eispass'?28:id==='windruh'?16:10,81031+REGION_IDS.indexOf(id)*1709);
-  for(let y=0;y<local.height;y++){
-   const from=y*local.width,to=(r.y+y)*WORLD_WIDTH+r.x;
-   result.tiles.set(local.tiles.subarray(from,from+local.width),to);
+  seedRegionResources(local,id,id==='wald'?54:id==='sumpf'?42:id==='hoehle'?40:id==='eispass'?40:id==='windruh'?22:16,81031+REGION_IDS.indexOf(id)*1709);
+  for(let y=0;y<local.height;y++)for(let x=0;x<local.width;x++){
+   const gx=r.x+x,gy=r.y+y;if(gx<0||gy<0||gx>=WORLD_WIDTH||gy>=WORLD_HEIGHT)continue;
+   const nx=(x+.5-local.width/2)/(local.width*.55),ny=(y+.5-local.height/2)/(local.height*.57);
+   const d=Math.sqrt(nx*nx+ny*ny),edgeNoise=Math.sin(gx*.17+gy*.11)*.035+Math.sin(gx*.071-gy*.19)*.025,edge=1+edgeNoise;
+   const hash=((gx*374761393+gy*668265263)>>>0)%1000/1000,feather=clamp((edge+.13-d)/.27,0,1),localTile=local.tiles[y*local.width+x];
+   let copy=d<edge-.13||hash<feather;
+   if(localTile===1&&d<1.25)copy=true;
+   if(copy)result.tiles[gy*WORLD_WIDTH+gx]=localTile;
   }
-  const offset=(o)=>{o.x+=r.x*T;o.y+=r.y*T};
+  const offset=o=>{o.x+=r.x*T;o.y+=r.y*T};
   for(const o of local.decor){offset(o);o.region=id;result.decor.push(o)}
   for(const b of local.buildings){b.x+=r.x*T;b.y+=r.y*T;b.doorX+=r.x*T;b.doorY+=r.y*T;b.region=id;result.buildings.push(b)}
   for(const n of local.npcs){offset(n);n.homeX+=r.x*T;n.homeY+=r.y*T;n.region=id;result.npcs.push(n)}
   for(const item of local.items){offset(item);item.region=id;result.items.push(item)}
  }
- const carve=(x1,y1,x2,y2,radius=2)=>{
-  const dx=x2-x1,dy=y2-y1,steps=Math.max(Math.abs(dx),Math.abs(dy));
-  for(let i=0;i<=steps;i++){
-   const x=Math.round(x1+dx*i/Math.max(1,steps)),y=Math.round(y1+dy*i/Math.max(1,steps));
-   for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++){
-    const tx=x+ox,ty=y+oy;
-    if(tx>=0&&ty>=0&&tx<WORLD_WIDTH&&ty<WORLD_HEIGHT&&ox*ox+oy*oy<=radius*radius+1)result.tiles[ty*WORLD_WIDTH+tx]=1;
+ // Die unsichtbare Regionszuordnung dient nur Quests und Gegnern, sie zeichnet keine Kasten-Grenzen.
+ for(let y=0;y<WORLD_HEIGHT;y++)for(let x=0;x<WORLD_WIDTH;x++){
+  let best=Infinity,code=REGION_CODES.windruh;
+  for(const id of REGION_IDS){
+   const r=REGION_LAYOUT[id],dx=(x+.5-r.x-r.w/2)/(r.w*.76),dy=(y+.5-r.y-r.h/2)/(r.h*.76),score=dx*dx+dy*dy;
+   if(score<best){best=score;code=REGION_CODES[id]}
+  }
+  result.regionGrid[y*WORLD_WIDTH+x]=code;
+ }
+ const setTile=(x,y,t)=>{if(x>=0&&y>=0&&x<WORLD_WIDTH&&y<WORLD_HEIGHT)result.tiles[y*WORLD_WIDTH+x]=t};
+ const clearPatch=(cx,cy,rx,ry,tile=0)=>{
+  for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
+   if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<=1)setTile(x,y,tile);
+  }
+ };
+ const road=(points,radius=2)=>{
+  for(let k=0;k<points.length-1;k++){
+   const a=points[k],b=points[k+1],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])*2));
+   for(let i=0;i<=steps;i++){
+    const q=i/steps,x=Math.round(a[0]+(b[0]-a[0])*q),y=Math.round(a[1]+(b[1]-a[1])*q);
+    for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++)if(ox*ox+oy*oy<=radius*radius+1)setTile(x+ox,y+oy,1);
    }
   }
  };
- const connect=(from,to,sx,sy,tx,ty,label,open=()=>true)=>{
-  const a=REGION_LAYOUT[from],b=REGION_LAYOUT[to];
-  const ax=(a.x+sx)*T+8,ay=(a.y+sy)*T+8,bx=(b.x+tx)*T+8,by=(b.y+ty)*T+8;
-  carve(Math.floor(ax/T),Math.floor(ay/T),Math.floor(bx/T),Math.floor(by/T),2);
-  result.exits.push({x:ax-25,y:ay-34,w:50,h:68,to,tx:tx*T,ty:ty*T,label,open});
+ const river=(points,radius=3)=>{
+  for(let k=0;k<points.length-1;k++){
+   const a=points[k],b=points[k+1],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])*2));
+   for(let i=0;i<=steps;i++){
+    const q=i/steps,x=a[0]+(b[0]-a[0])*q,y=a[1]+(b[1]-a[1])*q;
+    for(let oy=-radius;oy<=radius;oy++)for(let ox=-radius;ox<=radius;ox++)if(ox*ox+oy*oy<=radius*radius+1)setTile(Math.round(x+ox),Math.round(y+oy),2);
+   }
+  }
  };
- // Bridges and natural trails are all part of the same tile map.
- connect('windruh','wald',48,1,60,86,'Nordbrücke · Flüsterwald',()=>main.stage>=2);
- connect('wald','windruh',60,86,48,1,'Zurück nach Windruh');
- connect('sumpf','wald',97,30,2,30,'Steinpfad · Flüsterwald');
- connect('wald','sumpf',2,30,97,30,'Zum Nebelmoor');
- carve(REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+35,REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+70,1);
- connect('windruh','hoehle',48,70,44,2,'Wurzelpfad · Flüsterhöhle');
- connect('hoehle','windruh',44,2,48,70,'Zurück nach Windruh');
- connect('wald','shrine',119,31,2,17,'Zum Echo-Schrein',()=>main.forestFlowers>=3);
- connect('shrine','wald',2,17,119,31,'Zurück zum Flüsterwald');
- connect('hoehle','eispass',97,36,2,36,'Kristallpass · Frostgrat');
- connect('eispass','hoehle',2,36,97,36,'Zurück zur Flüsterhöhle');
+ const prop=(type,x,y,solid=false,extra={})=>result.decor.push(Object.assign({type,x:x*T,y:y*T,solid},extra));
+ const building=(id,name,x,y,ww,hh,style,region)=>{
+  result.buildings.push({id,name,x:x*T,y:y*T,w:ww*T,h:hh*T,style,doorX:(x+ww/2)*T,doorY:(y+hh)*T+5,region});
+ };
+ const npc=(id,name,x,y,color,hair,kind,line,region,extra={})=>{
+  const n=makeNPC(id,name,x,y,color,hair,kind,line,extra);
+  n.x=x*T+8;n.y=y*T+8;n.homeX=n.x;n.homeY=n.y;n.region=region;result.npcs.push(n);
+ };
+ const landmark=(id,name,x,y,kind)=>result.landmarks.push({id,name,x:x*T+8,y:y*T+8,kind});
+ // Küstenbucht und Hafenweiler: Wasser, Strand, Stege, Boote und Leuchtturm.
+ clearPatch(28,99,33,47,2);
+ for(let y=59;y<139;y++)for(let x=55;x<77;x++){
+  const d=((x-55)/22)**2+((y-99)/43)**2;
+  if(d<1&&d>.73)setTile(x,y,4);
+ }
+ clearPatch(77,99,22,20,0);
+ // Ein langer Fluss durchzieht Avarra und bildet eine natürliche Landschaftsachse.
+ river([[91,-5],[95,26],[108,59],[111,91],[127,121],[135,155],[147,192],[154,229],[171,266],[181,312],[191,365]],3);
+ // Landstraßen, Waldpfade und Brücken verbinden alle Orte ohne Level-Teleport.
+ road([[199,157],[190,137],[193,119],[207,103],[210,89]],2);
+ road([[210,89],[197,76],[178,65],[163,52]],2);
+ road([[210,89],[231,88],[250,84],[271,78],[296,58],[320,49]],2);
+ road([[198,157],[168,143],[140,128],[113,112],[86,105],[73,101]],2);
+ road([[188,162],[151,168],[116,178],[88,185],[69,187]],2);
+ road([[198,164],[199,190],[190,218],[184,247],[191,270]],2);
+ road([[191,270],[224,266],[257,263],[292,257],[332,246]],2);
+ road([[332,246],[344,218],[355,194],[365,177]],2);
+ road([[244,154],[260,147],[278,143],[296,148]],2);
+ road([[269,78],[283,99],[295,119],[298,143]],2);
+ prop('bridge',126,119,false);prop('bridge',149,221,false);prop('bridge',184,309,false);
+ // Hafenweiler – Fischerdorf, Kai, Markt und Leuchtturm.
+ clearPatch(81,98,19,17,0);
+ building('harbor_inn','Zum Möwenruf',70,88,7,6,'blue','sumpf');
+ building('harbor_shop','Netz & Nadel',80,88,7,6,'ochre','sumpf');
+ building('harbor_home','Haus am Kai',70,99,7,6,'teal','sumpf');
+ building('harbor_store','Fischräucherei',80,99,7,6,'orange','sumpf');
+ prop('dock',54,96,false);prop('boat',36,108,false);prop('boat',46,82,false);
+ prop('lighthouse',60,72,true);prop('lamp',68,108,false);prop('barrel',89,108,false);
+ prop('fishRack',91,95,false);prop('netRack',92,100,false);prop('sign',69,108,false);
+ npc('harbor_meri','Meri',75,109,'blue','silver','fisher','Der Morgenfang ist gut. Draußen bei den kleinen Felsen liegt ein versunkener Steg.','sumpf');
+ npc('harbor_jann','Jann',87,108,'gold','brown','merchant','Frischer Fisch, Muscheln und alles, was eine lange Reise braucht.','sumpf');
+ npc('harbor_ole','Ole',64,91,'green','ginger','guard','Der Leuchtturm weist auch bei dichtem Nebel den Weg.','sumpf');
+ landmark('hafenweiler','Hafenweiler',80,86,'settlement');
+ // Eichenruh – Wald-Dorf mit Dorfplatz, Feldern, Krämerladen und Schmiede.
+ clearPatch(211,91,23,17,0);
+ building('eichen_inn','Zur alten Eiche',198,82,7,6,'red','wald');
+ building('eichen_shop','Waldwaren',208,82,7,6,'green','wald');
+ building('eichen_home','Haus am Bach',218,82,7,6,'teal','wald');
+ building('eichen_smith','Eichenruher Schmiede',198,94,7,6,'slate','wald');
+ building('eichen_hall','Gemeindehaus',208,94,8,7,'ochre','wald');
+ prop('well',215,104,false);prop('campfire',204,103,false);prop('bench',220,105,false);
+ prop('flowerBed',195,104,false);prop('flowerBed',224,103,false);
+ for(let x=224;x<239;x+=3){prop('crop',x,112,false);prop('fence',x,111,true)}
+ npc('eichen_ilda','Ilda',205,108,'rose','auburn','merchant','Willkommen in Eichenruh. Hier beginnt der alte Pfad zum Weltenbaum.','wald');
+ npc('eichen_boro','Boro',222,109,'slate','brown','craftsman','Die Wurzeln unter dem Dorf sind älter als die Stadt Windruh.','wald');
+ npc('eichen_lio','Lio',196,100,'gold','blonde','child','Hinter der Mühle flattern nachts winzige Lichter.','wald');
+ landmark('eichenruh','Eichenruh',211,81,'settlement');
+ // Steinwacht – Bergdorf am Zugang zum Frostgrat.
+ clearPatch(366,177,22,16,0);
+ building('stone_inn','Zum kalten Amboss',354,166,7,6,'slate','eispass');
+ building('stone_smith','Passschmiede',364,166,7,6,'ochre','eispass');
+ building('stone_home','Wachtstube',374,166,7,6,'blue','eispass');
+ building('stone_store','Kristallhandel',354,178,7,6,'violet','eispass');
+ prop('campfire',370,188,false);prop('iceRock',348,162,false);prop('sign',366,190,false);
+ prop('watchTower',386,158,true);prop('iceSpire',391,183,false);
+ npc('stone_freya','Freya',365,191,'blue','silver','elder','Der Pass ist offen. Halte dich an die blauen Wegzeichen, dann findest du die sichere Route.','eispass');
+ npc('stone_hald','Hald',382,190,'gold','brown','guard','Ich bewache die Straße. In der alten Mine hört man manchmal ein Echo.','eispass');
+ npc('stone_anni','Anni',351,188,'rose','black','merchant','Warme Umhänge und Kristalllampen – alles für die Kälte.','eispass');
+ landmark('steinwacht','Steinwacht',367,163,'settlement');
+ // Königsstraße und vergessene Burg: Mauern, Statuen und Schatzhof.
+ clearPatch(277,145,20,15,0);
+ for(const [x,y] of [[266,137],[273,137],[280,137],[287,137],[266,150],[287,150]])prop('ruinWall',x,y,true);
+ prop('statue',276,142,true);prop('chest',280,154,false,{id:'kingRoadCache'});
+ prop('torch',263,146,false);prop('torch',290,146,false);prop('fallenLog',271,157,false);
+ npc('ruin_soren','Soren',273,159,'cream','white','elder','Die Königsstraße führte einst bis zum Meer. Unter den Steinen liegt noch ein alter Schatz.','windruh');
+ landmark('koenigsruine','Königsruine',277,135,'ruin');
+ // Der Weltenbaum ist ein großer Orientierungspunkt mit eigenem Wurzelhain.
+ clearPatch(270,86,16,16,5);
+ prop('worldTree',264,75,true,{id:'avarraWorldTree'});
+ for(const [x,y,t] of [[251,78,'tree'],[257,69,'cherryTree'],[282,72,'willow'],[286,88,'tree'],[252,94,'birch'],[281,99,'pine']])prop(t,x,y,true);
+ prop('altar',270,95,false);prop('crystal',258,91,false);prop('fireflyPlant',281,92,false);
+ landmark('weltenbaum','Uralter Weltenbaum',270,75,'landmark');
+ // Weitere besondere Orte an den Wegen.
+ prop('windmill',242,119,true);landmark('windmuehle','Windmühle',242,114,'structure');
+ prop('waterfall',112,151,false);landmark('wasserfall','Silberfall',112,147,'landmark');
+ clearPatch(247,218,14,10,0);
+ building('farm_house','Hof am Südweg',241,211,7,6,'green','hoehle');
+ prop('crop',250,222,false);prop('crop',253,222,false);prop('crop',256,222,false);
+ prop('fence',239,220,true);prop('fence',242,220,true);prop('fence',245,220,true);
+ prop('well',256,215,false);prop('barrel',238,218,false);
+ npc('farm_elsa','Elsa',249,226,'rose','brown','gardener','Auf dem Hof wächst auch im Herbst noch etwas. Der Wasserfall ist nur ein Stück westlich.','hoehle');
+ landmark('bauernhof','Südlicher Bauernhof',247,209,'settlement');
+ prop('watchTower',320,157,true);prop('ruinWall',316,166,true);landmark('aussichtsturm','Alter Aussichtsturm',320,151,'structure');
+ const stampRegion=(id,cx,cy,rx,ry)=>{
+  for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
+   if(x<0||y<0||x>=WORLD_WIDTH||y>=WORLD_HEIGHT)continue;
+   if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<=1)result.regionGrid[y*WORLD_WIDTH+x]=REGION_CODES[id];
+  }
+ };
+ stampRegion('sumpf',78,99,33,35);
+ stampRegion('wald',211,92,29,24);
+ stampRegion('eispass',367,178,27,23);
+ landmark('windruh','Windruh',REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+34,'capital');
+ landmark('echo_schrein','Echo-Schrein',REGION_LAYOUT.shrine.x+22,REGION_LAYOUT.shrine.y+18,'dungeon');
+ landmark('nebeltor','Nebelmoor',REGION_LAYOUT.sumpf.x+48,REGION_LAYOUT.sumpf.y+35,'region');
+ landmark('frostgrat','Frostgrat',REGION_LAYOUT.eispass.x+50,REGION_LAYOUT.eispass.y+38,'region');
+ landmark('fluestergrotte','Flüsterhöhle',REGION_LAYOUT.hoehle.x+48,REGION_LAYOUT.hoehle.y+35,'dungeon');
+ landmark('fluesterwald','Flüsterwald',REGION_LAYOUT.wald.x+60,REGION_LAYOUT.wald.y+32,'region');
+ // Die sechs Gebiete teilen sich ein einziges begehbares Tile-Grid; es gibt keine Gebiets-Teleports.
+ result.exits=[];
  applyTreeState(result);
  for(const item of result.items)item.found=!!collectedItems[item.id];
  return result;
@@ -752,7 +879,34 @@ function drawTreeVariant(o){
 }
 function drawProp(o,now){
  const x=o.x-camera.x,y=o.y-camera.y;
- if(TREE_TYPES.includes(o.type)){if(o.type==='birch'||o.type==='willow'||o.type==='autumnTree'||o.type==='cherryTree'||o.type==='snowPine'||o.type==='deadTree')drawTreeVariant(o);else drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree')}
+ if(o.type==='worldTree'){
+  drawSoftShadow(o.x+48,o.y+105,66,17,.5);drawGlow(o.x+50,o.y+54,116,'#8de3a0',.22);
+  pixel(x+42,y+74,24,66,'#59402d');pixel(x+47,y+77,13,60,'#8a6240');
+  for(const [cx,cy,w,h,col] of [[8,39,84,52,'#1f5a3a'],[20,15,65,53,'#286e43'],[37,0,52,48,'#357e4b'],[0,54,61,41,'#2e7043'],[57,51,48,39,'#2b6940']])pixel(x+cx,y+cy,w,h,col);
+  for(const [cx,cy] of [[20,28],[47,16],[66,57],[9,68],[82,75],[42,43]])pixel(x+cx,y+cy,10,7,'#70b85b');
+  for(const [cx,cy] of [[27,38],[62,29],[14,73],[76,64]]){pixel(x+cx,y+cy,5,5,'#f1d279');pixel(x+cx+1,y+cy-2,3,3,'#fff0b4')}
+  pixel(x+46,y+88,15,48,'#63442e');pixel(x+51,y+93,5,40,'#b27a4a');
+  pixel(x+18,y+119,40,5,'#73513a');pixel(x+65,y+117,36,5,'#73513a');
+ }else if(o.type==='lighthouse'){
+  drawGlow(o.x+18,o.y+15,78,'#ffe6a0',.22);pixel(x+7,y+10,25,47,'#d5c7a2');pixel(x+10,y+14,19,42,'#eee2bd');pixel(x+5,y+8,29,7,'#86563b');pixel(x+12,y+1,15,10,'#b94f41');pixel(x+14,y-2,11,5,'#f7e1a1');pixel(x+17,y+18,6,8,'#f6d77e');pixel(x+17,y+36,6,7,'#7db6bc');
+ }else if(o.type==='dock'){
+  drawSoftShadow(o.x+32,o.y+18,35,6,.25);pixel(x,y+4,65,20,'#765137');pixel(x+2,y+6,61,14,'#b7824c');for(let i=0;i<8;i++)pixel(x+4+i*8,y+6,2,14,'#68462f');pixel(x+2,y+1,4,27,'#62452f');pixel(x+59,y+1,4,27,'#62452f');pixel(x+24,y+13,10,2,'#e0b777');
+ }else if(o.type==='boat'){
+  drawSoftShadow(o.x+18,o.y+19,24,6,.3);pixel(x+1,y+8,36,10,'#5e3b2b');pixel(x+5,y+5,28,10,'#a45d3c');pixel(x+9,y+2,19,6,'#d4a76a');pixel(x+18,y-11,2,18,'#493c31');pixel(x+20,y-9,13,12,'#e8dfbd');
+ }else if(o.type==='windmill'){
+  drawSoftShadow(o.x+18,o.y+48,29,7,.28);pixel(x+9,y+20,20,34,'#d2b98a');pixel(x+12,y+23,14,30,'#eee0b9');pixel(x+7,y+17,24,6,'#8d5638');pixel(x+10,y+12,18,7,'#b64e43');pixel(x+17,y+1,4,4,'#68452e');for(let i=0;i<4;i++){ctx.save();ctx.translate(x+19,y+17);ctx.rotate(now/850+i*Math.PI/2);pixel(-2,-22,4,22,'#e7d5ab');pixel(-1,-26,2,7,'#8d5638');ctx.restore()}
+ }else if(o.type==='waterfall'){
+  drawGlow(o.x+18,o.y+23,54,'#83dff0',.25);pixel(x+1,y+1,31,10,'#596c60');pixel(x+5,y+10,24,31,'#238ec1');pixel(x+9,y+10,5,29,'#a6e9f3');pixel(x+20,y+10,4,29,'#77d3e8');pixel(x+2,y+40,30,5,'#d2eef0');
+ }else if(o.type==='watchTower'){
+  drawSoftShadow(o.x+14,o.y+36,20,6,.3);pixel(x+6,y+13,20,36,'#857456');pixel(x+9,y+17,14,30,'#c7b58e');pixel(x+2,y+9,28,7,'#614b37');pixel(x+5,y+3,22,9,'#a34e43');pixel(x+13,y+20,6,10,'#304a54');
+ }else if(o.type==='ruinWall'){
+  pixel(x+1,y+15,27,7,'#77796e');pixel(x+3,y+10,6,7,'#9c9d8d');pixel(x+12,y+6,7,10,'#898b7c');pixel(x+22,y+11,7,9,'#6e746c');pixel(x+3,y+22,25,3,'#535a54');
+ }else if(o.type==='statue'){
+  drawSoftShadow(o.x+14,o.y+27,18,5,.3);pixel(x+5,y+18,20,13,'#777c72');pixel(x+9,y+5,12,16,'#b7b39c');pixel(x+10,y+1,10,7,'#d0cbb0');pixel(x+12,y+8,6,4,'#686f69');pixel(x+1,y+29,28,4,'#625f55');
+ }else if(o.type==='fishRack'||o.type==='netRack'){
+  pixel(x+3,y+3,22,3,'#7f5738');pixel(x+5,y+6,3,16,'#684b35');pixel(x+20,y+6,3,16,'#684b35');
+  if(o.type==='fishRack'){for(let i=0;i<3;i++){pixel(x+7+i*5,y+8,5,3,'#b3a17a');pixel(x+10+i*5,y+9,2,1,'#e6d7ae')}}else{for(let i=0;i<4;i++){pixel(x+6+i*4,y+7,1,12,'#d8c49b');pixel(x+6,y+7+i*3,15,1,'#d8c49b')}}
+ }else if(TREE_TYPES.includes(o.type)){if(o.type==='birch'||o.type==='willow'||o.type==='autumnTree'||o.type==='cherryTree'||o.type==='snowPine'||o.type==='deadTree')drawTreeVariant(o);else drawTree(o.x,o.y,o.type==='pine',o.type==='appleTree')}
  else if(o.type==='bush'||o.type==='smallBush'||o.type==='berryBush'){
    drawSoftShadow(o.x+8,o.y+14,10,3,.22);const berry=o.type==='berryBush';
    pixel(x+1,y+8,15,7,berry?'#245b3f':'#286d43');pixel(x+3,y+5,12,8,berry?'#317a4a':'#46a252');pixel(x+5,y+2,8,7,berry?'#3f9254':'#5ab65b');pixel(x+6,y+4,4,2,'#91d16c');
@@ -1040,12 +1194,11 @@ function questGuideTarget(){
  if(main.stage===0){const n=world.npcs.find(function(v){return v.id==='mira'});return n?{x:n.x+12,y:n.y+28,label:'MIRA'}:null}
  if(main.stage===1&&zone==='windruh'){const v=nearest(seedSpots);return v?{x:v.x+8,y:v.y+8,label:'ECHOSAMEN'}:null}
  if(main.stage===2&&zone==='windruh'){const v=world.decor.find(function(o){return o.type==='fountain'});return v?{x:v.x+31,y:v.y+40,label:'BRUNNEN'}:null}
- if(main.stage===3&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
+ if(main.stage===3&&zone==='windruh'){const p=world.landmarks.find(v=>v.id==='eichenruh');return p?{x:p.x,y:p.y,label:'EICHENRUH'}:null}
  if(main.stage===3&&zone==='wald'){const v=nearest(flowerSpots);return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
- if(main.stage===4&&zone==='wald'){const e=world.exits.find(function(v){return v.to==='shrine'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'ECHO-SCHREIN'}:null}
- if(main.stage===4&&zone==='windruh'){const e=world.exits.find(function(v){return v.to==='wald'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'FLÜSTERWALD'}:null}
  if(main.stage===4&&zone==='shrine'){const g=monsters.find(function(m){return m.type==='guardian'&&m.hp>0});return g?{x:g.x+16,y:g.y+24,label:'WÄCHTER'}:null}
- if(zone!=='windruh'&&main.stage<3){const e=world.exits.find(function(v){return v.to==='windruh'});return e?{x:e.x+e.w/2,y:e.y+e.h/2,label:'WINDRUH'}:null}
+ if(main.stage===4){const p=world.landmarks.find(v=>v.id==='echo_schrein');return p?{x:p.x,y:p.y,label:'ECHO-SCHREIN'}:null}
+ if(zone!=='windruh'&&main.stage<3){const p=world.landmarks.find(v=>v.id==='windruh');return p?{x:p.x,y:p.y,label:'WINDRUH'}:null}
  return null;
 }
 function drawQuestGuide(now){
@@ -1209,7 +1362,9 @@ function pointBlocked(px,py){
  for(const o of world.decor){
   if(Math.abs(px-o.x)>64||Math.abs(py-o.y)>72)continue;
   if(!o.solid)continue;
-  if(TREE_TYPES.includes(o.type)){
+  if(o.type==='worldTree'){
+   if(px>o.x+28&&px<o.x+76&&py>o.y+72&&py<o.y+126)return true;
+  }else if(TREE_TYPES.includes(o.type)){
    if(px>o.x+14&&px<o.x+32&&py>o.y+37&&py<o.y+51)return true;
   }else if(['reed','rock','iceRock'].includes(o.type)){
    if(px>o.x+3&&px<o.x+23&&py>o.y+20&&py<o.y+35)return true;
@@ -1235,7 +1390,7 @@ function changeZone(id,x,y){
  saveGame(activeSlot,true);updateQuest();
 }
 function makeSaveState(){
- return {version:5,worldVersion:2,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,discoveredRegions,waypoint:worldWaypoint,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
+ return {version:5,worldVersion:3,selected,zone,room:currentRoom,x:player.x,y:player.y,hp:player.hp,coins:player.coins,potions:player.potions,xp:player.xp,bossHp:(monsters.find(m=>m.type==='guardian')?.hp??60),main,side,inventory,gear,chestStorage,openedChests,worldMinutes,fishLog,sideQuests,collectedItems,discoveredRegions,waypoint:worldWaypoint,seeds:seedSpots.map(s=>s.found),flowers:flowerSpots.map(s=>s.found),activeSlot};
 }
 function readSlots(){
  try{const v=JSON.parse(localStorage.getItem(slotsKey)||'null');if(Array.isArray(v))return v.slice(0,3)}catch(e){}
@@ -1260,10 +1415,17 @@ function loadGame(slot){
   const nextZone=validZones.includes(d.zone)?d.zone:'windruh';
   selected=clamp(Number(d.selected)||0,0,4);zone=nextZone;world=makeWorld(zone);
   const savedX=Number(d.x),savedY=Number(d.y),r=REGION_LAYOUT[zone];
-  const x=Number.isFinite(savedX)?(Number(d.worldVersion)>=2?savedX:r.x*T+savedX):(r.x+48)*T;
-  const y=Number.isFinite(savedY)?(Number(d.worldVersion)>=2?savedY:r.y*T+savedY):(r.y+36)*T;
+  const oldLayout={wald:{x:100,y:0},sumpf:{x:1,y:5},windruh:{x:100,y:88},shrine:{x:221,y:24},hoehle:{x:100,y:160},eispass:{x:199,y:160}};
+  let x,y;
+  if(Number(d.worldVersion)>=3){x=savedX;y=savedY}
+  else{
+   const previous=oldLayout[zone]||oldLayout.windruh;
+   const localX=Number.isFinite(savedX)?(Number(d.worldVersion)>=2?savedX-previous.x*T:savedX):48*T;
+   const localY=Number.isFinite(savedY)?(Number(d.worldVersion)>=2?savedY-previous.y*T:savedY):36*T;
+   x=r.x*T+localX;y=r.y*T+localY;
+  }
+  if(!Number.isFinite(x)||!Number.isFinite(y)||x<20||y<20||x>world.width*T-20||y>world.height*T-20){x=(REGION_LAYOUT.windruh.x+48)*T;y=(REGION_LAYOUT.windruh.y+36)*T}
   Object.assign(player,{x,y,hp:clamp(Number(d.hp)||5,1,5),coins:Math.max(0,Number(d.coins)||35),potions:Math.max(0,Number(d.potions)||0),xp:Math.max(0,Number(d.xp)||0),inv:0,rolling:0});
-  if(player.x<r.x*T||player.x>(r.x+r.w)*T||player.y<r.y*T||player.y>(r.y+r.h)*T){player.x=(r.x+48)*T;player.y=(r.y+36)*T}
   
 Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
 Object.assign(gear,{tool:null,head:null,body:null,feet:null,charm:null},d.gear||{});
@@ -1272,7 +1434,7 @@ Object.keys(openedChests).forEach(key=>delete openedChests[key]);Object.assign(o
 if(Number.isFinite(Number(d.worldMinutes)))worldMinutes=((Number(d.worldMinutes)%1440)+1440)%1440;
 Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.fishLog||{});
 
-  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});Object.keys(discoveredRegions).forEach(k=>delete discoveredRegions[k]);Object.assign(discoveredRegions,d.discoveredRegions||{windruh:true,[zone]:true});worldWaypoint=d.waypoint&&Number.isFinite(d.waypoint.x)&&Number.isFinite(d.waypoint.y)?d.waypoint:null;applyTreeState(world);
+  Object.assign(sideQuests,d.sideQuests||{});Object.assign(collectedItems,d.collectedItems||{});Object.keys(discoveredRegions).forEach(k=>delete discoveredRegions[k]);Object.assign(discoveredRegions,d.discoveredRegions||{windruh:true,[zone]:true});worldWaypoint=d.waypoint&&Number.isFinite(d.waypoint.x)&&Number.isFinite(d.waypoint.y)?(Number(d.worldVersion)>=3?d.waypoint:{x:d.waypoint.x+(REGION_LAYOUT[zone].x-(oldLayout[zone]||oldLayout.windruh).x)*T,y:d.waypoint.y+(REGION_LAYOUT[zone].y-(oldLayout[zone]||oldLayout.windruh).y)*T}):null;applyTreeState(world);
   for(const item of world.items)item.found=!!collectedItems[item.id];
   seedSpots.forEach((s,i)=>s.found=!!(d.seeds&&d.seeds[i]));flowerSpots.forEach((s,i)=>s.found=!!(d.flowers&&d.flowers[i]));
   currentRoom=null;room=null;roomNPC=null;
@@ -1443,13 +1605,19 @@ function drawWorldMap(){
  }
  c.save();c.lineWidth=1.5;
  for(const id of REGION_IDS){
-  const r=REGION_LAYOUT[id],known=!!discoveredRegions[id];
-  c.strokeStyle=id===zone?'#ffe08a':'#d8bd78';c.lineWidth=id===zone?3:1.5;
-  c.strokeRect(ox+r.x*scale,oy+r.y*scale,r.w*scale,r.h*scale);
-  const label=known?r.name:'Unbekannt';c.font='bold 13px ui-monospace,monospace';const tw=c.measureText(label).width;
+  const r=REGION_LAYOUT[id],known=!!discoveredRegions[id],label=known?r.name:'?';
+  c.font='bold 12px ui-monospace,monospace';const tw=c.measureText(label).width;
   const labelX=ox+(r.x+r.w/2)*scale,labelY=oy+(r.y+r.h/2)*scale;
-  c.fillStyle='rgba(8,23,38,.78)';c.fillRect(labelX-tw/2-5,labelY-10,tw+10,19);
-  c.fillStyle='#fff0c8';c.textAlign='center';c.fillText(label,labelX,labelY+4);
+  c.fillStyle='rgba(8,23,38,.78)';c.fillRect(labelX-tw/2-5,labelY-9,tw+10,17);
+  c.fillStyle='#fff0c8';c.textAlign='center';c.fillText(label,labelX,labelY+3);
+ }
+ for(const p of (world.landmarks||[])){
+  const x=ox+p.x/T*scale,y=oy+p.y/T*scale;
+  c.fillStyle=p.kind==='settlement'?'#f0c56c':p.kind==='dungeon'?'#b99bea':'#d8e7c6';
+  c.beginPath();c.arc(x,y,p.kind==='settlement'?3.2:2.5,0,Math.PI*2);c.fill();
+  c.font='bold 9px ui-monospace,monospace';const tw=c.measureText(p.name).width;
+  c.fillStyle='rgba(8,23,38,.68)';c.fillRect(x-tw/2-3,y-13,tw+6,12);
+  c.fillStyle='#fff0c8';c.textAlign='center';c.fillText(p.name,x,y-4);
  }
  c.textAlign='left';
  for(const exit of world.exits){const x=ox+(exit.x+exit.w/2)/T*scale,y=oy+(exit.y+exit.h/2)/T*scale;c.fillStyle=exit.open()?'#f1d276':'#b66b59';c.fillRect(x-2,y-2,4,4)}
@@ -1557,7 +1725,7 @@ function handleWorldPointer(e){
  if(hit.type==='seed'){const seed=hit.obj;seed.found=true;main.seeds++;inventory.seeds++;player.coins+=3;showDialogue('ECHOSAMEN','Der Samen pulsiert warm in deiner Hand. ('+main.seeds+'/3)');showToast('+3 Windtaler');if(main.seeds>=3)main.stage=2;updateQuest();saveGame(activeSlot);return}
  if(hit.type==='flower'){const flower=hit.obj;flower.found=true;main.forestFlowers++;inventory.blueHerb++;showDialogue('WALDBLÜTE','Eine blaue Blüte mit silbernem Staub. ('+main.forestFlowers+'/3)');if(main.forestFlowers>=3)main.stage=4;updateQuest();saveGame(activeSlot);return}
  if(hit.type==='exit'){if(!hit.obj.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(hit.obj.to,hit.obj.tx,hit.obj.ty);return}
- if(hit.type==='fountain'){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(hit.type==='fountain'){main.stage=3;zone=regionAt(player.x+12,player.y+31)||'windruh';showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
 }
 function interact(){
  if(dialogOpen){closeDialogue();return}if(panelOpen)return;
@@ -1576,7 +1744,7 @@ function interact(){
  const exit=world.exits.find(e=>px>=e.x-22&&px<=e.x+e.w+22&&py>=e.y-30&&py<=e.y+e.h+30);
  if(exit){if(!exit.open()){showDialogue('VERSCHLOSSENER WEG',zone==='windruh'?'Der Waldweg öffnet sich, wenn du die Echosamen zum Brunnen bringst.':'Der Schrein reagiert erst auf drei blaue Waldblüten.');return}changeZone(exit.to,exit.tx,exit.ty);return}
  const fountain=world.decor.find(o=>o.type==='fountain');
- if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+31-px,fountain.y+40-py)<76&&main.stage===2){main.stage=3;changeZone('wald',60*T,76*T);showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
+ if(zone==='windruh'&&fountain&&Math.hypot(fountain.x+31-px,fountain.y+40-py)<76&&main.stage===2){main.stage=3;zone=regionAt(player.x+12,player.y+31)||'windruh';showDialogue('DER BRUNNEN','Die drei Samen beginnen zu singen. Im Flüsterwald antwortet ein zweites Echo – folge dem Licht!');return}
  if(zone==='shrine'&&main.stage===4){bossState.active=true;showDialogue('ECHO-SCHREIN','Der Wächter bewacht den Klang. Greife ihn an, wenn er sich öffnet.');return}
  showDialogue(world.name,'Die Wege sind voller kleiner Geheimnisse. Sprich mit den Menschen, prüfe die Häuser und folge den Hinweisen im Questbuch.');
 }
