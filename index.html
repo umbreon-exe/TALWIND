@@ -1650,6 +1650,7 @@ function loadGame(slot){
 Object.assign(main,d.main||{});Object.assign(side,d.side||{});Object.assign(inventory,d.inventory||{});
 Object.assign(gear,{tool:null,head:null,body:null,feet:null,charm:null},d.gear||{});
 if(d.chestStorage){for(const id of Object.keys(chestStorage)){for(const key of Object.keys(chestStorage[id]))delete chestStorage[id][key];Object.assign(chestStorage[id],d.chestStorage[id]||{})}}
+if(!d.chestStorage||!Object.prototype.hasOwnProperty.call(d.chestStorage,'ridgeCache'))chestStorage.ridgeCache={oreGold:1,oreSilver:2,crystalShard:3,berries:5};
 Object.keys(openedChests).forEach(key=>delete openedChests[key]);Object.assign(openedChests,d.openedChests||{});
 if(Number.isFinite(Number(d.worldMinutes)))worldMinutes=((Number(d.worldMinutes)%1440)+1440)%1440;
 Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.fishLog||{});
@@ -1660,7 +1661,7 @@ Object.keys(fishLog).forEach(key=>delete fishLog[key]);Object.assign(fishLog,d.f
   currentRoom=null;room=null;roomNPC=null;
   if(d.room&&rooms[d.room]&&zone==='windruh'){currentRoom=d.room;roomNPC=rooms[d.room];room={w:30,h:17};const rb=world.buildings.find(b=>b.id===d.room);insideDoorSpawn=rb?{x:rb.doorX,y:rb.doorY+26}:{x:(REGION_LAYOUT.windruh.x+31)*T,y:(REGION_LAYOUT.windruh.y+29)*T};player.x=220;player.y=175}
   if(slots[n])activeSlot=n;else{activeSlot=0;slots[0]={savedAt:new Date().toISOString(),data:d};localStorage.setItem(slotsKey,JSON.stringify(slots))}
-  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp!==undefined&&d.bossHp!==null)guardian.hp=clamp(Number(d.bossHp),0,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();return true;
+  makeMonsters();const guardian=monsters.find(m=>m.type==='guardian');if(guardian&&d.bossHp!==undefined&&d.bossHp!==null)guardian.hp=clamp(Number(d.bossHp),0,guardian.maxHp);bossState.hp=guardian?guardian.hp:60;updateCamera();updateQuest();if(!d.worldSeed||!d.chestStorage||!Object.prototype.hasOwnProperty.call(d.chestStorage,'ridgeCache'))saveGame(activeSlot,true);return true;
  }catch(e){showToast('Dieser Spielstand ist beschädigt oder nicht lesbar.');return false}
 }
 function hasAnySave(){
