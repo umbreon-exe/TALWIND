@@ -285,6 +285,9 @@ function discoverRegion(id){
  showToast(regionName(id)+' entdeckt · +12 Windtaler · +20 EP');saveGame(activeSlot,true);updateQuest();return true;
 }
 const rand=(seed)=>{let x=seed>>>0;return()=>{x=(x*1664525+1013904223)>>>0;return x/4294967296}};
+function hashSeed(seed,label){let h=(Number(seed)>>>0)||0x9e3779b9;const value=String(label||'');for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619)}h^=h>>>16;h=Math.imul(h,0x7feb352d);h^=h>>>15;h=Math.imul(h,0x846ca68b);h^=h>>>16;return h>>>0}
+function createWorldSeed(){try{const a=new Uint32Array(1);window.crypto.getRandomValues(a);if(a[0])return a[0]>>>0}catch(e){}return (((Date.now()>>>0)^Math.floor(Math.random()*0xffffffff))>>>0)||1}
+function worldSeedCode(seed){return (Number(seed)>>>0).toString(36).toUpperCase().padStart(7,'0').slice(-7)}
 const heroes=[
 {name:'LYRA',spriteId:28,role:'Windläuferin',speed:104,hair:'#d9a45b',coat:'#398f85',cape:'#4bb3a0',detail:'#e6d091',skill:'Windstoß',desc:'Ein weiter Sprint, der dich kurz unverwundbar macht.',female:true},
 {name:'BRAM',spriteId:8,role:'Felswächter',speed:78,hair:'#654632',coat:'#a38d63',cape:'#766346',detail:'#c6c4a9',skill:'Steinhaut',desc:'Ein Schutzschild hält Treffer ab und stößt Gegner weg.'},
@@ -364,7 +367,7 @@ const ROOM_DRESSING={
 };
 
 const keys={},stick={x:0,y:0},camera={x:0,y:0};
-let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,roomNPC=null,currentRoom=null;
+let selected=0,heroChosen=false,started=false,last=0,zone='windruh',room=null,roomNPC=null,currentRoom=null,worldSeed=0;
 let dialogOpen=false,panelOpen=false,skillCD=0,attackCD=0,rollCD=0,toastTimer=0,currentPrompt='',combatFx=[];
 let activeSlot=0,worldTransition=null,particles=[],particleClock=0,gameLoopRunning=false;
 const player={x:31*T,y:27*T,faceX:0,faceY:1,walk:0,hp:5,coins:35,potions:2,xp:0,inv:0,rolling:0,attackAnim:0,skillAnim:0,shield:0,hurt:0};
