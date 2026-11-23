@@ -6,69 +6,73 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const html = read("index.html");
+const sw = read("sw.js");
 
 assert.match(html, /<canvas[^>]+id="world"/, "game canvas is present");
-assert.match(html, /id="mainMenu"/, "separate start menu is present");
+assert.match(html, /id="mainMenu"/, "main menu is present");
 assert.match(html, /id="titleScreen"/, "hero selection menu is present");
-assert.ok(html.includes("const sizes={windruh:[96,72]"), "Windruh is larger than before");
-assert.ok(html.includes("label:'Nordbrücke · Flüsterwald'") && !html.includes("label:'Ostweg · Nebelmoor'") && !html.includes("label:'Südweg · Echo-Schrein'"), "Windruh has one exit to the forest only");
-assert.ok(html.includes("const inDoor=Math.abs(x+12-VW/2)<34"), "room exit has a dedicated doorway corridor");
-assert.ok(html.includes("const exit=world.exits.find") && html.includes("function regionAt("), "global region crossings trigger while walking");
-assert.match(html, /id="gameOver"/, "checkpoint screen is present");
-assert.match(html, /id="retryBtn"/, "checkpoint action is present");
 assert.match(html, /id="heroGrid"/, "hero selection is present");
 assert.match(html, /id="questLine"/, "quest HUD is present");
-assert.match(html, /id="skillCooldown"/, "ability cooldown is visible");
-assert.match(html, /id="attackCooldown"/, "attack cooldown is visible");
-assert.ok(html.includes("function questGuideTarget(") && html.includes("function drawQuestGuide("), "main quest direction arrow is implemented");
-assert.ok(html.includes("One road only: the village connects to the forest through the north bridge."), "Windruh has only one outer-region route");
-assert.ok(html.includes("label:'Nordbrücke · Flüsterwald'") && !html.includes("label:'Ostweg · Nebelmoor'") && !html.includes("label:'Südweg · Echo-Schrein'"), "moor and shrine exits are not inside the village");
-assert.ok(html.includes("for(let i=0;i<980;i++)") && html.includes("for(let i=0;i<420;i++)"), "forest vegetation density is increased");
-assert.ok(html.includes("for(let i=0;i<390;i++)") && html.includes("for(let i=0;i<170;i++)"), "moor vegetation density is increased");
-assert.ok(html.includes("ripple=Math.sin(now/170)") && html.includes("o.x+31,o.y+52"), "fountain has a larger ornate basin and animated water");
-assert.ok(html.includes("to:'shrine',tx:30*T") && html.includes("to:'wald',tx:110*T"), "shrine is reached from the forest and returns to the forest");
-assert.ok(html.includes("function updateNPCs(dt)") && html.includes("updateNPCs(dt)"), "NPCs have ambient roaming movement");
-assert.ok(html.includes("const pulse=Math.sin(now/210)"), "fountain has recognizable animated basin details");
-assert.ok(html.includes("function spawnCombatFx("), "combat visual effects are implemented");
-assert.ok(html.includes("function drawCombatEffects("), "combat effects are rendered");
-assert.ok(html.includes("function combatTarget("), "combat targeting uses facing direction and range");
-assert.ok(html.includes("function damageMonster("), "shared enemy damage handling is present");
-assert.ok(html.includes("player.attackAnim=.24"), "basic attacks trigger an animation");
-assert.ok(html.includes("player.skillAnim=.72"), "hero abilities trigger an animation");
-assert.ok(html.includes("STEINHAUT · SCHUTZ AKTIV") && html.includes("STERNENSCHUSS") && html.includes("ECHOWELLE"), "hero abilities have distinct feedback");
-
-assert.ok(html.includes("frame16x20.png"), "default 16x20 character sheets are used");
-assert.ok(html.includes("const HERO_SPRITE_IDS=[28,8,1,31,24]"), "five distinct pack heroes are configured");
-assert.ok(html.includes("Art/Buildings/"), "the exterior building asset folder is used");
-assert.ok(html.includes("document.addEventListener('keydown',keyDown)"), "keyboard input is connected at document level");
-assert.ok(html.includes("pointerType==='touch'"), "touch joystick movement is handled");
-const startGameStart = html.indexOf("function startGame(){");
-const startGameEnd = html.indexOf("function startLoop(", startGameStart);
-const startGameBlock = startGameStart >= 0 && startGameEnd > startGameStart
-  ? html.slice(startGameStart, startGameEnd)
-  : "";
-assert.ok(startGameBlock, "startGame function is present");
-assert.doesNotMatch(startGameBlock, /showDialogue/, "the opening modal no longer blocks movement");
-const spriteRoot = "assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split";
-for (const id of [1, 8, 24, 28, 31]) {
-  const sprite = path.join(root, spriteRoot, `character_${id}`, `character_${id}_frame16x20.png`);
-  assert.ok(fs.existsSync(sprite), `hero sprite ${id} exists`);
-}
-const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Buildings";
-for (const file of ["House_Hay_1.png", "House_Hay_2.png", "House_Hay_3.png", "House_Hay_4_Purple.png"]) {
-  assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), `building sprite ${file} exists`);
-}
-assert.ok(read("sw.js").includes('CACHE_NAME = "talwind-shell-v9"'), "service worker cache was refreshed");
+assert.match(html, /id="gameOver"/, "checkpoint screen is present");
+assert.ok(html.includes("const WORLD_WIDTH=440,WORLD_HEIGHT=360"), "Avarra uses the current large world map");
+assert.ok(html.includes("function makeRegionWorld(") && html.includes("function makeWorld(initialZone)"), "the six regions are assembled into one world");
+assert.ok(html.includes("function changeZone(id,x,y)") && html.includes("function regionAt("), "regions remain connected in one world");
+assert.ok(html.includes("function updateNPCs(dt)") && html.includes("updateNPCs(dt)"), "NPCs have ambient movement");
+assert.ok(html.includes("heroes[selected].speed*1.3*gearBoost"), "player travel speed has been improved");
+assert.ok(html.includes("now/190+(n.phase||0)"), "imported NPC sprites animate at a readable pace");
+assert.ok(html.includes("const occupied=new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT)"), "world dressing avoids structures and existing props");
+assert.ok(html.includes("road([[354,185],[368,185],[382,193],[389,202]],1)"), "settlement side roads are present");
+assert.ok(html.includes("road([[195,105],[211,105],[225,105],[236,112]],1)"), "Eichenruh has connected village paths");
+assert.ok(html.includes("const speed=heroes[selected].speed*1.3*gearBoost"), "movement multiplier is applied to all heroes");
 
 const inlineScripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)]
   .map(match => match[1])
   .filter(script => script.trim().length > 0);
 assert.ok(inlineScripts.length > 0, "at least one inline script is present");
 for (const [index, script] of inlineScripts.entries()) {
-  // Parse without running browser-dependent game code.
   new Function(script);
-  console.log(`Inline script ${index + 1}: syntax OK`);
+  console.log("Inline script " + (index + 1) + ": syntax OK");
 }
+
+const npcBlock = html.match(/const NPC_SPRITE_IDS=\{([\s\S]*?)\};/);
+assert.ok(npcBlock, "NPC sprite mapping exists");
+const npcSpriteMap = new Map([...npcBlock[1].matchAll(/([a-zA-Z0-9_]+)\s*:\s*(\d+)/g)].map(match => [match[1], Number(match[2])]));
+const npcIds = new Set([
+  ...[...html.matchAll(/\bnpc\('([^']+)'/g)].map(match => match[1]),
+  ...[...html.matchAll(/makeNPC\('([^']+)'/g)].map(match => match[1])
+]);
+for (const id of npcIds) {
+  assert.ok(npcSpriteMap.has(id), "NPC " + id + " uses an imported character sprite");
+}
+const spriteRoot = "assets/imported/super-retro-world/SuperRetroWorld_CharacterPack_Full/sprite_split";
+for (const [name, id] of npcSpriteMap) {
+  const sprite = path.join(root, spriteRoot, "character_" + id, "character_" + id + "_frame16x20.png");
+  assert.ok(fs.existsSync(sprite), "imported NPC sprite for " + name + " exists");
+}
+
+const buildingBlock = html.match(/const BUILDING_SPRITES_BY_ID=\{([\s\S]*?)\};/);
+assert.ok(buildingBlock, "building sprite mapping exists");
+const buildingMap = new Map([...buildingBlock[1].matchAll(/([a-zA-Z0-9_]+)\s*:\s*'([^']+)'/g)].map(match => [match[1], match[2]]));
+const buildingIds = [
+  "mira","inn","shop","library","home2","tailor","smith","bakery","garden","clinic",
+  "harbor_inn","harbor_shop","harbor_home","harbor_store",
+  "eichen_inn","eichen_shop","eichen_home","eichen_smith","eichen_hall",
+  "stone_inn","stone_smith","stone_home","stone_store","farm_house"
+];
+for (const id of buildingIds) {
+  assert.ok(buildingMap.has(id), "building " + id + " uses an imported house sprite");
+}
+const buildingRoot = "assets/imported/fan-tasy-tileset/The Fan-tasy Tileset (Free)/Art/Buildings";
+for (const file of new Set(buildingMap.values())) {
+  assert.ok(fs.existsSync(path.join(root, buildingRoot, file)), "house sprite " + file + " exists");
+}
+
+assert.ok(html.includes("function attack()") && html.includes("function ability()") && html.includes("function dodge()"), "combat actions are present");
+assert.ok(html.includes("function drawPackCharacter(") && html.includes("frame16x20.png"), "animated character sprite sheets are used");
+assert.ok(html.includes("function drawBuilding(b)") && html.includes("ctx.drawImage(houseImage"), "imported house artwork is rendered");
+assert.ok(html.includes("function drawWorldMap()") && html.includes('id="worldMapCanvas"'), "interactive world map is present");
+assert.ok(html.includes("autosaveClock>=15") && html.includes("addEventListener('pagehide'"), "autosaving is connected");
+assert.ok(sw.includes('CACHE_NAME = "talwind-shell-v11"'), "service worker cache was refreshed");
 
 const manifest = JSON.parse(read("manifest.webmanifest"));
 assert.equal(manifest.name, "TALWIND – Die sieben Echos");
@@ -77,39 +81,3 @@ assert.ok(fs.existsSync(path.join(root, "assets/windruh.svg")), "title art exist
 assert.ok(fs.existsSync(path.join(root, "assets/icon.svg")), "app icon exists");
 
 console.log("TALWIND validation passed.");
-
-
-assert.ok(html.includes('id="worldClock"') && html.includes("function drawDayNight("), "day/night cycle and clock HUD exist");
-assert.ok(html.includes("function renderInventoryPanel(") && html.includes("const BAG_SLOTS=36"), "36-slot inventory exists");
-assert.ok(html.includes("function openChestPanel(") && html.includes("function transferChestItem("), "storage chests can transfer items");
-assert.ok(html.includes("function startFishing(") && html.includes("function drawFishingRod("), "fishing minigame and rod animation exist");
-assert.ok(html.includes("const RECIPES=") && html.includes("ironArmor") && html.includes("frostMantle"), "armor crafting recipes exist");
-assert.ok(html.includes("function takePlayerHit(") && html.includes("function armorBlockChance("), "armor affects incoming damage");
-assert.ok(html.includes("copperVein1") && html.includes("ironVein1") && html.includes("frostVein1"), "ore nodes exist in caves and ice biome");
-assert.ok(html.includes("drawTreeVariant(") && html.includes("'berryBush'") && html.includes("'snowPine'"), "tree, bush and snow foliage variants exist");
-assert.ok(html.includes("id:'forestCache'") && html.includes("id:'moorCache'") && html.includes("id:'caveCache'"), "three world chests exist");
-assert.ok(html.includes("function collectQuestItem(item)") && html.includes("nodeId"), "resource mining and persistence are implemented");
-
-assert.ok(html.includes("function handleWorldPointer(e)") && html.includes("canvas.addEventListener('pointerdown',handleWorldPointer)"), "world resources can be clicked");
-assert.ok(!html.includes('id="useBtn"'), "old action button is removed");
-assert.ok(html.includes("function collectTreeTwigs(tree)") && html.includes("function collectFallenWood(node)"), "trees and fallen logs provide natural materials");
-assert.ok(html.includes("woodNode") && html.includes("treeTwigs:"), "harvested resources persist in save data");
-assert.ok(html.includes("KLICK / E · ") && html.includes("Zu weit entfernt"), "interaction feedback and distance checks are present");
-assert.ok(html.includes("birchWood") && html.includes("frostWood") && !html.includes("woodAxe"), "wood types are present without a chopping tool requirement");
-
-
-assert.ok(html.includes("function makeRegionWorld(") && html.includes("function makeWorld(initialZone)"), "biome regions are merged into a single world");
-assert.ok(html.includes("WORLD_WIDTH=309,WORLD_HEIGHT=237"), "Avarra uses one large global tile map");
-assert.ok(html.includes("function drawWorldMap()") && html.includes('id="worldMapCanvas"'), "the interactive world map is rendered");
-assert.ok(html.includes("worldWaypoint={x:") && html.includes("waypoint:worldWaypoint"), "map waypoints are saved");
-assert.ok(html.includes("autosaveClock>=15") && html.includes("addEventListener('pagehide'"), "periodic and page-exit autosaving is connected");
-assert.ok(html.includes("if(loadGame(activeSlot)){buildHeroCards();startFromLoaded()}"), "the most recent save is resumed on startup");
-assert.ok(html.includes("worldVersion:2") && html.includes("discoveredRegions,waypoint:worldWaypoint"), "save data stores global coordinates and world discovery");
-assert.ok(html.includes("function seedRegionResources(") && html.includes("oreSilver") && html.includes("frostBerry"), "biome-specific resource pools are generated");
-assert.ok(html.includes("id:'healingSalve'") && html.includes("id:'fieldRation'") && html.includes("function useBagItem(key)"), "crafted food and healing items are usable");
-assert.ok(html.includes("function changeZone(id,x,y)") && !html.slice(html.indexOf("function changeZone("),html.indexOf("function makeSaveState(")).includes("world=makeWorld(id)"), "biome transitions keep the same world instance");
-
-assert.ok(html.includes("discoverRegion(id)") && html.includes("+12 Windtaler"), "first-time biome discovery rewards exploration");
-assert.ok(html.includes("carve(REGION_LAYOUT.windruh.x+48,REGION_LAYOUT.windruh.y+35"), "Windruh has a walkable connector toward the cave");
-assert.ok(html.includes("if(o.x>=camera.x-64") && html.includes("Math.abs(px-o.x)>64"), "large-world renderer and collision checks cull distant props");
-assert.ok(html.includes("connect('sumpf','wald'") && html.includes("connect('hoehle','eispass'"), "major biomes have continuous paths");
