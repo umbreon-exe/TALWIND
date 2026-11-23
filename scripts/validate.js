@@ -24,7 +24,7 @@ assert.ok(html.includes("const occupied=new Uint8Array(WORLD_WIDTH*WORLD_HEIGHT)
 assert.ok(html.includes("road([[354,185],[368,185],[382,193],[389,202]],1)"), "settlement side roads are present");
 assert.ok(html.includes("road([[195,105],[211,105],[225,105],[236,112]],1)"), "Eichenruh has connected village paths");
 assert.ok(html.includes("function hashSeed(seed,label)") && html.includes("function createWorldSeed()"), "each new run can create a distinct reproducible seed");
-const seedHashSource = html.match(/function hashSeed\\(seed,label\\)\\{[\\s\\S]*?\\}(?=\\nfunction createWorldSeed)/);
+const seedHashSource = html.match(/function hashSeed\(seed,label\)\{[\s\S]*?\}(?=\nfunction createWorldSeed)/);
 assert.ok(seedHashSource, "seed hashing helper can be isolated for regression testing");
 const seedHash = new Function(seedHashSource[0] + ";return hashSeed")();
 assert.equal(seedHash(12345, "vegetation:forest"), seedHash(12345, "vegetation:forest"), "the same seed reproduces the same generation stream");
