@@ -662,6 +662,18 @@ function makeWorld(initialZone){
    if(((x-cx)*(x-cx))/(rx*rx)+((y-cy)*(y-cy))/(ry*ry)<=1)setTile(x,y,tile);
   }
  };
+ const clearNaturalDecor=(cx,cy,rx,ry)=>{
+  const natural=['tree','pine','appleTree','birch','willow','autumnTree','cherryTree','snowPine','deadTree','rock','iceRock','reed','mushroom','tuft','flower','fern','berryBush','smallBush','fallenLog','fireflyPlant','iceBush','iceFlower','snowTuft'];
+  result.decor=result.decor.filter(o=>{
+   const tx=o.x/T,ty=o.y/T,inside=((tx-cx)*(tx-cx))/(rx*rx)+((ty-cy)*(ty-cy))/(ry*ry)<=1;
+   return !inside||!natural.includes(o.type);
+  });
+  result.items=result.items.filter(item=>{
+   if(item.kind!=='resource')return true;
+   const tx=item.x/T,ty=item.y/T;
+   return ((tx-cx)*(tx-cx))/(rx*rx)+((ty-cy)*(ty-cy))/(ry*ry)>1;
+  });
+ };
  const road=(points,radius=2)=>{
   for(let k=0;k<points.length-1;k++){
    const a=points[k],b=points[k+1],steps=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])*2));
@@ -716,14 +728,20 @@ function makeWorld(initialZone){
  building('harbor_shop','Netz & Nadel',80,88,7,6,'ochre','sumpf');
  building('harbor_home','Haus am Kai',70,99,7,6,'teal','sumpf');
  building('harbor_store','Fischräucherei',80,99,7,6,'orange','sumpf');
- prop('dock',54,96,false);prop('boat',36,108,false);prop('boat',46,82,false);
+ prop('dock',54,96,false);prop('boat',36,108,false);prop('boat',46,82,false);prop('boat',32,136,false);
  prop('lighthouse',60,72,true);prop('lamp',68,108,false);prop('barrel',89,108,false);
  prop('fishRack',91,95,false);prop('netRack',92,100,false);prop('sign',69,108,false);
  npc('harbor_meri','Meri',75,109,'blue','silver','fisher','Der Morgenfang ist gut. Draußen bei den kleinen Felsen liegt ein versunkener Steg.','sumpf');
  npc('harbor_jann','Jann',87,108,'gold','brown','merchant','Frischer Fisch, Muscheln und alles, was eine lange Reise braucht.','sumpf');
  npc('harbor_ole','Ole',64,91,'green','ginger','guard','Der Leuchtturm weist auch bei dichtem Nebel den Weg.','sumpf');
+ road([[73,101],[67,103],[61,108],[56,114],[48,128]],1);
+ clearPatch(42,137,7,5,0);
+ prop('tree',40,134,true);prop('crystal',43,137,false);prop('chest',39,139,false,{id:'moonIslandCache'});
+ if(!chestStorage.moonIslandCache)chestStorage.moonIslandCache={oreSilver:1,crystalShard:2,berries:4};
+ landmark('mondinsel','Mondinsel',42,136,'secret');
  landmark('hafenweiler','Hafenweiler',80,86,'settlement');
  // Eichenruh – Wald-Dorf mit Dorfplatz, Feldern, Krämerladen und Schmiede.
+ clearNaturalDecor(211,91,25,19);
  clearPatch(211,91,23,17,0);
  building('eichen_inn','Zur alten Eiche',198,82,7,6,'red','wald');
  building('eichen_shop','Waldwaren',208,82,7,6,'green','wald');
@@ -1204,7 +1222,7 @@ function questGuideTarget(){
  if(main.stage===0){const n=world.npcs.find(function(v){return v.id==='mira'});return n?{x:n.x+12,y:n.y+28,label:'MIRA'}:null}
  if(main.stage===1&&zone==='windruh'){const v=nearest(seedSpots);return v?{x:v.x+8,y:v.y+8,label:'ECHOSAMEN'}:null}
  if(main.stage===2&&zone==='windruh'){const v=world.decor.find(function(o){return o.type==='fountain'});return v?{x:v.x+31,y:v.y+40,label:'BRUNNEN'}:null}
- if(main.stage===3&&zone==='windruh'){const p=world.landmarks.find(v=>v.id==='eichenruh');return p?{x:p.x,y:p.y,label:'EICHENRUH'}:null}
+ if(main.stage===3&&zone!=='wald'){const p=world.landmarks.find(v=>v.id==='eichenruh');return p?{x:p.x,y:p.y,label:'EICHENRUH'}:null}
  if(main.stage===3&&zone==='wald'){const v=nearest(flowerSpots);return v?{x:v.x+8,y:v.y+8,label:'WALDBLÜTE'}:null}
  if(main.stage===4&&zone==='shrine'){const g=monsters.find(function(m){return m.type==='guardian'&&m.hp>0});return g?{x:g.x+16,y:g.y+24,label:'WÄCHTER'}:null}
  if(main.stage===4){const p=world.landmarks.find(v=>v.id==='echo_schrein');return p?{x:p.x,y:p.y,label:'ECHO-SCHREIN'}:null}
