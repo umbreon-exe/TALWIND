@@ -25,7 +25,7 @@ assert.ok(html.includes("road([[354,185],[368,185],[382,193],[389,202]],1)"), "s
 assert.ok(html.includes("road([[195,105],[211,105],[225,105],[236,112]],1)"), "Eichenruh has connected village paths");
 assert.ok(html.includes("function hashSeed(seed,label)") && html.includes("function createWorldSeed()"), "each new run can create a distinct reproducible seed");
 assert.ok(html.includes("worldSeed,selected,zone") && html.includes("worldSeed=(Number(d.worldSeed)>>>0)||createWorldSeed()"), "world seed persists when saving and loading");
-assert.ok(html.includes("function ridge(") && html.includes("Windkamm-Ausblick"), "mountain ridges and an optional summit route are generated");
+assert.ok(html.includes("const ridge=(") && html.includes("Windkamm-Ausblick"), "mountain ridges and an optional summit route are generated");
 assert.ok(html.includes("const tallPlants=new Set") && html.includes("nearRoad(tx,ty,1)"), "vegetation is clustered and kept away from roads");
 assert.ok(html.includes("const houseLooks=") && html.includes("b.spriteFile=look.files"), "houses vary by village and world seed");
 assert.ok(html.includes("function resetNewAdventure()") && html.includes("freeSlot=slots.findIndex"), "new worlds use a separate save slot where possible");
