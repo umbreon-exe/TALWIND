@@ -840,6 +840,48 @@ function makeWorld(initialZone,seed){
  road([[229,153],[250,149],[270,145]],2);
  road([[269,78],[283,99],[295,119],[298,143]],2);
  prop('bridge',126,119,false);prop('bridge',149,221,false);prop('bridge',184,309,false);
+ // Ortskerne erhalten eigene Gassen, kleine Plätze und Zugänge zu Handwerk und Feldern.
+ road([[67,105],[72,103],[78,103],[84,104],[90,108]],1);
+ road([[73,94],[76,99],[79,104],[84,109]],1);
+ road([[88,94],[87,99],[85,104],[82,108]],1);
+ road([[194,102],[202,101],[211,101],[220,102],[228,107]],1);
+ road([[201,88],[203,94],[207,100],[211,106]],1);
+ road([[221,88],[219,94],[216,100],[212,106]],1);
+ road([[352,184],[360,181],[369,180],[379,183],[387,189]],1);
+ road([[359,169],[361,175],[366,181],[372,187]],1);
+ road([[379,169],[376,175],[372,181],[367,187]],1);
+ road([[237,220],[244,218],[251,219],[258,222]],1);
+ // Neue Höhenzüge aus Felsstufen und Schneekappen, mit begehbaren Serpentinen.
+ const ridge=(cx,cy,rx,ry,theme,label)=>{
+  const ang=theme==='snow'?-0.22:0.18,co=Math.cos(ang),si=Math.sin(ang);
+  for(let y=Math.floor(cy-ry-2);y<=Math.ceil(cy+ry+2);y++)for(let x=Math.floor(cx-rx-2);x<=Math.ceil(cx+rx+2);x++){
+   if(x<2||y<2||x>=WORLD_WIDTH-2||y>=WORLD_HEIGHT-2)continue;
+   const dx=x-cx,dy=y-cy,u=(dx*co-dy*si)/rx,v=(dx*si+dy*co)/ry;
+   const noise=(Math.sin((x+activeSeed%71)*.63+label.length)+Math.cos((y+activeSeed%113)*.47-label.length))*.055,d=u*u+v*v;
+   if(d>1+noise)continue;
+   const existing=result.tiles[y*WORLD_WIDTH+x];
+   if(existing===1||existing===2||existing===4)continue;
+   const hash=(Math.imul(x+label.length+1,73856093)^Math.imul(y+17,19349663)^activeSeed)>>>0;
+   const peak=d<.22||(theme==='snow'&&((hash>>>5)%5)<2);
+   setTile(x,y,peak?11:10);
+  }
+ };
+ ridge(39,61,20,12,'rock','west-ridge');
+ ridge(302,181,24,18,'rock','echo-ridge');
+ ridge(405,94,25,34,'rock','east-ridge');
+ ridge(317,326,43,18,'snow','south-ice-ridge');
+ // Aussichtspfad zum Windkamm, ein zweiter Kammweg und ein verstecktes Lager.
+ clearPatch(405,77,6,5,0);
+ road([[379,129],[389,116],[399,102],[405,88],[405,77]],1);
+ clearPatch(292,178,5,4,0);
+ road([[277,188],[287,182],[297,177],[307,177],[316,181]],1);
+ clearPatch(313,311,6,5,0);
+ road([[279,321],[291,315],[304,309],[318,307],[332,311],[341,319]],1);
+ prop('campfire',399,83,false);prop('chest',407,77,false,{id:'ridgeCache'});prop('crystal',297,178,false);
+ if(!chestStorage.ridgeCache)chestStorage.ridgeCache={oreGold:1,oreSilver:2,crystalShard:3,berries:5};
+ landmark('windkamm','Windkamm-Ausblick',405,72,'landmark');
+ landmark('echohoehe','Echohöhe',301,169,'landmark');
+ landmark('suedgrat','Südlicher Eisgrat',317,315,'region');
  const stampRegion=(id,cx,cy,rx,ry)=>{
   for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
    if(x<0||y<0||x>=WORLD_WIDTH||y>=WORLD_HEIGHT)continue;
